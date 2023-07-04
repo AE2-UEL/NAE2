@@ -1,0 +1,4 @@
+item.nae2.pattern_multiplier.name=Pattern Multi-Tool
+
+nae2.pattern_multiplier.unencode=Unencode
+nae2.pattern_multiplier.unencode.desc=Turns all encoded patterns into blank patterns. This cannot be reversed!
