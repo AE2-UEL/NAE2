@@ -2,13 +2,13 @@ package co.neeve.nae2.item.patternmultiplier.net;
 
 import appeng.api.AEApi;
 import appeng.items.misc.ItemEncodedPattern;
+import appeng.tile.inventory.AppEngInternalInventory;
 import co.neeve.nae2.item.patternmultiplier.container.ContainerPatternMultiplier;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -25,7 +25,7 @@ public class HandlerPatternMultiplier implements IMessageHandler<PatternMultipli
     // Processes a received message
     private void processMessage(PatternMultiplierPacket message, EntityPlayerMP player) {
         if (player.openContainer instanceof ContainerPatternMultiplier container) {
-            NonNullList<ItemStack> inv = container.getInventory();
+            AppEngInternalInventory inv = container.getPatternInventory();
             for (ItemStack is : inv) {
                 if (is.getItem() instanceof ItemEncodedPattern) {
                     handleButtonPress(is, container, message.getButtonId());

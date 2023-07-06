@@ -7,6 +7,7 @@ import co.neeve.nae2.item.patternmultiplier.net.PatternMultiplierPacket;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -17,16 +18,21 @@ public class NAE2 {
     public static NAE2 instance;
 
     public static SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
+    private Items itemHandler;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         NAE2.instance = this;
         MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.register(new Items());
+        itemHandler = new Items();
+        MinecraftForge.EVENT_BUS.register(itemHandler);
         NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerPatternMultiplier());
 
-        Items.init();
-
         NAE2.network.registerMessage(HandlerPatternMultiplier.class, PatternMultiplierPacket.class, 0, Side.SERVER);
+    }
+
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        itemHandler.init();
     }
 }

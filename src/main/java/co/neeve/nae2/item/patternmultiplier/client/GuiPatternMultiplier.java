@@ -1,9 +1,11 @@
 package co.neeve.nae2.item.patternmultiplier.client;
 
+import appeng.api.config.Upgrades;
 import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.core.localization.ButtonToolTips;
 import appeng.core.localization.GuiText;
+import appeng.parts.automation.UpgradeInventory;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.item.patternmultiplier.ObjPatternMultiplier;
@@ -23,11 +25,14 @@ import java.io.IOException;
 public class GuiPatternMultiplier extends AEBaseGui {
     // GUI texture
     private final ResourceLocation loc = new ResourceLocation(Tags.MODID, "textures/gui/pattern_multiplier.png");
+    private final ObjPatternMultiplier te;
 
     // Constructor
     public GuiPatternMultiplier(InventoryPlayer inventoryPlayer, ObjPatternMultiplier te) {
         super(new ContainerPatternMultiplier(inventoryPlayer, te));
-        this.ySize = 189;
+        this.ySize = 189 + 18;
+        this.xSize = 211;
+        this.te = te;
     }
 
     // Handles button actions
@@ -45,26 +50,25 @@ public class GuiPatternMultiplier extends AEBaseGui {
 
         // Calculate start position for buttons
         int totalButtonW = 20 * 3 + 60 + 3 * 3;
-        int start = 1 + this.guiLeft + this.xSize / 2 - totalButtonW / 2;
+        int start = 1 + this.guiLeft + 176 / 2 - totalButtonW / 2;
 
         // Add buttons to the GUI
-        // GUI buttons
-        this.buttonList.add(new TooltipButton(0, start, this.guiTop + 76, "*2",
+        this.buttonList.add(new TooltipButton(0, start, this.guiTop + 76 + 18, "*2",
                 ButtonToolTips.MultiplyByTwo, ButtonToolTips.MultiplyByTwoDesc));
-        this.buttonList.add(new TooltipButton(1, start + 23, this.guiTop + 76, "*3",
+        this.buttonList.add(new TooltipButton(1, start + 23, this.guiTop + 76 + 18, "*3",
                 ButtonToolTips.MultiplyByThree, ButtonToolTips.MultiplyByThreeDesc));
-        this.buttonList.add(new TooltipButton(2, start + 46, this.guiTop + 76, "+1",
+        this.buttonList.add(new TooltipButton(2, start + 46, this.guiTop + 76 + 18, "+1",
                 ButtonToolTips.IncreaseByOne, ButtonToolTips.IncreaseByOneDesc));
 
-        this.buttonList.add(new TooltipButton(3, start, this.guiTop + 76, "/2",
+        this.buttonList.add(new TooltipButton(3, start, this.guiTop + 76 + 18, "/2",
                 ButtonToolTips.DivideByTwo, ButtonToolTips.DivideByTwoDesc));
-        this.buttonList.add(new TooltipButton(4, start + 23, this.guiTop + 76, "/3",
+        this.buttonList.add(new TooltipButton(4, start + 23, this.guiTop + 76 + 18, "/3",
                 ButtonToolTips.DivideByThree, ButtonToolTips.DivideByThreeDesc));
-        this.buttonList.add(new TooltipButton(5, start + 46, this.guiTop + 76, "-1",
+        this.buttonList.add(new TooltipButton(5, start + 46, this.guiTop + 76 + 18, "-1",
                 ButtonToolTips.DecreaseByOne, ButtonToolTips.DecreaseByOneDesc));
 
         GuiButton unencode;
-        this.buttonList.add(unencode = new TooltipButton(6, start + 69, this.guiTop + 76, "Unencode",
+        this.buttonList.add(unencode = new TooltipButton(6, start + 69, this.guiTop + 76 + 18, "Unencode",
                 "nae2.pattern_multiplier.unencode", "nae2.pattern_multiplier.unencode.desc"));
         unencode.width = 60;
 
@@ -89,7 +93,22 @@ public class GuiPatternMultiplier extends AEBaseGui {
     // Draws the background
     public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {
         this.mc.getTextureManager().bindTexture(loc);
-        this.drawTexturedModalRect(offsetX, offsetY, 0, 0, this.xSize, this.ySize);
+        this.drawTexturedModalRect(offsetX, offsetY, 0, 0, 177, this.ySize);
+        this.drawTexturedModalRect(offsetX + 177, offsetY, 177, 0, 35,
+                14 + this.te.getInventoryByName("upgrades").getSlots() * 18);
+
+        int upgrades = ((UpgradeInventory)this.te.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.CAPACITY);
+        for (int u = 0; u < upgrades; u++) {
+            this.drawTexturedModalRect(offsetX + 8, offsetY + 37 + u * 18, 8, 19, 18 * 9 - 1, 18 - 1);
+        }
+
+        if (this.hasToolbox()) {
+            this.drawTexturedModalRect(offsetX + 178, offsetY + this.ySize - 90, 178, this.ySize - 90, 68, 68);
+        }
+    }
+
+    protected boolean hasToolbox() {
+        return ((ContainerPatternMultiplier)this.inventorySlots).hasToolbox();
     }
 
     public static class TooltipButton extends GuiButton implements ITooltip {
@@ -100,6 +119,7 @@ public class GuiPatternMultiplier extends AEBaseGui {
         public TooltipButton(int buttonId, int x, int y, String buttonText, ButtonToolTips title, ButtonToolTips hint) {
             this(buttonId, x, y, buttonText, title.getUnlocalized(), hint.getUnlocalized());
         }
+
         public TooltipButton(int buttonId, int x, int y, String buttonText, String title, String hint) {
             super(buttonId, x, y, buttonText);
             this.width = 18;

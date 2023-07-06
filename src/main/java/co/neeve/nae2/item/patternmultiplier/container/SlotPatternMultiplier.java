@@ -4,7 +4,8 @@ import appeng.api.AEApi;
 import appeng.api.definitions.IDefinitions;
 import appeng.api.definitions.IMaterials;
 import appeng.api.implementations.ICraftingPatternItem;
-import appeng.container.slot.SlotRestrictedInput;
+import appeng.container.slot.IOptionalSlotHost;
+import appeng.container.slot.OptionalSlotRestrictedInput;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.util.Platform;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -12,7 +13,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-public class SlotPatternMultiplier extends SlotRestrictedInput {
+public class SlotPatternMultiplier extends OptionalSlotRestrictedInput {
     private boolean allowEdit = true;
     private boolean isAllowEdit() {
         return this.allowEdit;
@@ -20,8 +21,8 @@ public class SlotPatternMultiplier extends SlotRestrictedInput {
     public void setAllowEdit(boolean allowEdit) {
         this.allowEdit = allowEdit;
     }
-    public SlotPatternMultiplier(IItemHandler i, int slotIndex, int x, int y, InventoryPlayer p) {
-        super(PlacableItemType.PATTERN, i, slotIndex, x, y, p);
+    public SlotPatternMultiplier(IItemHandler i, IOptionalSlotHost host, int slotIndex, int x, int y, int grp, InventoryPlayer p) {
+        super(PlacableItemType.PATTERN, i, host, slotIndex, x, y, grp, p);
 
         this.setReturnAsSingleStack(false);
     }
