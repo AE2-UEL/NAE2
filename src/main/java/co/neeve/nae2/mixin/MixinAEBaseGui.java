@@ -30,7 +30,7 @@ public abstract class MixinAEBaseGui extends GuiScreen {
                     value = "INVOKE"
             ), cancellable = true)
     public void drawSlot(Slot s, @NotNull CallbackInfo ci) {
-        if (((Object)this) instanceof GuiPatternMultiplier && s instanceof AppEngSlot aes) {
+        if (((Object) this) instanceof GuiPatternMultiplier && s instanceof AppEngSlot aes) {
             AEItemStack ais = AEItemStack.fromItemStack(aes.getDisplayStack());
 
             ItemStack is = aes.getStack();

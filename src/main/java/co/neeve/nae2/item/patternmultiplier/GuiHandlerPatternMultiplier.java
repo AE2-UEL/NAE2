@@ -11,35 +11,35 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 public class GuiHandlerPatternMultiplier implements IGuiHandler {
     @Override
     public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        ItemStack it = getPlayerItemStack(player, x);
+        if (ID == GuiIDs.PATTERN_MULTIPLIER.ordinal() || ID == GuiIDs.PATTERN_MULTIPLIER_IFACE.ordinal()) {
+            ItemStack heldItemMainhand = player.getHeldItemMainhand();
+            ItemStack it = heldItemMainhand.getItem() instanceof ItemPatternMultiplier ? heldItemMainhand : player.getHeldItemOffhand();
 
-        if (it.getItem() instanceof ItemPatternMultiplier ipm && ID == GuiIDs.PATTERN_MULTIPLIER.ordinal()) {
-            return new ContainerPatternMultiplier(player.inventory, (ObjPatternMultiplier) ipm.getGuiObject(it, world, new BlockPos(x, y, z)));
+            if (it.getItem() instanceof ItemPatternMultiplier ipm) {
+                return new ContainerPatternMultiplier(player.inventory,
+                        (ObjPatternMultiplier) ipm.getGuiObject(it, world, ID == GuiIDs.PATTERN_MULTIPLIER_IFACE.ordinal() ? new BlockPos(x, y, z) : null));
+            }
         }
         return null;
     }
 
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        ItemStack it = getPlayerItemStack(player, x);
+        if (ID == GuiIDs.PATTERN_MULTIPLIER.ordinal() | ID == GuiIDs.PATTERN_MULTIPLIER_IFACE.ordinal()) {
+            ItemStack heldItemMainhand = player.getHeldItemMainhand();
+            ItemStack it = heldItemMainhand.getItem() instanceof ItemPatternMultiplier ? heldItemMainhand : player.getHeldItemOffhand();
 
-        if (it.getItem() instanceof ItemPatternMultiplier ipm && ID == GuiIDs.PATTERN_MULTIPLIER.ordinal()) {
-            return new GuiPatternMultiplier(player.inventory, (ObjPatternMultiplier) ipm.getGuiObject(it, world, new BlockPos(x, y, z)));
+            if (it.getItem() instanceof ItemPatternMultiplier ipm) {
+                return new GuiPatternMultiplier(player.inventory,
+                        (ObjPatternMultiplier) ipm.getGuiObject(it, world, ID == GuiIDs.PATTERN_MULTIPLIER_IFACE.ordinal() ? new BlockPos(x, y, z) : null));
+            }
         }
         return null;
     }
 
-    // Helper method to get player's item stack
-    private ItemStack getPlayerItemStack(EntityPlayer player, int x) {
-        ItemStack it = ItemStack.EMPTY;
-        if (x >= 0 && x < player.inventory.mainInventory.size()) {
-            it = player.inventory.getStackInSlot(x);
-        }
-        return it;
-    }
-
     // Enum for Gui IDs
     public enum GuiIDs {
-        PATTERN_MULTIPLIER
+        PATTERN_MULTIPLIER,
+        PATTERN_MULTIPLIER_IFACE
     }
 }

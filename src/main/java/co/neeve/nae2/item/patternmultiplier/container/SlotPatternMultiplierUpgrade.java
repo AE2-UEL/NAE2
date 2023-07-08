@@ -15,7 +15,7 @@ public class SlotPatternMultiplierUpgrade extends SlotRestrictedInput {
 
     @Override
     public boolean canTakeStack(EntityPlayer par1EntityPlayer) {
-        Boolean hostCanTakeStack = this.host.canTakeStack(this, par1EntityPlayer);
-        return hostCanTakeStack && super.canTakeStack(par1EntityPlayer);
+        return this.host.canTakeStack(this, par1EntityPlayer) &&
+                super.canTakeStack(par1EntityPlayer);
     }
 }

@@ -23,7 +23,7 @@ public abstract class MixinStackSizeRenderer {
 
             String str = String.valueOf(count);
             FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
-            fr.drawStringWithShadow(str, (float)(xPos + 19 - 2 - fr.getStringWidth(str)), yPos, 16777215);
+            fr.drawStringWithShadow(str, (float) (xPos + 19 - 2 - fr.getStringWidth(str)), yPos, 16777215);
         }
     }
 }

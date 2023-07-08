@@ -88,8 +88,8 @@ public class HandlerPatternMultiplier implements IMessageHandler<PatternMultipli
         NBTTagCompound newNbt = is.getTagCompound();
         newNbt.setTag("in", newTagIn);
         newNbt.setTag("out", newTagOut);
-        newNbt.setByte("crafting", (byte)0);
-        newNbt.setByte("substitute", (byte)0);
+        newNbt.setByte("crafting", (byte) 0);
+        newNbt.setByte("substitute", (byte) 0);
     }
 
     // Modifies the count of each tag in the list based on the operation and factor

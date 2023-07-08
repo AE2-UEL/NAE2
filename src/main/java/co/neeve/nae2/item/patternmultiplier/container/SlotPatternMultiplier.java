@@ -4,7 +4,6 @@ import appeng.api.AEApi;
 import appeng.api.definitions.IDefinitions;
 import appeng.api.definitions.IMaterials;
 import appeng.api.implementations.ICraftingPatternItem;
-import appeng.container.slot.IOptionalSlotHost;
 import appeng.container.slot.OptionalSlotRestrictedInput;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.util.Platform;
@@ -14,21 +13,31 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
 public class SlotPatternMultiplier extends OptionalSlotRestrictedInput {
+    private final IPatternMultiplierSlotHost host;
     private boolean allowEdit = true;
-    private boolean isAllowEdit() {
-        return this.allowEdit;
-    }
-    public void setAllowEdit(boolean allowEdit) {
-        this.allowEdit = allowEdit;
-    }
-    public SlotPatternMultiplier(IItemHandler i, IOptionalSlotHost host, int slotIndex, int x, int y, int grp, InventoryPlayer p) {
-        super(PlacableItemType.PATTERN, i, host, slotIndex, x, y, grp, p);
+
+    public SlotPatternMultiplier(IItemHandler i, IPatternMultiplierSlotHost host, int slotIndex, int x, int y, int grp, InventoryPlayer p) {
+        super(host.getContainerObject().isBoundToInterface() ?
+                PlacableItemType.ENCODED_PATTERN : PlacableItemType.PATTERN, i, host, slotIndex, x, y, grp, p);
+        this.host = host;
 
         this.setReturnAsSingleStack(false);
     }
 
+    private boolean isAllowEdit() {
+        return this.allowEdit;
+    }
+
+    public void setAllowEdit(boolean allowEdit) {
+        this.allowEdit = allowEdit;
+    }
+
     @Override
     public boolean isItemValid(ItemStack i) {
+        if (this.host.getContainerObject().isBoundToInterface()) {
+            return super.isItemValid(i);
+        }
+
         if (!this.getContainer().isValidForSlot(this, i)) {
             return false;
         } else if (i.isEmpty()) {
@@ -47,6 +56,7 @@ public class SlotPatternMultiplier extends OptionalSlotRestrictedInput {
             return materials.blankPattern().isSameAs(i);
         }
     }
+
     public ItemStack getDisplayStack() {
         if (!Platform.isClient()) return super.getStack();
 

@@ -1,11 +1,9 @@
 package co.neeve.nae2.item.patternmultiplier.client;
 
-import appeng.api.config.Upgrades;
 import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.core.localization.ButtonToolTips;
 import appeng.core.localization.GuiText;
-import appeng.parts.automation.UpgradeInventory;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.item.patternmultiplier.ObjPatternMultiplier;
@@ -49,8 +47,7 @@ public class GuiPatternMultiplier extends AEBaseGui {
         super.initGui();
 
         // Calculate start position for buttons
-        int totalButtonW = 20 * 3 + 60 + 3 * 3;
-        int start = 1 + this.guiLeft + 176 / 2 - totalButtonW / 2;
+        int start = 7 + this.guiLeft;
 
         // Add buttons to the GUI
         this.buttonList.add(new TooltipButton(0, start, this.guiTop + 76 + 18, "*2",
@@ -68,8 +65,10 @@ public class GuiPatternMultiplier extends AEBaseGui {
                 ButtonToolTips.DecreaseByOne, ButtonToolTips.DecreaseByOneDesc));
 
         GuiButton unencode;
-        this.buttonList.add(unencode = new TooltipButton(6, start + 69, this.guiTop + 76 + 18, "Unencode",
-                "nae2.pattern_multiplier.unencode", "nae2.pattern_multiplier.unencode.desc"));
+        this.buttonList.add(unencode = new TooltipButton(6, start + 176 - 60 - 15, this.guiTop + 76 + 18,
+                "nae2.pattern_multiplier.unencode",
+                "nae2.pattern_multiplier.unencode",
+                "nae2.pattern_multiplier.unencode.desc"));
         unencode.width = 60;
 
     }
@@ -86,7 +85,14 @@ public class GuiPatternMultiplier extends AEBaseGui {
 
     // Draws the foreground
     public void drawFG(int offsetX, int offsetY, int mouseX, int mouseY) {
-        this.fontRenderer.drawString(I18n.format("item.nae2.pattern_multiplier.name"), 8, 6, 4210752);
+        StringBuilder sb = new StringBuilder().append(I18n.format("item.nae2.pattern_multiplier.name"));
+        if (this.te.isBoundToInterface()) {
+            sb.append(" (");
+            sb.append(GuiText.Interface.getLocal());
+            sb.append(")");
+        }
+        this.fontRenderer.drawString(sb.toString(), 8, 6, 4210752);
+
         this.fontRenderer.drawString(GuiText.inventory.getLocal(), 8, this.ySize - 96 + 3, 4210752);
     }
 
@@ -94,21 +100,31 @@ public class GuiPatternMultiplier extends AEBaseGui {
     public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {
         this.mc.getTextureManager().bindTexture(loc);
         this.drawTexturedModalRect(offsetX, offsetY, 0, 0, 177, this.ySize);
-        this.drawTexturedModalRect(offsetX + 177, offsetY, 177, 0, 35,
-                14 + this.te.getInventoryByName("upgrades").getSlots() * 18);
 
-        int upgrades = ((UpgradeInventory)this.te.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.CAPACITY);
-        for (int u = 0; u < upgrades; u++) {
+        // Draw pattern rows.
+        int installedCapacityUpgrades = this.te.getInstalledCapacityUpgrades();
+        for (int u = 0; u < installedCapacityUpgrades; u++) {
             this.drawTexturedModalRect(offsetX + 8, offsetY + 37 + u * 18, 8, 19, 18 * 9 - 1, 18 - 1);
         }
 
+        // Draw the upgrade inventory depending on the size.
+        int upgradeInventorySize = this.te.getUpgradeInventory().getSlots();
+        if (upgradeInventorySize > 0) {
+            this.drawTexturedModalRect(offsetX + 180, offsetY, 180, 0, 32, 32);
+            for (int u = 1; u < upgradeInventorySize; u++) {
+                this.drawTexturedModalRect(offsetX + 180, offsetY + 8 + u * 18 - 1, 180, 7, 32, 30);
+            }
+
+        }
+
+        // Draw the network tool if present.
         if (this.hasToolbox()) {
             this.drawTexturedModalRect(offsetX + 178, offsetY + this.ySize - 90, 178, this.ySize - 90, 68, 68);
         }
     }
 
     protected boolean hasToolbox() {
-        return ((ContainerPatternMultiplier)this.inventorySlots).hasToolbox();
+        return ((ContainerPatternMultiplier) this.inventorySlots).hasToolbox();
     }
 
     public static class TooltipButton extends GuiButton implements ITooltip {
@@ -121,7 +137,7 @@ public class GuiPatternMultiplier extends AEBaseGui {
         }
 
         public TooltipButton(int buttonId, int x, int y, String buttonText, String title, String hint) {
-            super(buttonId, x, y, buttonText);
+            super(buttonId, x, y, I18n.format(buttonText));
             this.width = 18;
             this.height = 18;
             this.title = title;

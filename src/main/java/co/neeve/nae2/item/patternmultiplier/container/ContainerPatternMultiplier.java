@@ -4,7 +4,9 @@ import appeng.api.config.Upgrades;
 import appeng.api.implementations.guiobjects.IGuiItem;
 import appeng.container.AEBaseContainer;
 import appeng.container.slot.SlotRestrictedInput;
+import appeng.helpers.IInterfaceHost;
 import appeng.items.contents.NetworkToolViewer;
+import appeng.items.misc.ItemEncodedPattern;
 import appeng.items.tools.ToolNetworkTool;
 import appeng.parts.automation.UpgradeInventory;
 import appeng.tile.inventory.AppEngInternalInventory;
@@ -18,10 +20,12 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAppEngInventory, IPatternMultiplierSlotHost {
@@ -46,18 +50,18 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
         World w = ip.player.world;
 
         int v;
-        for(v = 0; v < pi.getSizeInventory(); ++v) {
+        for (v = 0; v < pi.getSizeInventory(); ++v) {
             ItemStack pii = pi.getStackInSlot(v);
             if (!pii.isEmpty() && pii.getItem() instanceof ToolNetworkTool) {
                 this.lockPlayerInventorySlot(v);
-                this.tbInventory = (NetworkToolViewer)((IGuiItem)pii.getItem()).getGuiObject(pii, w, new BlockPos(0, 0, 0));
+                this.tbInventory = (NetworkToolViewer) ((IGuiItem) pii.getItem()).getGuiObject(pii, w, new BlockPos(0, 0, 0));
                 break;
             }
         }
 
         if (this.hasToolbox()) {
-            for(v = 0; v < 3; ++v) {
-                for(int u = 0; u < 3; ++u) {
+            for (v = 0; v < 3; ++v) {
+                for (int u = 0; u < 3; ++u) {
                     this.addSlotToContainer((new SlotRestrictedInput(SlotRestrictedInput.PlacableItemType.UPGRADES, this.tbInventory.getInternalInventory(), u + v * 3, 186 + u * 18, 189 + 18 - 82 + v * 18, this.getInventoryPlayer())).setPlayerSide());
                 }
             }
@@ -72,16 +76,16 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
     }
 
     public AppEngInternalInventory getPatternInventory() {
-        return (AppEngInternalInventory) this.toolInv.getInventory();
+        return (AppEngInternalInventory) this.toolInv.getPatternInventory();
     }
 
     // Add slots for the container
     private void addSlots() {
         for (int y = 0; y < 4; ++y) {
             for (int x = 0; x < 9; ++x) {
-                SlotRestrictedInput slot = new SlotPatternMultiplier(this.toolInv.getInventory(), this,
+                SlotRestrictedInput slot = new SlotPatternMultiplier(this.toolInv.getPatternInventory(), this,
                         y * 9 + x, 8 + x * 18, 19 + y * 18, y, this.getInventoryPlayer());
-                slot.setStackLimit(64);
+                slot.setStackLimit(this.toolInv.isBoundToInterface() ? 1 : 64);
 
                 this.addSlotToContainer(slot);
             }
@@ -90,7 +94,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     public void setupUpgrades() {
         if (this.toolInv != null) {
-            UpgradeInventory ui = (UpgradeInventory) this.toolInv.getInventoryByName("upgrades");
+            UpgradeInventory ui = this.toolInv.getUpgradeInventory();
 
             for (int upgradeSlot = 0; upgradeSlot < ui.getSlots(); upgradeSlot++) {
                 SlotRestrictedInput slot = new SlotPatternMultiplierUpgrade(SlotRestrictedInput.PlacableItemType.UPGRADES,
@@ -104,6 +108,16 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
     // Check changes and send updates
     @Override
     public void detectAndSendChanges() {
+        if (this.toolInv.isBoundToInterface()) {
+            IInterfaceHost anInterface = this.toolInv.getInterface();
+            TileEntity tileEntity = anInterface.getTileEntity();
+            if (tileEntity == null || tileEntity != tileEntity.getWorld().getTileEntity(tileEntity.getPos())) {
+                this.setValidContainer(false);
+                super.detectAndSendChanges();
+                return;
+            }
+        }
+
         ItemStack currentItem = this.getPlayerInv().getCurrentItem();
         ItemStack toolInvItemStack = this.toolInv.getItemStack();
 
@@ -119,6 +133,30 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     // Handle slot changes
     public void onSlotChange(Slot s) {
+        if (this.toolInv.isBoundToInterface()) {
+            IItemHandler patterns = this.getPatternInventory();
+            List<ItemStack> dropList = new ArrayList<>();
+
+            int maxSlots = this.getContainerObject().getInstalledCapacityUpgrades() * 9;
+            for (int invSlot = 0; invSlot < patterns.getSlots(); ++invSlot) {
+                ItemStack is = patterns.getStackInSlot(invSlot);
+                if (!(is.getItem() instanceof ItemEncodedPattern)) {
+                    dropList.add(patterns.extractItem(invSlot, Integer.MAX_VALUE, false));
+                } else if (invSlot > 8 + maxSlots) {
+                    if (!is.isEmpty()) {
+                        dropList.add(patterns.extractItem(invSlot, Integer.MAX_VALUE, false));
+                    }
+                }
+            }
+
+            if (dropList.size() > 0) {
+                TileEntity tileEntity = this.toolInv.getInterface().getTileEntity();
+                World world = tileEntity.getWorld();
+                BlockPos blockPos = tileEntity.getPos();
+                Platform.spawnDrops(world, blockPos, dropList);
+            }
+        }
+
         super.detectAndSendChanges();
     }
 
@@ -136,14 +174,14 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     @Override
     public boolean isSlotEnabled(int i) {
-        return i <= ((UpgradeInventory)this.toolInv.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.CAPACITY);
+        return i <= this.toolInv.getInstalledCapacityUpgrades();
     }
 
     @Override
     public boolean canTakeStack(SlotPatternMultiplierUpgrade slot, EntityPlayer player) {
-        List<ItemStack> inventory = Lists.newArrayList((AppEngInternalInventory) this.toolInv.getInventory());
+        List<ItemStack> inventory = Lists.newArrayList((AppEngInternalInventory) this.toolInv.getPatternInventory());
         int slices = inventory.size() / 9;
-        UpgradeInventory upgrades = (UpgradeInventory) this.toolInv.getInventoryByName("upgrades");
+        UpgradeInventory upgrades = this.toolInv.getUpgradeInventory();
 
         int lockedUpgrades = slices; // Stub
         int installedUpgrades = upgrades.getInstalledUpgrades(Upgrades.CAPACITY);
@@ -157,6 +195,11 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
         }
 
         return installedUpgrades >= lockedUpgrades;
+    }
+
+    @Override
+    public ObjPatternMultiplier getContainerObject() {
+        return this.toolInv;
     }
 }
 
