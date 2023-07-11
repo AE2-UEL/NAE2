@@ -1,9 +1,9 @@
 package co.neeve.nae2;
 
-import co.neeve.nae2.core.common.Items;
-import co.neeve.nae2.item.patternmultiplier.GuiHandlerPatternMultiplier;
-import co.neeve.nae2.item.patternmultiplier.net.HandlerPatternMultiplier;
-import co.neeve.nae2.item.patternmultiplier.net.PatternMultiplierPacket;
+import co.neeve.nae2.common.Items;
+import co.neeve.nae2.items.patternmultiplier.GuiHandlerPatternMultiplier;
+import co.neeve.nae2.items.patternmultiplier.net.HandlerPatternMultiplier;
+import co.neeve.nae2.items.patternmultiplier.net.PatternMultiplierPacket;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -15,9 +15,8 @@ import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:appliedenergistics2")
 public class NAE2 {
+    public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
     public static NAE2 instance;
-
-    public static SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
     private Items itemHandler;
 
     @EventHandler

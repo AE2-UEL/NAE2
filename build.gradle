@@ -297,7 +297,9 @@ minecraft {
         extraRunJvmArguments.addAll([
             '-Dmixin.hotSwap=true',
             '-Dmixin.checks.interfaces=true',
-            '-Dmixin.debug.export=true'
+            '-Dmixin.debug.export=true',
+            '-Dmixin.debug=true',
+            '-Dmixin.debug.verbose=true',
         ])
     }
     if (coreModClass) {
@@ -400,8 +402,8 @@ configurations {
 
 dependencies {
     if (usesMixins.toBoolean() || forceEnableMixins.toBoolean()) {
-        implementation 'zone.rong:mixinbooter:7.0'
-        String mixin = modUtils.enableMixins('org.spongepowered:mixin:0.8.3', "mixins.${modId}.refmap.json")
+        implementation 'zone.rong:mixinbooter:8.3'
+        String mixin = modUtils.enableMixins('zone.rong:mixinbooter:8.3', "mixins.${modId}.refmap.json")
 
         api (mixin) {
             transitive = false
@@ -1095,6 +1097,7 @@ def getLastTag() {
 runClient {
     workingDir = file('run/client')
 }
+
 runServer {
     workingDir = file('run/server')
 }

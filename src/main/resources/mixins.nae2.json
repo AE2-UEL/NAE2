@@ -5,7 +5,27 @@
   "target": "@env(DEFAULT)",
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
-  "mixins": [],
-  "client": ["MixinAEBaseGui", "MixinStackSizeRenderer", "MixinAEItemStack"],
+  "mixins": [
+    "MixinContainerInterface",
+    "MixinContainerUpgradeable",
+    "MixinAEBaseContainer",
+    "MixinContainerInterfaceTerminal",
+    "MixinContainerPatternTerm",
+    "MixinContainerMEMonitorable",
+    "MixinContainerPatternEncoder",
+    "MixinContainerWirelessPatternTerminal"
+  ],
+  "client": [
+    "client.MixinAEBaseGui",
+    "client.MixinAEItemStack",
+    "client.MixinStackSizeRenderer",
+    "client.MixinGuiInterface",
+    "client.MixinGuiUpgradeable",
+    "client.MixinJEIIngredientGrid",
+    "client.MixinGuiInterfaceTerminal",
+    "client.MixinGuiPatternTerminal",
+    "client.MixinGuiMEMonitorable",
+    "client.MixinAEBaseMEGui"
+  ],
   "server": []
 }
