@@ -8,7 +8,6 @@ import appeng.container.slot.AppEngSlot;
 import appeng.helpers.InventoryAction;
 import appeng.parts.reporting.PartInterfaceTerminal;
 import appeng.util.helpers.ItemHandlerUtil;
-import co.neeve.nae2.common.enums.PatternMultiplierInventories;
 import co.neeve.nae2.common.interfaces.IPatternMultiplierHost;
 import co.neeve.nae2.common.slots.SlotPatternMultiplier;
 import co.neeve.nae2.items.patternmultiplier.ObjPatternMultiplier;
@@ -66,7 +65,7 @@ public class MixinContainerInterfaceTerminal extends AEBaseContainer implements 
 
             for (v = 0; v < 9; v++) {
                 for (int u = 0; u < 4; u++) {
-                    Slot slotPatternMultiplier = (new SlotPatternMultiplier(this.pmtInventory.getPatternInventory(PatternMultiplierInventories.PMT),
+                    Slot slotPatternMultiplier = (new SlotPatternMultiplier(this.pmtInventory.getPatternInventory(),
                             this, v + u * 9, offsetX + u * 18, offsetY + v * 18, u, this.getInventoryPlayer())).setPlayerSide();
                     this.addSlotToContainer(slotPatternMultiplier);
                     this.patternMultiplierSlots.add((AppEngSlot) slotPatternMultiplier);
@@ -85,7 +84,7 @@ public class MixinContainerInterfaceTerminal extends AEBaseContainer implements 
     )
     public void injectPMTInventory(EntityPlayerMP player, InventoryAction action, int slot, long id, CallbackInfo ci, @Local(ordinal = 0) IItemHandler theSlot) {
         if (this.pmtInventory != null) {
-            IItemHandler pmtPatterns = this.pmtInventory.getPatternInventory(PatternMultiplierInventories.PMT);
+            IItemHandler pmtPatterns = this.pmtInventory.getPatternInventory();
             List<AppEngSlot> pmtSlots = this.getPatternMultiplierSlots();
             ItemStack partialIs = theSlot.getStackInSlot(0);
 

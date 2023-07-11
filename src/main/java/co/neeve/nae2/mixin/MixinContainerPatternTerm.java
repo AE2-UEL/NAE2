@@ -4,7 +4,6 @@ import appeng.api.implementations.guiobjects.IGuiItem;
 import appeng.api.storage.ITerminalHost;
 import appeng.container.implementations.ContainerPatternTerm;
 import appeng.container.slot.AppEngSlot;
-import co.neeve.nae2.common.enums.PatternMultiplierInventories;
 import co.neeve.nae2.common.interfaces.IPatternMultiplierHost;
 import co.neeve.nae2.common.slots.SlotPatternMultiplier;
 import co.neeve.nae2.items.patternmultiplier.ObjPatternMultiplier;
@@ -57,7 +56,7 @@ public class MixinContainerPatternTerm extends MixinContainerPatternEncoder impl
 
             for (v = 0; v < 9; v++) {
                 for (int u = 0; u < 4; u++) {
-                    Slot slotPatternMultiplier = (new SlotPatternMultiplier(this.pmtInventory.getPatternInventory(PatternMultiplierInventories.PMT),
+                    Slot slotPatternMultiplier = (new SlotPatternMultiplier(this.pmtInventory.getPatternInventory(),
                             this, v + u * 9, offsetX + u * 18, offsetY + v * 18, u, this.getInventoryPlayer())).setPlayerSide();
                     this.addSlotToContainer(slotPatternMultiplier);
                     this.patternMultiplierSlots.add((AppEngSlot) slotPatternMultiplier);

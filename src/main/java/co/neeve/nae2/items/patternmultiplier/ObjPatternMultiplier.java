@@ -2,7 +2,6 @@ package co.neeve.nae2.items.patternmultiplier;
 
 import appeng.api.config.Upgrades;
 import appeng.api.implementations.guiobjects.IGuiItemObject;
-import appeng.helpers.IInterfaceHost;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.parts.automation.StackUpgradeInventory;
 import appeng.parts.automation.UpgradeInventory;
@@ -11,7 +10,6 @@ import appeng.util.Platform;
 import appeng.util.inv.IAEAppEngInventory;
 import appeng.util.inv.InvOperation;
 import appeng.util.inv.filter.IAEItemFilter;
-import co.neeve.nae2.common.enums.PatternMultiplierInventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandler;
@@ -21,9 +19,8 @@ public class ObjPatternMultiplier implements IGuiItemObject, IAEAppEngInventory 
     private final AppEngInternalInventory inv;
     private final ItemStack is;
     private final StackUpgradeInventory upgrades;
-    private IInterfaceHost iface = null;
 
-    public ObjPatternMultiplier(ItemStack is, IInterfaceHost iface) {
+    public ObjPatternMultiplier(ItemStack is) {
         this.is = is;
         this.inv = new AppEngInternalInventory(this, 36);
         this.inv.setFilter(new ObjPatternMultiplier.ObjPatternMultiplierInventoryFilter());
@@ -37,10 +34,6 @@ public class ObjPatternMultiplier implements IGuiItemObject, IAEAppEngInventory 
             this.inv.readFromNBT(data, "inv");
             this.upgrades.readFromNBT(data, "upgrades");
         }
-
-        if (iface != null) {
-            this.iface = iface;
-        }
     }
 
     public void saveChanges() {
@@ -50,10 +43,6 @@ public class ObjPatternMultiplier implements IGuiItemObject, IAEAppEngInventory 
         this.upgrades.writeToNBT(data, "upgrades");
     }
 
-    public boolean isBoundToInterface() {
-        return this.iface != null;
-    }
-
     public void onChangeInventory(IItemHandler inv, int slot, InvOperation mc, ItemStack removedStack, ItemStack newStack) {
     }
 
@@ -61,38 +50,16 @@ public class ObjPatternMultiplier implements IGuiItemObject, IAEAppEngInventory 
         return this.is;
     }
 
-    public IItemHandler getPatternInventory(PatternMultiplierInventories which) {
-        switch (which) {
-            case PMT -> {
-                return this.inv;
-            }
-            case INTERFACE -> {
-                return this.iface.getInventoryByName("patterns");
-            }
-        }
-        return null;
+    public IItemHandler getPatternInventory() {
+        return this.inv;
     }
 
-    public UpgradeInventory getUpgradeInventory(PatternMultiplierInventories which) {
-        switch (which) {
-            case PMT -> {
-                return this.upgrades;
-            }
-            case INTERFACE -> {
-                return (UpgradeInventory) this.iface.getInventoryByName("upgrades");
-            }
-        }
-        return null;
+    public UpgradeInventory getUpgradeInventory() {
+        return this.upgrades;
     }
 
-    public int getInstalledCapacityUpgrades(PatternMultiplierInventories which) {
-        UpgradeInventory inv = this.getUpgradeInventory(which);
-
-        return inv.getInstalledUpgrades(which == PatternMultiplierInventories.INTERFACE ? Upgrades.PATTERN_EXPANSION : Upgrades.CAPACITY);
-    }
-
-    public IInterfaceHost getInterface() {
-        return this.iface;
+    public int getInstalledCapacityUpgrades() {
+        return upgrades.getInstalledUpgrades(Upgrades.CAPACITY);
     }
 
     private static class ObjPatternMultiplierInventoryFilter implements IAEItemFilter {

@@ -4,7 +4,6 @@ import appeng.api.config.SecurityPermissions;
 import appeng.api.implementations.guiobjects.IGuiItem;
 import appeng.api.implementations.guiobjects.IGuiItemObject;
 import appeng.api.networking.security.ISecurityGrid;
-import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.parts.SelectedPart;
 import appeng.core.AppEng;
@@ -105,24 +104,6 @@ public class ToolPatternMultiplier extends AEBaseItem implements IGuiItem {
     }
 
     public IGuiItemObject getGuiObject(ItemStack is, World w, BlockPos bp) {
-        IInterfaceHost iface = null;
-
-        if (bp != null) {
-            int yCoord = bp.getY() & 0xFF;
-            int facing = ((bp.getY() >> 8) & 0x7);
-            TileEntity te = w.getTileEntity(new BlockPos(bp.getX(), yCoord, bp.getZ()));
-
-            // This is a part host
-            if (facing > 0 && te instanceof IPartHost partHost) {
-                IPart part = partHost.getPart(EnumFacing.byIndex(facing - 1));
-                if (part instanceof IGridProxyable && part instanceof IInterfaceHost ifacePart) {
-                    iface = ifacePart;
-                }
-            } else if (facing == 0 && te instanceof IInterfaceHost ifaceHost) {
-                iface = ifaceHost;
-            }
-        }
-
-        return new ObjPatternMultiplier(is, iface);
+        return new ObjPatternMultiplier(is);
     }
 }

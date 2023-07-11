@@ -2,13 +2,13 @@ package co.neeve.nae2.client.gui;
 
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiplierHostGui;
-import co.neeve.nae2.common.enums.PatternMultiplierInventories;
 import co.neeve.nae2.items.patternmultiplier.ObjPatternMultiplier;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.List;
 
 public class PatternMultiplierGUIHelper {
@@ -23,7 +23,7 @@ public class PatternMultiplierGUIHelper {
 
         ObjPatternMultiplier pmt = gui.getPMTObject();
         if (pmt != null) {
-            int columns = pmt.getInstalledCapacityUpgrades(PatternMultiplierInventories.PMT);
+            int columns = pmt.getInstalledCapacityUpgrades();
             for (int i = 1; i <= columns; i++) {
                 gui.drawTexturedModalRect(offsetX + gui.getPMTOffsetX() + 8 + (i * 18), offsetY + gui.getPMTOffsetY() + 8, 8, 8, 18, 18 * 9);
             }
@@ -31,7 +31,7 @@ public class PatternMultiplierGUIHelper {
     }
 
     public static List<Rectangle> getJEIExclusionArea(IPatternMultiplierHostGui gui) {
-        return List.of(new Rectangle(gui.getGuiLeft() + gui.getPMTOffsetX(), gui.getGuiTop() + gui.getPMTOffsetY(), PMT_WIDTH, PMT_HEIGHT));
+        return Arrays.asList(new Rectangle(gui.getGuiLeft() + gui.getPMTOffsetX(), gui.getGuiTop() + gui.getPMTOffsetY(), PMT_WIDTH, PMT_HEIGHT));
     }
 
     public static <T extends IPatternMultiplierHostGui> boolean hasClickedOutside(T gui, int mouseX, int mouseY, int guiLeft, int guiTop) {

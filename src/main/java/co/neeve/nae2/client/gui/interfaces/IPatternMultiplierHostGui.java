@@ -20,4 +20,6 @@ public interface IPatternMultiplierHostGui {
     int getGuiTop();
 
     int getGuiLeft();
+
+
 }

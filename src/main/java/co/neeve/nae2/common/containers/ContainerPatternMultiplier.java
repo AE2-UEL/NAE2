@@ -36,21 +36,26 @@ import java.util.List;
 
 public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAppEngInventory, IContainerPatternMultiplier {
     // Instance of ObjPatternMultiplier
-    private final ObjPatternMultiplier toolInv;
+    private final ObjPatternMultiplier patternMultiplier;
     private final InventoryPlayer inventoryPlayer;
     private final List<AppEngSlot> patternMultiplierSlots = new ArrayList<>();
+    private final IInterfaceHost iface;
     @GuiSync(0)
     public PatternMultiplierInventories viewingInventory = PatternMultiplierInventories.PMT;
     private NetworkToolViewer tbInventory;
 
-    // Constructor
     public ContainerPatternMultiplier(InventoryPlayer ip, ObjPatternMultiplier te) {
+        this(ip, te, null);
+    }
+
+    public ContainerPatternMultiplier(InventoryPlayer ip, ObjPatternMultiplier te, IInterfaceHost iface) {
         super(ip, te);
-        this.toolInv = te;
+        this.patternMultiplier = te;
         this.inventoryPlayer = ip;
+        this.iface = iface;
         this.lockPlayerInventorySlot(ip.currentItem);
 
-        if (this.toolInv.isBoundToInterface()) {
+        if (iface != null) {
             this.viewingInventory = PatternMultiplierInventories.INTERFACE;
         }
 
@@ -66,8 +71,13 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
         return this.viewingInventory == PatternMultiplierInventories.INTERFACE;
     }
 
-    public AppEngInternalInventory getPatternInventory() {
-        return (AppEngInternalInventory) this.toolInv.getPatternInventory(this.viewingInventory);
+    @Override
+    public IItemHandler getPatternInventory() {
+        switch (this.viewingInventory) {
+            case PMT -> { return this.patternMultiplier.getPatternInventory(); }
+            case INTERFACE -> { return this.iface.getInventoryByName("patterns"); }
+        }
+        return null;
     }
 
     @Override
@@ -123,9 +133,21 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
         this.bindPlayerInventory(this.inventoryPlayer, 0, 107 + 18);
     }
 
+    public UpgradeInventory getUpgradeInventory() {
+        switch (this.viewingInventory) {
+            case PMT -> { return this.patternMultiplier.getUpgradeInventory(); }
+            case INTERFACE -> { return (UpgradeInventory)this.iface.getInventoryByName("upgrades"); }
+        }
+        return null;
+    }
+
+    public boolean isBoundToInterface() {
+        return this.iface != null;
+    }
+
     public void setupUpgrades() {
-        if (this.toolInv != null) {
-            UpgradeInventory ui = this.toolInv.getUpgradeInventory(this.viewingInventory);
+        if (this.patternMultiplier != null) {
+            UpgradeInventory ui = this.getUpgradeInventory();
 
             for (int upgradeSlot = 0; upgradeSlot < ui.getSlots(); upgradeSlot++) {
                 SlotRestrictedInput slot = new SlotPatternMultiplierUpgrade(SlotRestrictedInput.PlacableItemType.UPGRADES,
@@ -139,9 +161,8 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
     // Check changes and send updates
     @Override
     public void detectAndSendChanges() {
-        if (this.toolInv.isBoundToInterface()) {
-            IInterfaceHost anInterface = this.toolInv.getInterface();
-            TileEntity tileEntity = anInterface.getTileEntity();
+        if (this.iface != null) {
+            TileEntity tileEntity = iface.getTileEntity();
             if (tileEntity == null || tileEntity != tileEntity.getWorld().getTileEntity(tileEntity.getPos())) {
                 this.setValidContainer(false);
                 super.detectAndSendChanges();
@@ -150,7 +171,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
         }
 
         ItemStack currentItem = this.getPlayerInv().getCurrentItem();
-        ItemStack toolInvItemStack = this.toolInv.getItemStack();
+        ItemStack toolInvItemStack = this.patternMultiplier.getItemStack();
 
         if (!ItemStack.areItemsEqual(toolInvItemStack, currentItem)) {
             if (!currentItem.isEmpty()) {
@@ -170,7 +191,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
             IItemHandler patterns = this.getPatternInventory();
             List<ItemStack> dropList = new ArrayList<>();
 
-            int maxSlots = this.getPMTObject().getInstalledCapacityUpgrades(this.viewingInventory) * 9;
+            int maxSlots = ((UpgradeInventory)iface.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.PATTERN_EXPANSION) * 9;
             for (int invSlot = 0; invSlot < patterns.getSlots(); ++invSlot) {
                 ItemStack is = patterns.getStackInSlot(invSlot);
                 if (!(is.getItem() instanceof ItemEncodedPattern)) {
@@ -183,7 +204,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
             }
 
             if (dropList.size() > 0) {
-                TileEntity tileEntity = this.toolInv.getInterface().getTileEntity();
+                TileEntity tileEntity = iface.getTileEntity();
                 World world = tileEntity.getWorld();
                 BlockPos blockPos = tileEntity.getPos();
                 Platform.spawnDrops(world, blockPos, dropList);
@@ -196,7 +217,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
     @Override
     public void saveChanges() {
         if (Platform.isServer()) {
-            this.toolInv.saveChanges();
+            this.patternMultiplier.saveChanges();
         }
     }
 
@@ -207,7 +228,21 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     @Override
     public boolean isPatternSlotEnabled(int i) {
-        return i <= this.toolInv.getInstalledCapacityUpgrades(this.viewingInventory);
+        return i <= this.getInstalledCapacityUpgrades();
+    }
+
+    public int getInstalledCapacityUpgrades() {
+        Upgrades which = null;
+        UpgradeInventory ui = this.getUpgradeInventory();
+        switch (this.viewingInventory) {
+            case PMT -> which = Upgrades.CAPACITY;
+            case INTERFACE -> which = Upgrades.PATTERN_EXPANSION;
+        }
+        if (which == null) {
+            throw new RuntimeException("Invalid upgrade container state.");
+        }
+
+        return ui.getInstalledUpgrades(which);
     }
 
     @Override
@@ -217,12 +252,10 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     @Override
     public boolean canTakeStack(SlotPatternMultiplierUpgrade slot, EntityPlayer player) {
-        List<ItemStack> inventory = Lists.newArrayList((AppEngInternalInventory) this.toolInv.getPatternInventory(this.viewingInventory));
+        List<ItemStack> inventory = Lists.newArrayList((AppEngInternalInventory) this.getPatternInventory());
         int slices = inventory.size() / 9;
-        UpgradeInventory upgrades = this.toolInv.getUpgradeInventory(this.viewingInventory);
-
         int lockedUpgrades = slices; // Stub
-        int installedUpgrades = upgrades.getInstalledUpgrades(Upgrades.CAPACITY);
+        int installedUpgrades = this.getInstalledCapacityUpgrades();
 
         for (int i = slices - 1; i >= 0; i--) {
             if (inventory.subList(i * 9, i * 9 + 9).stream().allMatch(ItemStack::isEmpty)) {
@@ -237,7 +270,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     @Override
     public ObjPatternMultiplier getPMTObject() {
-        return this.toolInv;
+        return this.patternMultiplier;
     }
 
     public void toggleInventory() {

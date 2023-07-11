@@ -5,6 +5,7 @@ import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.widgets.ITooltip;
 import appeng.core.localization.ButtonToolTips;
 import appeng.core.localization.GuiText;
+import appeng.helpers.IInterfaceHost;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.buttons.NAE2GuiTabButton;
@@ -34,9 +35,12 @@ public class GuiPatternMultiplier extends AEBaseGui implements IPatternMultiplie
     private static final ResourceLocation loc = new ResourceLocation(Tags.MODID, "textures/gui/pattern_multiplier.png");
     private NAE2GuiTabButton switcherButton;
 
+    private ContainerPatternMultiplier containerPatternMultiplier;
+
     // Constructor
-    public GuiPatternMultiplier(InventoryPlayer inventoryPlayer, ObjPatternMultiplier te) {
-        super(new ContainerPatternMultiplier(inventoryPlayer, te));
+    public GuiPatternMultiplier(InventoryPlayer inventoryPlayer, ObjPatternMultiplier te, IInterfaceHost iface) {
+        super(new ContainerPatternMultiplier(inventoryPlayer, te, iface));
+        this.containerPatternMultiplier = (ContainerPatternMultiplier) this.inventorySlots;
         this.ySize = 189 + 18;
         this.xSize = 211;
     }
@@ -80,7 +84,7 @@ public class GuiPatternMultiplier extends AEBaseGui implements IPatternMultiplie
         unencode.width = 60;
 
         // Draw Interface/PMT switcher
-        if (this.getPMTObject().isBoundToInterface()) {
+        if (containerPatternMultiplier.isBoundToInterface()) {
             switcherButton = new NAE2GuiTabButton(this.guiLeft + 152 - 1, this.guiTop + 3 - 18 + 11, PMT_ICON, GuiText.Priority.getLocal(), this.itemRender);
             switcherButton.setHideEdge(1);
             switcherButton.id = 7;
@@ -118,19 +122,17 @@ public class GuiPatternMultiplier extends AEBaseGui implements IPatternMultiplie
 
     // Draws the background
     public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {
-        PatternMultiplierInventories inventory = this.getContainer().viewingInventory;
-
         this.mc.getTextureManager().bindTexture(loc);
         this.drawTexturedModalRect(offsetX, offsetY, 0, 0, 177, this.ySize);
 
         // Draw pattern rows.
-        int installedCapacityUpgrades = this.getPMTObject().getInstalledCapacityUpgrades(inventory);
+        int installedCapacityUpgrades = containerPatternMultiplier.getInstalledCapacityUpgrades();
         for (int u = 0; u < installedCapacityUpgrades; u++) {
             this.drawTexturedModalRect(offsetX + 8, offsetY + 37 + u * 18, 8, 19, 18 * 9 - 1, 18 - 1);
         }
 
         // Draw the upgrade inventory depending on the size.
-        int upgradeInventorySize = this.getPMTObject().getUpgradeInventory(inventory).getSlots();
+        int upgradeInventorySize = containerPatternMultiplier.getUpgradeInventory().getSlots();
         if (upgradeInventorySize > 0) {
             this.drawTexturedModalRect(offsetX + 180, offsetY, 180, 0, 32, 32);
             for (int u = 1; u < upgradeInventorySize; u++) {

@@ -29,7 +29,7 @@ public class HandlerPatternMultiplier implements IMessageHandler<PatternMultipli
         if (Platform.isClient()) return;
 
         if (player.openContainer instanceof ContainerPatternMultiplier container) {
-            AppEngInternalInventory inv = container.getPatternInventory();
+            AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternInventory();
             PatternMultiplierButtons value = PatternMultiplierButtons.values()[message.getButtonId()];
 
             if (value == PatternMultiplierButtons.INV_SWITCH) {
