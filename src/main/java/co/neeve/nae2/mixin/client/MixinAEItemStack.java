@@ -6,7 +6,6 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(value = AEItemStack.class)
 public class MixinAEItemStack implements IExtendedAEItemStack {
-
     private int extendedCount;
 
     @Override

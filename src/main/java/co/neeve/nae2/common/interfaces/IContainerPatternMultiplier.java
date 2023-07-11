@@ -7,4 +7,6 @@ public interface IContainerPatternMultiplier extends IPatternMultiplierHost {
     boolean canTakeStack(SlotPatternMultiplierUpgrade slot, EntityPlayer player);
 
     boolean isViewingInterface();
+
+    void toggleInventory();
 }

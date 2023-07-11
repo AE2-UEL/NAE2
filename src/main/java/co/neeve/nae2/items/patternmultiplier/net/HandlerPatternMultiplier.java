@@ -1,11 +1,13 @@
 package co.neeve.nae2.items.patternmultiplier.net;
 
 import appeng.api.AEApi;
+import appeng.container.AEBaseContainer;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.util.Platform;
-import co.neeve.nae2.common.containers.ContainerPatternMultiplier;
 import co.neeve.nae2.common.enums.PatternMultiplierButtons;
+import co.neeve.nae2.common.interfaces.IContainerPatternMultiplier;
+import co.neeve.nae2.common.interfaces.IPatternMultiplierHost;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
@@ -28,30 +30,31 @@ public class HandlerPatternMultiplier implements IMessageHandler<PatternMultipli
     private void processMessage(PatternMultiplierPacket message, EntityPlayerMP player) {
         if (Platform.isClient()) return;
 
-        if (player.openContainer instanceof ContainerPatternMultiplier container) {
+        if (player.openContainer instanceof AEBaseContainer bc && bc instanceof IPatternMultiplierHost container) {
             AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternInventory();
             PatternMultiplierButtons value = PatternMultiplierButtons.values()[message.getButtonId()];
 
-            if (value == PatternMultiplierButtons.INV_SWITCH) {
-                container.toggleInventory();
+            if (value == PatternMultiplierButtons.INV_SWITCH && container instanceof IContainerPatternMultiplier cmp) {
+                cmp.toggleInventory();
+                return;
             }
 
             for (ItemStack is : inv) {
                 if (is.getItem() instanceof ItemEncodedPattern) {
                     try {
-                        handleButtonPress(is, container, value);
+                        handleButtonPress(is, bc, value);
                     } catch (IndexOutOfBoundsException e) {
                         // uwu
                     }
                 }
             }
 
-            container.detectAndSendChanges();
+            bc.detectAndSendChanges();
         }
     }
 
     // Handles the logic for when a button is pressed
-    private void handleButtonPress(ItemStack is, ContainerPatternMultiplier container, PatternMultiplierButtons buttonId) {
+    private void handleButtonPress(ItemStack is, AEBaseContainer container, PatternMultiplierButtons buttonId) {
         switch (buttonId) {
             case MUL2 -> updatePatternCount(is, 2, Operation.MULTIPLY);
             case MUL3 -> updatePatternCount(is, 3, Operation.MULTIPLY);
@@ -63,7 +66,7 @@ public class HandlerPatternMultiplier implements IMessageHandler<PatternMultipli
         }
     }
 
-    private void emptyPattern(ItemStack is, ContainerPatternMultiplier container) {
+    private void emptyPattern(ItemStack is, AEBaseContainer container) {
         ItemStack newStack = AEApi.instance().definitions().materials().blankPattern().maybeStack(is.getCount()).orElse(ItemStack.EMPTY);
 
         container.putStackInSlot(container.getInventory().indexOf(is), newStack);

@@ -16,22 +16,6 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class GuiHandlerPatternMultiplier implements IGuiHandler {
-    @Override
-    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-        if (ID == GuiIDs.PATTERN_MULTIPLIER.ordinal() || ID == GuiIDs.PATTERN_MULTIPLIER_IFACE.ordinal()) {
-            ItemStack heldItemMainhand = player.getHeldItemMainhand();
-            ItemStack it = heldItemMainhand.getItem() instanceof ToolPatternMultiplier ? heldItemMainhand : player.getHeldItemOffhand();
-
-            IInterfaceHost iface = getiInterfaceHost(world, x, y, z);
-
-            if (it.getItem() instanceof ToolPatternMultiplier ipm) {
-                return new ContainerPatternMultiplier(player.inventory,
-                        (ObjPatternMultiplier) ipm.getGuiObject(it, null, null), iface);
-            }
-        }
-        return null;
-    }
-
     @Nullable
     private static IInterfaceHost getiInterfaceHost(World world, int x, int y, int z) {
         IInterfaceHost iface = null;
@@ -52,6 +36,22 @@ public class GuiHandlerPatternMultiplier implements IGuiHandler {
             }
         }
         return iface;
+    }
+
+    @Override
+    public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+        if (ID == GuiIDs.PATTERN_MULTIPLIER.ordinal() || ID == GuiIDs.PATTERN_MULTIPLIER_IFACE.ordinal()) {
+            ItemStack heldItemMainhand = player.getHeldItemMainhand();
+            ItemStack it = heldItemMainhand.getItem() instanceof ToolPatternMultiplier ? heldItemMainhand : player.getHeldItemOffhand();
+
+            IInterfaceHost iface = getiInterfaceHost(world, x, y, z);
+
+            if (it.getItem() instanceof ToolPatternMultiplier ipm) {
+                return new ContainerPatternMultiplier(player.inventory,
+                        (ObjPatternMultiplier) ipm.getGuiObject(it, null, null), iface);
+            }
+        }
+        return null;
     }
 
     @Override

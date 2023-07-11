@@ -30,6 +30,7 @@ public class PatternMultiplierGUIHelper {
         }
     }
 
+    @SuppressWarnings({"ArraysAsListWithZeroOrOneArgument"})
     public static List<Rectangle> getJEIExclusionArea(IPatternMultiplierHostGui gui) {
         return Arrays.asList(new Rectangle(gui.getGuiLeft() + gui.getPMTOffsetX(), gui.getGuiTop() + gui.getPMTOffsetY(), PMT_WIDTH, PMT_HEIGHT));
     }

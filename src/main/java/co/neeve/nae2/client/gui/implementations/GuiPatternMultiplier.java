@@ -35,7 +35,7 @@ public class GuiPatternMultiplier extends AEBaseGui implements IPatternMultiplie
     private static final ResourceLocation loc = new ResourceLocation(Tags.MODID, "textures/gui/pattern_multiplier.png");
     private NAE2GuiTabButton switcherButton;
 
-    private ContainerPatternMultiplier containerPatternMultiplier;
+    private final ContainerPatternMultiplier containerPatternMultiplier;
 
     // Constructor
     public GuiPatternMultiplier(InventoryPlayer inventoryPlayer, ObjPatternMultiplier te, IInterfaceHost iface) {

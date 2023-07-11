@@ -74,8 +74,12 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
     @Override
     public IItemHandler getPatternInventory() {
         switch (this.viewingInventory) {
-            case PMT -> { return this.patternMultiplier.getPatternInventory(); }
-            case INTERFACE -> { return this.iface.getInventoryByName("patterns"); }
+            case PMT -> {
+                return this.patternMultiplier.getPatternInventory();
+            }
+            case INTERFACE -> {
+                return this.iface.getInventoryByName("patterns");
+            }
         }
         return null;
     }
@@ -135,8 +139,12 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
 
     public UpgradeInventory getUpgradeInventory() {
         switch (this.viewingInventory) {
-            case PMT -> { return this.patternMultiplier.getUpgradeInventory(); }
-            case INTERFACE -> { return (UpgradeInventory)this.iface.getInventoryByName("upgrades"); }
+            case PMT -> {
+                return this.patternMultiplier.getUpgradeInventory();
+            }
+            case INTERFACE -> {
+                return (UpgradeInventory) this.iface.getInventoryByName("upgrades");
+            }
         }
         return null;
     }
@@ -191,7 +199,7 @@ public class ContainerPatternMultiplier extends AEBaseContainer implements IAEAp
             IItemHandler patterns = this.getPatternInventory();
             List<ItemStack> dropList = new ArrayList<>();
 
-            int maxSlots = ((UpgradeInventory)iface.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.PATTERN_EXPANSION) * 9;
+            int maxSlots = ((UpgradeInventory) iface.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.PATTERN_EXPANSION) * 9;
             for (int invSlot = 0; invSlot < patterns.getSlots(); ++invSlot) {
                 ItemStack is = patterns.getStackInSlot(invSlot);
                 if (!(is.getItem() instanceof ItemEncodedPattern)) {
