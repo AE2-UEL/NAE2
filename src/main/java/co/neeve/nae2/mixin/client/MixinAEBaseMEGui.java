@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(AEBaseMEGui.class)
 public class MixinAEBaseMEGui extends MixinAEBaseGui {
-    public MixinAEBaseMEGui(Container inventorySlotsIn) {
-        super(inventorySlotsIn);
-    }
+	public MixinAEBaseMEGui(Container inventorySlotsIn) {
+		super(inventorySlotsIn);
+	}
 }

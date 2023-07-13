@@ -6,26 +6,26 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "MixinContainerInterface",
-    "MixinContainerUpgradeable",
     "MixinAEBaseContainer",
-    "MixinContainerInterfaceTerminal",
-    "MixinContainerPatternTerm",
     "MixinContainerMEMonitorable",
     "MixinContainerPatternEncoder",
-    "MixinContainerWirelessPatternTerminal"
+    "MixinContainerUpgradeable",
+    "pmthosts.MixinContainerInterface",
+    "pmthosts.MixinContainerInterfaceTerminal",
+    "pmthosts.MixinContainerPatternTerm",
+    "pmthosts.MixinContainerWirelessPatternTerminal"
   ],
   "client": [
     "client.MixinAEBaseGui",
+    "client.MixinAEBaseMEGui",
     "client.MixinAEItemStack",
-    "client.MixinStackSizeRenderer",
     "client.MixinGuiInterface",
+    "client.MixinGuiInterfaceTerminal",
+    "client.MixinGuiMEMonitorable",
+    "client.MixinGuiPatternTerminal",
     "client.MixinGuiUpgradeable",
     "client.MixinJEIIngredientGrid",
-    "client.MixinGuiInterfaceTerminal",
-    "client.MixinGuiPatternTerminal",
-    "client.MixinGuiMEMonitorable",
-    "client.MixinAEBaseMEGui"
+    "client.MixinStackSizeRenderer"
   ],
   "server": []
 }

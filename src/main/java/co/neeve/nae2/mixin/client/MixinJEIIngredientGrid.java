@@ -15,19 +15,22 @@ import java.util.Collection;
 @Mixin(value = IngredientGrid.class, remap = false)
 public class MixinJEIIngredientGrid {
 
-    private Collection<Rectangle> rectangles = null;
+	private Collection<Rectangle> rectangles = null;
 
-    @Inject(at = @At("HEAD"), method = "shouldDeleteItemOnClick(Lnet/minecraft/client/Minecraft;II)Z", cancellable = true)
-    private void shouldDeleteItemOnClick(Minecraft minecraft, int mouseX, int mouseY, CallbackInfoReturnable<Boolean> cir) {
-        if (this.rectangles != null) {
-            if (rectangles.stream().anyMatch(x -> x.contains(mouseX, mouseY))) {
-                cir.setReturnValue(false);
-            }
-        }
-    }
+	@Inject(at = @At("HEAD"), method = "shouldDeleteItemOnClick(Lnet/minecraft/client/Minecraft;II)Z", cancellable =
+		true)
+	private void shouldDeleteItemOnClick(Minecraft minecraft, int mouseX, int mouseY,
+	                                     CallbackInfoReturnable<Boolean> cir) {
+		if (this.rectangles != null) {
+			if (rectangles.stream().anyMatch(x -> x.contains(mouseX, mouseY))) {
+				cir.setReturnValue(false);
+			}
+		}
+	}
 
-    @Inject(at = @At("HEAD"), method = "updateBounds(Ljava/awt/Rectangle;ILjava/util/Collection;)Z")
-    public void updateBounds(Rectangle availableArea, int minWidth, Collection<Rectangle> exclusionAreas, CallbackInfoReturnable<Boolean> cir) {
-        rectangles = exclusionAreas;
-    }
+	@Inject(at = @At("HEAD"), method = "updateBounds(Ljava/awt/Rectangle;ILjava/util/Collection;)Z")
+	public void updateBounds(Rectangle availableArea, int minWidth, Collection<Rectangle> exclusionAreas,
+	                         CallbackInfoReturnable<Boolean> cir) {
+		rectangles = exclusionAreas;
+	}
 }

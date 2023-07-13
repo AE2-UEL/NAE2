@@ -12,12 +12,12 @@ import java.util.List;
 
 @Mixin(GuiMEMonitorable.class)
 public class MixinGuiMEMonitorable extends MixinAEBaseMEGui {
-    public MixinGuiMEMonitorable(Container inventorySlotsIn) {
-        super(inventorySlotsIn);
-    }
+	public MixinGuiMEMonitorable(Container inventorySlotsIn) {
+		super(inventorySlotsIn);
+	}
 
-    @Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false)
-    public void injectJEIAreas(CallbackInfoReturnable<List<Rectangle>> cir) {
-        cir.getReturnValue().addAll(super.getJEIExclusionArea());
-    }
+	@Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false)
+	public void injectJEIAreas(CallbackInfoReturnable<List<Rectangle>> cir) {
+		cir.getReturnValue().addAll(super.getJEIExclusionArea());
+	}
 }

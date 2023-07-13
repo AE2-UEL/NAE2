@@ -12,18 +12,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = StackSizeRenderer.class)
 public abstract class MixinStackSizeRenderer {
-    @Inject(method = "renderStackSize",
-            at = @At(value = "INVOKE",
-                    shift = At.Shift.BEFORE,
-                    target = "Lnet/minecraft/client/renderer/GlStateManager;enableLighting()V"
-            ))
-    private void renderStackExtended(FontRenderer fontRenderer, IAEItemStack aeStack, int xPos, int yPos, CallbackInfo ci) {
-        if (aeStack instanceof IExtendedAEItemStack eais && eais.getExtendedCount() > 1) {
-            int count = eais.getExtendedCount();
+	@Inject(method = "renderStackSize", at = @At(value = "INVOKE", shift = At.Shift.BEFORE, target =
+		"Lnet/minecraft" + "/client/renderer/GlStateManager;enableLighting()V"))
+	private void renderStackExtended(FontRenderer fontRenderer, IAEItemStack aeStack, int xPos, int yPos,
+	                                 CallbackInfo ci) {
+		if (aeStack instanceof IExtendedAEItemStack eais && eais.getExtendedCount() > 1) {
+			int count = eais.getExtendedCount();
 
-            String str = String.valueOf(count);
-            FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
-            fr.drawStringWithShadow(str, (float) (xPos + 19 - 2 - fr.getStringWidth(str)), yPos, 16777215);
-        }
-    }
+			String str = String.valueOf(count);
+			FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+			fr.drawStringWithShadow(str, (float) (xPos + 19 - 2 - fr.getStringWidth(str)), yPos, 16777215);
+		}
+	}
 }

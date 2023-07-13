@@ -11,18 +11,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.awt.*;
 import java.util.List;
 
+@SuppressWarnings("EmptyMethod")
 @Mixin(GuiUpgradeable.class)
 public class MixinGuiUpgradeable extends MixinAEBaseGui {
-    public MixinGuiUpgradeable(Container inventorySlotsIn) {
-        super(inventorySlotsIn);
-    }
+	public MixinGuiUpgradeable(Container inventorySlotsIn) {
+		super(inventorySlotsIn);
+	}
 
-    @Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false)
-    public void injectJEIAreas(CallbackInfoReturnable<List<Rectangle>> cir) {
-        cir.getReturnValue().addAll(super.getJEIExclusionArea());
-    }
+	@Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false)
+	public void injectJEIAreas(CallbackInfoReturnable<List<Rectangle>> cir) {
+		cir.getReturnValue().addAll(super.getJEIExclusionArea());
+	}
 
-    @Shadow
-    public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {
-    }
+	@Shadow
+	public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {
+	}
 }

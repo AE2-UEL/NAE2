@@ -13,33 +13,33 @@ import java.util.Map;
 @IFMLLoadingPlugin.Name("NAE2-Core")
 public class NAE2MixinPlugin implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
-    @Override
-    public String[] getASMTransformerClass() {
-        return new String[0];
-    }
+	@Override
+	public String[] getASMTransformerClass() {
+		return new String[0];
+	}
 
-    @Override
-    public String getModContainerClass() {
-        return null;
-    }
+	@Override
+	public String getModContainerClass() {
+		return null;
+	}
 
-    @Nullable
-    @Override
-    public String getSetupClass() {
-        return null;
-    }
+	@Nullable
+	@Override
+	public String getSetupClass() {
+		return null;
+	}
 
-    @Override
-    public void injectData(Map<String, Object> data) {
-    }
+	@Override
+	public void injectData(Map<String, Object> data) {
+	}
 
-    @Override
-    public String getAccessTransformerClass() {
-        return null;
-    }
+	@Override
+	public String getAccessTransformerClass() {
+		return null;
+	}
 
-    @Override
-    public List<String> getMixinConfigs() {
-        return ImmutableList.of("mixins.nae2.json");
-    }
+	@Override
+	public List<String> getMixinConfigs() {
+		return ImmutableList.of("mixins.nae2.json");
+	}
 }
