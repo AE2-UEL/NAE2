@@ -7,18 +7,17 @@ import appeng.util.item.AEItemStack;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.common.interfaces.IExtendedAEItemStack;
-import co.neeve.nae2.common.slots.SlotPatternMultiTool;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.awt.*;
@@ -35,6 +34,18 @@ public class MixinAEBaseGui extends GuiContainer {
 
 	public MixinAEBaseGui(Container inventorySlotsIn) {
 		super(inventorySlotsIn);
+	}
+
+	@WrapOperation(method = "drawSlot", at = @At(value = "INVOKE", target = "Lappeng/util/item/AEItemStack;" +
+		"fromItemStack(Lnet/minecraft/item/ItemStack;)Lappeng/util/item/AEItemStack;"))
+	private static AEItemStack injectItemStack(ItemStack itemStack, Operation<AEItemStack> original, Slot slot) {
+		AEItemStack stack = original.call(itemStack);
+		ItemStack slotIs = slot.getStack();
+
+		if (stack instanceof IExtendedAEItemStack eais && slotIs.getItem() instanceof ItemEncodedPattern)
+			eais.setExtendedCount(slotIs.getCount());
+
+		return stack;
 	}
 
 	@Shadow
@@ -57,22 +68,6 @@ public class MixinAEBaseGui extends GuiContainer {
 			List<Rectangle> areas = PatternMultiToolGUIHelper.getJEIExclusionArea(pmh);
 			if (returnValue != EMPTY_LIST) returnValue.addAll(areas);
 			else cir.setReturnValue(areas);
-		}
-	}
-
-	@Inject(method = "drawSlot", at = @At(target =
-		"Lappeng/client/render/StackSizeRenderer;renderStackSize" + "(Lnet" + "/minecraft/client/gui/FontRenderer;" +
-			"Lappeng/api/storage/data/IAEItemStack;II)V", value = "INVOKE"), cancellable = true)
-	public void drawSlot(Slot s, @NotNull CallbackInfo ci) {
-		if (s instanceof SlotPatternMultiTool aes) {
-			AEItemStack ais = AEItemStack.fromItemStack(aes.getDisplayStack());
-
-			ItemStack is = aes.getStack();
-			if (ais instanceof IExtendedAEItemStack eais && is.getItem() instanceof ItemEncodedPattern)
-				eais.setExtendedCount(is.getCount());
-
-			this.stackSizeRenderer.renderStackSize(fontRenderer, ais, s.xPos, s.yPos);
-			ci.cancel();
 		}
 	}
 
