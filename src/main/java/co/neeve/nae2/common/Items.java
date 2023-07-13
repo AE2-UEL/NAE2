@@ -1,6 +1,7 @@
 package co.neeve.nae2.common;
 
 import appeng.api.config.Upgrades;
+import co.neeve.nae2.Tags;
 import co.neeve.nae2.items.patternmultitool.ToolPatternMultiTool;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -35,5 +36,12 @@ public class Items {
 		});
 	}
 
-
+	@SubscribeEvent
+	public void remap(final RegistryEvent.MissingMappings<Item> event) {
+		event.getMappings().forEach(x -> {
+			if (x.key.getNamespace().equals(Tags.MODID) && x.key.getPath().equals("pattern_multiplier")) {
+				x.remap(PATTERN_MULTI_TOOL);
+			}
+		});
+	}
 }
