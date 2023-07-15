@@ -39,10 +39,10 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 			for (int i = 0; i < pmhInv.getSlots(); i++) {
 				ItemStack is = pmhInv.getStackInSlot(i);
 				if (!is.isEmpty() && definitions.materials().blankPattern().isSameAs(is)) {
+					ItemStack newPattern = is.copy();
+					newPattern.setCount(1);
 					is.shrink(1);
-					is = is.copy();
-					is.setCount(1);
-					this.patternSlotIN.putStack(is);
+					this.patternSlotIN.putStack(newPattern);
 					return;
 				}
 			}
