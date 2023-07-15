@@ -1,6 +1,8 @@
 package co.neeve.nae2.client.gui;
 
+import appeng.client.gui.AEBaseGui;
 import co.neeve.nae2.Tags;
+import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
 import net.minecraft.client.gui.GuiScreen;
@@ -45,5 +47,13 @@ public class PatternMultiToolGUIHelper {
 		int offsetY = gui.getGuiTop() + gui.getPMTOffsetY();
 
 		return !(mouseX >= offsetX && mouseX <= offsetX + PMT_WIDTH && mouseY >= offsetY && mouseY <= offsetY + PMT_HEIGHT);
+	}
+
+	public static void repositionButtons(AEBaseGui gui, List<PatternMultiToolButton> patternMultiToolButtons,
+	                                     int offsetX, int offsetY) {
+		for (PatternMultiToolButton button : patternMultiToolButtons) {
+			button.y = button.getY() + offsetY;
+			button.x = button.getX() + offsetX;
+		}
 	}
 }

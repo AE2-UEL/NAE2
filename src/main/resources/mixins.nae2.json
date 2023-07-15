@@ -10,6 +10,7 @@
     "MixinContainerMEMonitorable",
     "MixinContainerPatternEncoder",
     "MixinContainerUpgradeable",
+    "pmthosts.MixinContainerExpandedPatternTerm",
     "pmthosts.MixinContainerInterface",
     "pmthosts.MixinContainerInterfaceTerminal",
     "pmthosts.MixinContainerPatternTerm",
@@ -19,13 +20,13 @@
     "client.MixinAEBaseGui",
     "client.MixinAEBaseMEGui",
     "client.MixinAEItemStack",
-    "client.MixinGuiInterface",
-    "client.MixinGuiInterfaceTerminal",
     "client.MixinGuiMEMonitorable",
-    "client.MixinGuiPatternTerminal",
     "client.MixinGuiUpgradeable",
     "client.MixinJEIIngredientGrid",
-    "client.MixinStackSizeRenderer"
+    "client.MixinStackSizeRenderer",
+    "client.pmthosts.MixinGuiInterface",
+    "client.pmthosts.MixinGuiInterfaceTerminal",
+    "client.pmthosts.MixinGuiPatternTerminal"
   ],
   "server": []
 }

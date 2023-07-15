@@ -2,16 +2,15 @@ package co.neeve.nae2.client.gui.implementations;
 
 import appeng.api.AEApi;
 import appeng.client.gui.AEBaseGui;
-import appeng.client.gui.widgets.ITooltip;
-import appeng.core.localization.ButtonToolTips;
 import appeng.core.localization.GuiText;
 import appeng.helpers.IInterfaceHost;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.buttons.NAE2GuiTabButton;
+import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.common.containers.ContainerPatternMultiTool;
-import co.neeve.nae2.common.enums.PatternMultiToolButtons;
+import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import co.neeve.nae2.common.enums.PatternMultiToolInventories;
 import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
 import co.neeve.nae2.items.patternmultitool.ToolPatternMultiTool;
@@ -51,8 +50,10 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	@Override
 	protected void actionPerformed(@NotNull GuiButton btn) throws IOException {
 		super.actionPerformed(btn);
-		// Check which button was pressed and send corresponding packet
-		NAE2.network.sendToServer(new PatternMultiToolPacket(btn.id));
+
+		if (btn == this.switcherButton) {
+			NAE2.network.sendToServer(new PatternMultiToolPacket(PatternMultiToolActions.INV_SWITCH.ordinal()));
+		}
 	}
 
 	// Initializes the GUI
@@ -64,24 +65,15 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		int start = 7 + this.guiLeft;
 
 		// Add buttons to the GUI
-		this.buttonList.add(new TooltipButton(PatternMultiToolButtons.MUL3.ordinal(), start, this.guiTop + 76 + 18,
-			"*2", ButtonToolTips.MultiplyByTwo, ButtonToolTips.MultiplyByTwoDesc));
-		this.buttonList.add(new TooltipButton(PatternMultiToolButtons.MUL3.ordinal(), start + 23,
-			this.guiTop + 76 + 18, "*3", ButtonToolTips.MultiplyByThree, ButtonToolTips.MultiplyByThreeDesc));
-		this.buttonList.add(new TooltipButton(PatternMultiToolButtons.ADD.ordinal(), start + 46, this.guiTop + 76 + 18
-			, "+1", ButtonToolTips.IncreaseByOne, ButtonToolTips.IncreaseByOneDesc));
-
-		this.buttonList.add(new TooltipButton(PatternMultiToolButtons.DIV2.ordinal(), start, this.guiTop + 76 + 18,
-			"/2", ButtonToolTips.DivideByTwo, ButtonToolTips.DivideByTwoDesc));
-		this.buttonList.add(new TooltipButton(PatternMultiToolButtons.DIV3.ordinal(), start + 23,
-			this.guiTop + 76 + 18, "/3", ButtonToolTips.DivideByThree, ButtonToolTips.DivideByThreeDesc));
-		this.buttonList.add(new TooltipButton(PatternMultiToolButtons.SUB.ordinal(), start + 46, this.guiTop + 76 + 18
-			, "-1", ButtonToolTips.DecreaseByOne, ButtonToolTips.DecreaseByOneDesc));
+		this.buttonList.add(new PatternMultiToolButton(start, this.guiTop + 76 + 18, PatternMultiToolActions.MUL2));
+		this.buttonList.add(new PatternMultiToolButton(start + 23, this.guiTop + 76 + 18,
+			PatternMultiToolActions.MUL3));
+		this.buttonList.add(new PatternMultiToolButton(start + 46, this.guiTop + 76 + 18,
+			PatternMultiToolActions.ADD));
 
 		GuiButton unencode;
-		this.buttonList.add(unencode = new TooltipButton(PatternMultiToolButtons.CLEAR.ordinal(),
-			start + 176 - 60 - 15, this.guiTop + 76 + 18, "nae2.pattern_multiplier.unencode", "nae2" +
-			".pattern_multiplier.unencode", "nae2.pattern_multiplier.unencode.desc"));
+		this.buttonList.add(unencode = new PatternMultiToolButton(start + 176 - 60 - 15, this.guiTop + 76 + 18,
+			PatternMultiToolActions.CLEAR));
 		unencode.width = 60;
 
 		// Draw Interface/PMT switcher
@@ -109,10 +101,6 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
-
-		boolean shiftDown = isShiftKeyDown();
-		this.buttonList.subList(0, 3).forEach(but -> but.visible = !shiftDown);
-		this.buttonList.subList(3, 6).forEach(but -> but.visible = shiftDown);
 	}
 
 	// Draws the foreground
@@ -166,52 +154,5 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	@Override
 	public int getPMTOffsetY() {return 0;}
 
-	public static class TooltipButton extends GuiButton implements ITooltip {
-		private final String title;
-		private final String hint;
-
-		public TooltipButton(int buttonId, int x, int y, String buttonText, ButtonToolTips title,
-		                     ButtonToolTips hint) {
-			this(buttonId, x, y, buttonText, title.getUnlocalized(), hint.getUnlocalized());
-		}
-
-		public TooltipButton(int buttonId, int x, int y, String buttonText, String title, String hint) {
-			super(buttonId, x, y, I18n.format(buttonText));
-			this.width = 18;
-			this.height = 18;
-			this.title = title;
-			this.hint = hint;
-		}
-
-		@Override
-		public String getMessage() {
-			return I18n.format(this.title) + "\n" + I18n.format(this.hint);
-		}
-
-		@Override
-		public int xPos() {
-			return this.x;
-		}
-
-		@Override
-		public int yPos() {
-			return this.y;
-		}
-
-		@Override
-		public int getWidth() {
-			return this.width;
-		}
-
-		@Override
-		public int getHeight() {
-			return this.height;
-		}
-
-		@Override
-		public boolean isVisible() {
-			return this.visible;
-		}
-	}
 }
 

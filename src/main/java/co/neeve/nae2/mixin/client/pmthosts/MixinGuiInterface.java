@@ -1,11 +1,15 @@
-package co.neeve.nae2.mixin.client;
+package co.neeve.nae2.mixin.client.pmthosts;
 
 import appeng.client.gui.implementations.GuiInterface;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
+import co.neeve.nae2.mixin.client.MixinGuiUpgradeable;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiInterface.class)
 public class MixinGuiInterface extends MixinGuiUpgradeable implements IPatternMultiToolHostGui {
@@ -31,5 +35,10 @@ public class MixinGuiInterface extends MixinGuiUpgradeable implements IPatternMu
 	@Override
 	public int getPMTOffsetY() {
 		return 43 + 16 - 7;
+	}
+
+	@Inject(method = "addButtons", at = @At("RETURN"), remap = false)
+	public void injectButtons(CallbackInfo ci) {
+		initializePatternMultiTool();
 	}
 }

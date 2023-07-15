@@ -5,8 +5,11 @@ import appeng.client.render.StackSizeRenderer;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
+import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
+import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import co.neeve.nae2.common.interfaces.IExtendedAEItemStack;
+import co.neeve.nae2.common.interfaces.IPatternMultiToolToolboxHost;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -21,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.EMPTY_LIST;
@@ -28,6 +32,7 @@ import static java.util.Collections.EMPTY_LIST;
 @SuppressWarnings("SameReturnValue")
 @Mixin(value = AEBaseGui.class)
 public class MixinAEBaseGui extends GuiContainer {
+	protected List<PatternMultiToolButton> patternMultiToolButtons = null;
 	@Final
 	@Shadow
 	private StackSizeRenderer stackSizeRenderer;
@@ -46,6 +51,38 @@ public class MixinAEBaseGui extends GuiContainer {
 			eais.setExtendedCount(slotIs.getCount());
 
 		return stack;
+	}
+
+	protected void initializePatternMultiTool() {
+		if (this instanceof IPatternMultiToolHostGui) {
+			// Calculate start position for buttons
+			Container inventorySlots = this.inventorySlots;
+			if (inventorySlots == null) return;
+			if (inventorySlots instanceof IPatternMultiToolToolboxHost pmh) {
+				int offsetX = this.guiLeft + pmh.getPatternMultiToolToolboxOffsetX() - 1;
+				int offsetY = this.guiTop + pmh.getPatternMultiToolToolboxOffsetY() - 1;
+
+				offsetY = offsetY + 9 * 18 + 3;
+
+				if (patternMultiToolButtons == null) patternMultiToolButtons = new ArrayList<>();
+				patternMultiToolButtons.clear();
+
+				// Add buttons to the GUI
+				this.patternMultiToolButtons.add(new PatternMultiToolButton(offsetX, offsetY,
+					PatternMultiToolActions.MUL2));
+				this.patternMultiToolButtons.add(new PatternMultiToolButton(offsetX + 18, offsetY,
+					PatternMultiToolActions.MUL3));
+				this.patternMultiToolButtons.add(new PatternMultiToolButton(offsetX + 18 * 2, offsetY,
+					PatternMultiToolActions.ADD));
+
+				PatternMultiToolButton button;
+				this.patternMultiToolButtons.add(button = new PatternMultiToolButton(offsetX + 18 * 3, offsetY,
+					PatternMultiToolActions.CLEAR));
+				button.setOverrideName("X");
+
+				this.buttonList.addAll(patternMultiToolButtons);
+			}
+		}
 	}
 
 	@Shadow

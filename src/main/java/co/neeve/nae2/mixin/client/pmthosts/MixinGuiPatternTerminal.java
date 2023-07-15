@@ -1,10 +1,13 @@
-package co.neeve.nae2.mixin.client;
+package co.neeve.nae2.mixin.client.pmthosts;
 
+import appeng.client.gui.AEBaseGui;
+import appeng.client.gui.implementations.GuiExpandedProcessingPatternTerm;
 import appeng.client.gui.implementations.GuiPatternTerm;
 import appeng.container.slot.AppEngSlot;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.common.slots.SlotPatternMultiTool;
+import co.neeve.nae2.mixin.client.MixinGuiMEMonitorable;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static co.neeve.nae2.client.gui.PatternMultiToolGUIHelper.PMT_HEIGHT;
 
-@Mixin(GuiPatternTerm.class)
+@Mixin({ GuiPatternTerm.class, GuiExpandedProcessingPatternTerm.class })
 public class MixinGuiPatternTerminal extends MixinGuiMEMonitorable implements IPatternMultiToolHostGui {
 
 	public MixinGuiPatternTerminal(Container inventorySlotsIn) {
@@ -36,6 +39,14 @@ public class MixinGuiPatternTerminal extends MixinGuiMEMonitorable implements IP
 			s.yPos = s.getY() + this.getPMTOffsetY() - 50;
 			ci.cancel();
 		}
+	}
+
+	@Inject(method = "initGui", at = @At("RETURN"), remap = false)
+	public void injectButtons(CallbackInfo ci) {
+		initializePatternMultiTool();
+		if (this.patternMultiToolButtons != null)
+			PatternMultiToolGUIHelper.repositionButtons((AEBaseGui) (Object) this, patternMultiToolButtons, 0,
+				this.getPMTOffsetY() - 50);
 	}
 
 	@Override

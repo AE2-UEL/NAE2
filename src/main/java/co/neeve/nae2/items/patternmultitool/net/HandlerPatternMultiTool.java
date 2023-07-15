@@ -5,7 +5,7 @@ import appeng.container.AEBaseContainer;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.util.Platform;
-import co.neeve.nae2.common.enums.PatternMultiToolButtons;
+import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import co.neeve.nae2.common.interfaces.IContainerPatternMultiTool;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -34,9 +34,9 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 			AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternMultiToolInventory();
 			if (inv == null) return;
 
-			PatternMultiToolButtons value = PatternMultiToolButtons.values()[message.getButtonId()];
+			PatternMultiToolActions value = PatternMultiToolActions.values()[message.getButtonId()];
 
-			if (value == PatternMultiToolButtons.INV_SWITCH && container instanceof IContainerPatternMultiTool cmp) {
+			if (value == PatternMultiToolActions.INV_SWITCH && container instanceof IContainerPatternMultiTool cmp) {
 				cmp.toggleInventory();
 				return;
 			}
@@ -56,7 +56,7 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 	}
 
 	// Handles the logic for when a button is pressed
-	private void handleButtonPress(ItemStack is, AEBaseContainer container, PatternMultiToolButtons buttonId) {
+	private void handleButtonPress(ItemStack is, AEBaseContainer container, PatternMultiToolActions buttonId) {
 		switch (buttonId) {
 			case MUL2 -> updatePatternCount(is, 2, Operation.MULTIPLY);
 			case MUL3 -> updatePatternCount(is, 3, Operation.MULTIPLY);

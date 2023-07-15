@@ -1,5 +1,7 @@
 package co.neeve.nae2;
 
+import appeng.util.Platform;
+import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
 import co.neeve.nae2.common.Items;
 import co.neeve.nae2.items.patternmultitool.GuiHandlerPatternMultiTool;
 import co.neeve.nae2.items.patternmultitool.net.HandlerPatternMultiTool;
@@ -26,6 +28,9 @@ public class NAE2 {
 		MinecraftForge.EVENT_BUS.register(this);
 		itemHandler = new Items();
 		MinecraftForge.EVENT_BUS.register(itemHandler);
+		if (Platform.isClient()) {
+			MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
+		}
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerPatternMultiTool());
 
 		NAE2.network.registerMessage(HandlerPatternMultiTool.class, PatternMultiToolPacket.class, 0, Side.SERVER);

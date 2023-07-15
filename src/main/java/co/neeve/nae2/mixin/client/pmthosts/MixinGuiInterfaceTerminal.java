@@ -1,10 +1,12 @@
-package co.neeve.nae2.mixin.client;
+package co.neeve.nae2.mixin.client.pmthosts;
 
+import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.implementations.GuiInterfaceTerminal;
 import appeng.container.slot.AppEngSlot;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.common.slots.SlotPatternMultiTool;
+import co.neeve.nae2.mixin.client.MixinAEBaseGui;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -42,6 +44,12 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 	@Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false)
 	public void injectJEIAreas(CallbackInfoReturnable<List<Rectangle>> cir) {
 		cir.getReturnValue().addAll(super.getJEIExclusionArea());
+	}
+
+	@Inject(method = "drawFG", at = @At("RETURN"), remap = false)
+	public void injectButtons(CallbackInfo ci) {
+		initializePatternMultiTool();
+		PatternMultiToolGUIHelper.repositionButtons((AEBaseGui) (Object) this, patternMultiToolButtons, 0, 11);
 	}
 
 	@Override

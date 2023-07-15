@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ContainerPatternTerm.class)
 public class MixinContainerPatternTerm extends MixinContainerPatternEncoder implements IPatternMultiToolToolboxHost {
 	@Inject(method =
-		"Lappeng/container/implementations/ContainerPatternTerm;<init>" + "(Lnet/minecraft/entity/player" +
-			"/InventoryPlayer;Lappeng/api/storage/ITerminalHost;)V", at = @At(value = "INVOKE", target = "Lappeng" +
+		"Lappeng/container/implementations/ContainerPatternTerm;<init>(Lnet/minecraft/entity/player/InventoryPlayer;" +
+			"Lappeng/api/storage/ITerminalHost;)V", at = @At(value = "INVOKE", target = "Lappeng" +
 		"/container/implementations/ContainerPatternTerm;bindPlayerInventory" + "(Lnet/minecraft/entity/player" +
 		"/InventoryPlayer;II)V"))
 	public void ctor(final InventoryPlayer ip, final ITerminalHost monitorable, CallbackInfo ci) {
