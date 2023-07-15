@@ -54,7 +54,7 @@ public class MixinAEBaseGui extends GuiContainer {
 	}
 
 	protected void initializePatternMultiTool() {
-		if (this instanceof IPatternMultiToolHostGui) {
+		if (this instanceof IPatternMultiToolHostGui host && host.getPMTObject() != null) {
 			// Calculate start position for buttons
 			Container inventorySlots = this.inventorySlots;
 			if (inventorySlots == null) return;

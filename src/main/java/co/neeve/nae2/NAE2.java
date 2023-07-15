@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
-	dependencies = "required-after:appliedenergistics2")
+	dependencies = "required-after:appliedenergistics2;required-after:mixinbooter")
 public class NAE2 {
 	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 	public static NAE2 instance;
