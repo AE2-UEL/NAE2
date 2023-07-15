@@ -11,6 +11,8 @@ import appeng.items.AEBaseItem;
 import appeng.me.GridAccessException;
 import appeng.me.helpers.IGridProxyable;
 import appeng.util.Platform;
+import baubles.api.BaubleType;
+import baubles.api.IBauble;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import net.minecraft.entity.player.EntityPlayer;
@@ -24,9 +26,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import org.jetbrains.annotations.NotNull;
 
-public class ToolPatternMultiTool extends AEBaseItem implements IGuiItem {
+@Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
+public class ToolPatternMultiTool extends AEBaseItem implements IGuiItem, IBauble {
 	public ToolPatternMultiTool() {
 		setRegistryName(Tags.MODID, "pattern_multiplier");
 		setTranslationKey(Tags.MODID + ".pattern_multiplier");
@@ -113,5 +117,10 @@ public class ToolPatternMultiTool extends AEBaseItem implements IGuiItem {
 
 	public ObjPatternMultiTool getGuiObject(ItemStack is, World w, BlockPos bp) {
 		return new ObjPatternMultiTool(is);
+	}
+
+	@Override
+	public BaubleType getBaubleType(ItemStack itemStack) {
+		return BaubleType.TRINKET;
 	}
 }
