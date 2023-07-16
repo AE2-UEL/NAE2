@@ -49,7 +49,8 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 	@Inject(method = "drawFG", at = @At("RETURN"), remap = false)
 	public void injectButtons(CallbackInfo ci) {
 		initializePatternMultiTool();
-		PatternMultiToolGUIHelper.repositionButtons((AEBaseGui) (Object) this, patternMultiToolButtons, 0, 11);
+		if (this.patternMultiToolButtons != null)
+			PatternMultiToolGUIHelper.repositionButtons((AEBaseGui) (Object) this, patternMultiToolButtons, 0, 11);
 	}
 
 	@Override
