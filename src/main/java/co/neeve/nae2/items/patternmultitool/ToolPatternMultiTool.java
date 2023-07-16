@@ -120,6 +120,7 @@ public class ToolPatternMultiTool extends AEBaseItem implements IGuiItem, IBaubl
 	}
 
 	@Override
+	@Optional.Method(modid = "baubles")
 	public BaubleType getBaubleType(ItemStack itemStack) {
 		return BaubleType.TRINKET;
 	}
