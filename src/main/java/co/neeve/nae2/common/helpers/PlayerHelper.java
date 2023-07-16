@@ -3,6 +3,7 @@ package co.neeve.nae2.common.helpers;
 import baubles.api.BaublesApi;
 import co.neeve.nae2.items.patternmultitool.ToolPatternMultiTool;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Optional;
@@ -42,5 +43,18 @@ public class PlayerHelper {
 	@Optional.Method(modid = "baubles")
 	public static IInventory getBaubles(EntityPlayer ep) throws NoSuchMethodError {
 		return BaublesApi.getBaubles(ep);
+	}
+
+	public static int getSlotFor(InventoryPlayer inventoryPlayer, ItemStack patternMultiTool) {
+		for (int i = 0; i < inventoryPlayer.mainInventory.size(); ++i) {
+			if (!inventoryPlayer.mainInventory.get(i).isEmpty()) {
+				ItemStack stack2 = inventoryPlayer.mainInventory.get(i);
+				if (patternMultiTool.getItem() == stack2.getItem() && (!patternMultiTool.getHasSubtypes() || patternMultiTool.getMetadata() == stack2.getMetadata()) && ItemStack.areItemStackTagsEqual(patternMultiTool, stack2)) {
+					return i;
+				}
+			}
+		}
+
+		return -1;
 	}
 }

@@ -82,7 +82,10 @@ public class MixinAEBaseContainer extends Container {
 			final ItemStack patternMultiTool = PlayerHelper.getPatternMultiTool(inventoryPlayer.player);
 			if (patternMultiTool == null) return;
 
-			this.lockPlayerInventorySlot(inventoryPlayer.getSlotFor(patternMultiTool));
+			int slot = PlayerHelper.getSlotFor(inventoryPlayer, patternMultiTool);
+			if (slot != -1)
+				this.lockPlayerInventorySlot(slot);
+
 			this.patternMultiToolObject = ToolPatternMultiTool.getGuiObject(patternMultiTool);
 			this.patternMultiToolSlots = new ArrayList<>();
 
