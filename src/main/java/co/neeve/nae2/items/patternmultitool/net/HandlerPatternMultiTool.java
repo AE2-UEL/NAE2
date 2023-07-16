@@ -103,19 +103,16 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 			return;
 		}
 
-		NBTTagList newTagIn = modifyTagList(tagIn, factor, operation);
-		NBTTagList newTagOut = modifyTagList(tagOut, factor, operation);
+		modifyTagList(tagIn, factor, operation);
+		modifyTagList(tagOut, factor, operation);
 
 		NBTTagCompound newNbt = is.getTagCompound();
-		newNbt.setTag("in", newTagIn);
-		newNbt.setTag("out", newTagOut);
 		newNbt.setByte("crafting", (byte) 0);
 		newNbt.setByte("substitute", (byte) 0);
 	}
 
 	// Modifies the count of each tag in the list based on the operation and factor
-	private NBTTagList modifyTagList(NBTTagList tagList, int factor, Operation operation) {
-		NBTTagList newTagList = new NBTTagList();
+	private void modifyTagList(NBTTagList tagList, int factor, Operation operation) {
 		for (NBTBase tag : tagList) {
 			NBTTagCompound ntc = (NBTTagCompound) tag;
 			int count = ntc.getInteger("Count");
@@ -150,9 +147,7 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 			} else {
 				ntc.removeTag("stackSize");
 			}
-			newTagList.appendTag(ntc);
 		}
-		return newTagList;
 	}
 
 	// Enum for possible operations
