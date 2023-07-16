@@ -2,7 +2,7 @@ package co.neeve.nae2;
 
 import appeng.util.Platform;
 import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
-import co.neeve.nae2.common.Items;
+import co.neeve.nae2.common.RegistryHandler;
 import co.neeve.nae2.items.patternmultitool.GuiHandlerPatternMultiTool;
 import co.neeve.nae2.items.patternmultitool.net.HandlerPatternMultiTool;
 import co.neeve.nae2.items.patternmultitool.net.PatternMultiToolPacket;
@@ -20,14 +20,13 @@ import net.minecraftforge.fml.relauncher.Side;
 public class NAE2 {
 	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 	public static NAE2 instance;
-	private Items itemHandler;
+	private final RegistryHandler registryHandler = new RegistryHandler();
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		NAE2.instance = this;
 		MinecraftForge.EVENT_BUS.register(this);
-		itemHandler = new Items();
-		MinecraftForge.EVENT_BUS.register(itemHandler);
+
 		if (Platform.isClient()) {
 			MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
 		}
@@ -38,6 +37,6 @@ public class NAE2 {
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		itemHandler.init();
+		registryHandler.postInit();
 	}
 }

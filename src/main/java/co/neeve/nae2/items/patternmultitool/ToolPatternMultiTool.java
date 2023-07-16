@@ -14,7 +14,6 @@ import appeng.util.Platform;
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
 import co.neeve.nae2.NAE2;
-import co.neeve.nae2.Tags;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -32,8 +31,6 @@ import org.jetbrains.annotations.NotNull;
 @Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
 public class ToolPatternMultiTool extends AEBaseItem implements IGuiItem, IBauble {
 	public ToolPatternMultiTool() {
-		setRegistryName(Tags.MODID, "pattern_multiplier");
-		setTranslationKey(Tags.MODID + ".pattern_multiplier");
 		setMaxStackSize(1);
 	}
 
