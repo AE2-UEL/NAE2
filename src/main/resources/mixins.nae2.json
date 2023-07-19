@@ -20,10 +20,12 @@
     "client.MixinAEBaseGui",
     "client.MixinAEBaseMEGui",
     "client.MixinAEItemStack",
+    "client.MixinCableBusContainer",
     "client.MixinGuiMEMonitorable",
     "client.MixinGuiUpgradeable",
     "client.MixinJEIIngredientGrid",
     "client.MixinStackSizeRenderer",
+    "client.MixinTileCableBusTESR",
     "client.pmthosts.MixinGuiInterface",
     "client.pmthosts.MixinGuiInterfaceTerminal",
     "client.pmthosts.MixinGuiPatternTerminal"
