@@ -26,13 +26,13 @@ public class NAE2 {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		NAE2.instance = this;
-		MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
 		MinecraftForge.EVENT_BUS.register(new WorldListener());
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerPatternMultiTool());
 
 		NAE2.network.registerMessage(HandlerPatternMultiTool.class, PatternMultiToolPacket.class, 0, Side.SERVER);
 
 		if (event.getSide() == Side.CLIENT) {
+			MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
 			ModelManager.register();
 		}
 	}

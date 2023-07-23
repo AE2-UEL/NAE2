@@ -193,7 +193,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@Override
 	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
 		try {
-			var isValid = newState.isTranslucent() || !newState.getMaterial().isOpaque();
+			var isValid = !newState.getMaterial().isOpaque();
 			if (connection != null && !isValid) {
 				breakPos = pos;
 				this.getProxy().getTick().alertDevice(this.getGridNode());
@@ -319,7 +319,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 			var block = world.getBlockState(loc);
 			// No can do. Something is blocking us.
-			if (!block.isTranslucent()) {
+			if (block.getMaterial().isOpaque()) {
 				disconnect();
 				return TickRateModulation.SLOWER;
 			}

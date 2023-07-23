@@ -28,7 +28,7 @@ public enum Parts {
 	private final String id;
 	private final Class<? extends NAEBasePart> clazz;
 	private final String translationKey;
-	@SideOnly(Side.CLIENT)
+
 	private ModelResourceLocation modelResourceLocation = null;
 
 	Parts(String id, Class<? extends NAEBasePart> clazz) {
@@ -53,6 +53,7 @@ public enum Parts {
 		return registered.get(part.getClass()).getTranslationKey();
 	}
 
+	@SideOnly(Side.CLIENT)
 	public ModelResourceLocation getModelResourceLocation() {
 		return modelResourceLocation;
 	}
