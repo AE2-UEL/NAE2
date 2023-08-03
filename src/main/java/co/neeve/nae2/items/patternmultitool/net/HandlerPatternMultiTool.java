@@ -119,11 +119,11 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 
 		for (var i = 0; i < inv.getSlots(); i++) {
 			var is = inv.getStackInSlot(i);
-			if (!(is.getItem() instanceof ItemEncodedPattern)) return;
+			if (!(is.getItem() instanceof ItemEncodedPattern)) continue;
 			NBTTagCompound nbt = is.getTagCompound();
 			if (nbt == null) {
 				// Skip this item if it has no NBT data
-				return;
+				continue;
 			}
 
 			final NBTTagList tagIn = (NBTTagList) nbt.getTag("in").copy();

@@ -290,7 +290,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 			for (var slot : patternMultiToolSlots) {
 				var is = slot.getStack();
-				if (!(is.getItem() instanceof ItemEncodedPattern)) return;
+				if (!(is.getItem() instanceof ItemEncodedPattern)) continue;
 				NBTTagCompound nbt = is.getTagCompound();
 				if (nbt == null) {
 					// Skip this item if it has no NBT data
