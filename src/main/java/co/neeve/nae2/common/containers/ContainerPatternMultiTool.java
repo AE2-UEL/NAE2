@@ -57,12 +57,12 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	private final InventoryPlayer inventoryPlayer;
 	private final List<AppEngSlot> patternMultiToolSlots = new ArrayList<>();
 	private final IInterfaceHost iface;
-	@SideOnly(Side.CLIENT)
-	private final HashMap<AppEngSlot, ValidatonResult> highlightedSlots = new HashMap<>();
 	@GuiSync(0)
 	public PatternMultiToolInventories viewingInventory = PatternMultiToolInventories.PMT;
 	@GuiSync(1)
 	public PatternMultiToolTabs viewingTab = PatternMultiToolTabs.MULTIPLIER;
+	@SideOnly(Side.CLIENT)
+	private HashMap<AppEngSlot, ValidatonResult> highlightedSlots;
 	private NetworkToolViewer tbInventory;
 	private List<SlotFake> srSlots;
 
@@ -72,6 +72,10 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		this.inventoryPlayer = ip;
 		this.iface = iface;
 		this.lockPlayerInventorySlot(ip.currentItem);
+
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+			highlightedSlots = new HashMap<>();
+		}
 
 		if (iface != null) {
 			this.viewingInventory = PatternMultiToolInventories.INTERFACE;
@@ -128,7 +132,9 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		this.inventorySlots.clear();
 		this.inventoryItemStacks.clear();
 		this.patternMultiToolSlots.clear();
-		this.highlightedSlots.clear();
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+			this.highlightedSlots.clear();
+		}
 		this.srSlots = null;
 
 		for (int y = 0; y < 4; ++y) {
