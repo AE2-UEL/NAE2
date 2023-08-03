@@ -17,12 +17,14 @@ import net.minecraftforge.items.IItemHandler;
 public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 	public static final int UPGRADE_COUNT = 3;
 	private final AppEngInternalInventory inv;
+	private final AppEngInternalInventory srInv;
 	private final ItemStack is;
 	private final StackUpgradeInventory upgrades;
 
 	public ObjPatternMultiTool(ItemStack is) {
 		this.is = is;
 		this.inv = new AppEngInternalInventory(this, 36);
+		this.srInv = new AppEngInternalInventory(this, 2, 1);
 		this.inv.setFilter(new ObjPatternMultiToolInventoryFilter());
 		upgrades = new StackUpgradeInventory(this.is, this, UPGRADE_COUNT);
 
@@ -30,9 +32,11 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 			NBTTagCompound data = Platform.openNbtData(is);
 			data.getCompoundTag("inv").removeTag("Size");
 			data.getCompoundTag("upgrades").removeTag("Size");
+			data.getCompoundTag("srInv").removeTag("Size");
 
 			this.inv.readFromNBT(data, "inv");
 			this.upgrades.readFromNBT(data, "upgrades");
+			this.srInv.readFromNBT(data, "srInv");
 		}
 	}
 
@@ -41,6 +45,7 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 
 		this.inv.writeToNBT(data, "inv");
 		this.upgrades.writeToNBT(data, "upgrades");
+		this.srInv.writeToNBT(data, "srInv");
 	}
 
 	public void onChangeInventory(IItemHandler inv, int slot, InvOperation mc, ItemStack removedStack,
@@ -53,6 +58,10 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 
 	public IItemHandler getPatternInventory() {
 		return this.inv;
+	}
+
+	public IItemHandler getSearchReplaceInventory() {
+		return this.srInv;
 	}
 
 	public UpgradeInventory getUpgradeInventory() {

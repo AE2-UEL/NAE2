@@ -2,14 +2,21 @@ package co.neeve.nae2.items.patternmultitool.net;
 
 import appeng.api.AEApi;
 import appeng.container.AEBaseContainer;
+import appeng.container.ContainerNull;
+import appeng.helpers.ItemStackHelper;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.util.Platform;
+import co.neeve.nae2.common.containers.ContainerPatternMultiTool;
+import co.neeve.nae2.common.enums.PatternMultiToolActionTypes;
 import co.neeve.nae2.common.enums.PatternMultiToolActions;
+import co.neeve.nae2.common.enums.PatternMultiToolTabs;
 import co.neeve.nae2.common.interfaces.IContainerPatternMultiTool;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -31,27 +38,38 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 		if (Platform.isClient()) return;
 
 		if (player.openContainer instanceof AEBaseContainer bc && bc instanceof IPatternMultiToolHost container) {
-			AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternMultiToolInventory();
-			if (inv == null) return;
+			if (message.getActionType() == PatternMultiToolActionTypes.TAB_SWITCH && container instanceof ContainerPatternMultiTool containerPatternMultiTool) {
+				containerPatternMultiTool.switchTab(PatternMultiToolTabs.values()[message.getValue()]);
+			} else if (message.getActionType() == PatternMultiToolActionTypes.BUTTON_PRESS) {
+				AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternMultiToolInventory();
+				if (inv == null) return;
 
-			PatternMultiToolActions value = PatternMultiToolActions.values()[message.getButtonId()];
+				PatternMultiToolActions value = PatternMultiToolActions.values()[message.getValue()];
 
-			if (value == PatternMultiToolActions.INV_SWITCH && container instanceof IContainerPatternMultiTool cmp) {
-				cmp.toggleInventory();
-				return;
-			}
+				if (value == PatternMultiToolActions.INV_SWITCH && container instanceof IContainerPatternMultiTool cmp) {
+					cmp.toggleInventory();
+					bc.detectAndSendChanges();
+					return;
+				}
 
-			for (ItemStack is : inv) {
-				if (is.getItem() instanceof ItemEncodedPattern) {
-					try {
-						handleButtonPress(is, bc, value);
-					} catch (IndexOutOfBoundsException e) {
-						// uwu
+				if (value == PatternMultiToolActions.REPLACE && container instanceof IContainerPatternMultiTool cmp) {
+					searchAndReplace(cmp, player);
+					bc.detectAndSendChanges();
+					return;
+				}
+
+				for (ItemStack is : inv) {
+					if (is.getItem() instanceof ItemEncodedPattern) {
+						try {
+							handleButtonPress(is, bc, value);
+						} catch (IndexOutOfBoundsException e) {
+							// uwu
+						}
 					}
 				}
-			}
 
-			bc.detectAndSendChanges();
+				bc.detectAndSendChanges();
+			}
 		}
 	}
 
@@ -84,6 +102,74 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 			}
 		}
 		return false;
+	}
+
+	// Searches and replaces items. Duh :)
+	private void searchAndReplace(IContainerPatternMultiTool host, EntityPlayerMP player) {
+		var srInv = host.getSearchReplaceInventory();
+		var inv = host.getPatternMultiToolInventory();
+		if (srInv == null || inv == null) return;
+
+		var itemA = srInv.getStackInSlot(0);
+		var itemB = srInv.getStackInSlot(1);
+		if (itemA.isEmpty() || itemB.isEmpty()) return;
+
+		var itemBData = ItemStackHelper.stackToNBT(itemB);
+		var crafting = new InventoryCrafting(new ContainerNull(), 3, 3);
+
+		for (var i = 0; i < inv.getSlots(); i++) {
+			var is = inv.getStackInSlot(i);
+			if (!(is.getItem() instanceof ItemEncodedPattern)) return;
+			NBTTagCompound nbt = is.getTagCompound();
+			if (nbt == null) {
+				// Skip this item if it has no NBT data
+				return;
+			}
+
+			final NBTTagList tagIn = (NBTTagList) nbt.getTag("in").copy();
+			final NBTTagList tagOut = (NBTTagList) nbt.getTag("out").copy();
+
+			var lists = new NBTTagList[]{ tagIn, tagOut };
+			for (var list : lists) {
+				var idx = 0;
+				for (NBTBase tag : list.copy()) {
+					NBTTagCompound compound = (NBTTagCompound) tag;
+					var stack = ItemStackHelper.stackFromNBT(compound);
+					if (itemA.isItemEqual(stack)) {
+						var count = compound.getTag("Count").copy();
+						var data = itemBData.copy();
+						data.setTag("Count", count);
+						list.set(idx, data);
+					}
+					idx++;
+				}
+			}
+
+			// Validate
+			if (nbt.getBoolean("crafting")) {
+				try {
+					if (tagIn.tagCount() != 9) {
+						continue;
+					}
+					var w = player.world;
+
+					crafting.clear();
+					for (var j = 0; j < tagIn.tagCount(); j++) {
+						var is1 = ItemStackHelper.stackFromNBT((NBTTagCompound) tagIn.get(j));
+						crafting.setInventorySlotContents(j, is1);
+					}
+
+					if (null == CraftingManager.findMatchingRecipe(crafting, w)) {
+						continue;
+					}
+				} catch (Exception e) {
+					continue;
+				}
+			}
+
+			nbt.setTag("in", tagIn);
+			nbt.setTag("out", tagOut);
+		}
 	}
 
 	// Updates the count of a pattern based on the operation and factor

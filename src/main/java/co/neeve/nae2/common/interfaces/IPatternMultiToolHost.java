@@ -28,6 +28,13 @@ public interface IPatternMultiToolHost {
 		return pmtObject.getUpgradeInventory();
 	}
 
+	default @Nullable IItemHandler getSearchReplaceInventory() {
+		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
+		if (pmtObject == null) return null;
+		return pmtObject.getSearchReplaceInventory();
+	}
+
+
 	default boolean isPatternMultiToolSlotEnabled(int i) {
 		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
 		if (pmtObject == null) return false;

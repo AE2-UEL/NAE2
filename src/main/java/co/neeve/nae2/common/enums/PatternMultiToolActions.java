@@ -6,6 +6,7 @@ import javax.annotation.Nullable;
 
 public enum PatternMultiToolActions {
 	CLEAR("nae2.pattern_multiplier.unencode"),
+	REPLACE("nae2.pattern_multiplier.replace"),
 	INV_SWITCH(),
 	SUB("-1", ButtonToolTips.DecreaseByOne),
 	DIV2("/2", ButtonToolTips.DivideByTwo),

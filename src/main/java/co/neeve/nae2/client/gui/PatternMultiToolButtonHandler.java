@@ -3,6 +3,7 @@ package co.neeve.nae2.client.gui;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
+import co.neeve.nae2.common.enums.PatternMultiToolActionTypes;
 import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import co.neeve.nae2.items.patternmultitool.net.PatternMultiToolPacket;
 import net.minecraft.client.Minecraft;
@@ -22,12 +23,14 @@ public class PatternMultiToolButtonHandler {
 
 				mc.displayGuiScreen(new GuiYesNo((boolean confirm, int i) -> {
 					if (confirm) {
-						network.sendToServer(new PatternMultiToolPacket(PatternMultiToolActions.CLEAR.ordinal()));
+						network.sendToServer(new PatternMultiToolPacket(PatternMultiToolActionTypes.BUTTON_PRESS,
+							PatternMultiToolActions.CLEAR.ordinal()));
 					}
 					mc.displayGuiScreen(event.getGui());
 				}, "Do you really want to clear patterns?", "", 0));
 			} else {
-				network.sendToServer(new PatternMultiToolPacket(tb.getAction().ordinal()));
+				network.sendToServer(new PatternMultiToolPacket(PatternMultiToolActionTypes.BUTTON_PRESS,
+					tb.getAction().ordinal()));
 			}
 		}
 	}

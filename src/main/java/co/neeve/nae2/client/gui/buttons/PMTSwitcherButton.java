@@ -14,14 +14,14 @@ import org.jetbrains.annotations.NotNull;
 import static net.minecraftforge.fml.relauncher.Side.CLIENT;
 
 @SideOnly(CLIENT)
-public class NAE2GuiTabButton extends GuiButton implements ITooltip {
+public class PMTSwitcherButton extends GuiButton implements ITooltip {
 	private final RenderItem itemRenderer;
 	private String message;
 	private int hideEdge = 0;
 	private int myIcon = -1;
 	private ItemStack myItem;
 
-	public NAE2GuiTabButton(int x, int y, int ico, String message, RenderItem ir) {
+	public PMTSwitcherButton(int x, int y, int ico, String message, RenderItem ir) {
 		super(0, 0, 16, "");
 		this.x = x;
 		this.y = y;
@@ -32,7 +32,7 @@ public class NAE2GuiTabButton extends GuiButton implements ITooltip {
 		this.itemRenderer = ir;
 	}
 
-	public NAE2GuiTabButton(int x, int y, ItemStack ico, String message, RenderItem ir) {
+	public PMTSwitcherButton(int x, int y, ItemStack ico, String message, RenderItem ir) {
 		super(0, 0, 16, "");
 		this.x = x;
 		this.y = y;

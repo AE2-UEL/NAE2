@@ -1,4 +1,11 @@
+#PARSE_ESCAPES
+
 item.nae2.pattern_multiplier.name=Pattern Multi-Tool
 
 nae2.pattern_multiplier.unencode=Clear
 nae2.pattern_multiplier.unencode.desc=Turns all encoded patterns into blank patterns. This cannot be reversed!
+nae2.pattern_multiplier.replace=Replace
+nae2.pattern_multiplier.replace.desc=Replaces the item in the first slot with the second slot in all patterns. This cannot be reversed!\n\nRed means that matching item is found, but replacement will result in an invalid pattern. Red slots are skipped.\n\nGreen means that replacement will succeed.
+
+nae2.pattern_multiplier.tab.multiply=Multiply
+nae2.pattern_multiplier.tab.replace=Replace

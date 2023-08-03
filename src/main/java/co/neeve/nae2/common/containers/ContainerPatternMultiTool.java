@@ -3,10 +3,14 @@ package co.neeve.nae2.common.containers;
 import appeng.api.config.Upgrades;
 import appeng.api.implementations.guiobjects.IGuiItem;
 import appeng.container.AEBaseContainer;
+import appeng.container.ContainerNull;
 import appeng.container.guisync.GuiSync;
 import appeng.container.slot.AppEngSlot;
+import appeng.container.slot.SlotFake;
+import appeng.container.slot.SlotFakeTypeOnly;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.helpers.IInterfaceHost;
+import appeng.helpers.ItemStackHelper;
 import appeng.items.contents.NetworkToolViewer;
 import appeng.items.misc.ItemEncodedPattern;
 import appeng.items.tools.ToolNetworkTool;
@@ -15,23 +19,35 @@ import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.util.Platform;
 import appeng.util.inv.IAEAppEngInventory;
 import appeng.util.inv.InvOperation;
+import co.neeve.nae2.client.gui.implementations.GuiPatternMultiTool;
 import co.neeve.nae2.common.enums.PatternMultiToolInventories;
+import co.neeve.nae2.common.enums.PatternMultiToolTabs;
 import co.neeve.nae2.common.interfaces.IContainerPatternMultiTool;
 import co.neeve.nae2.common.slots.SlotPatternMultiTool;
 import co.neeve.nae2.common.slots.SlotPatternMultiToolUpgrade;
 import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
 import com.google.common.collect.Lists;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,9 +58,14 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	private final InventoryPlayer inventoryPlayer;
 	private final List<AppEngSlot> patternMultiToolSlots = new ArrayList<>();
 	private final IInterfaceHost iface;
+	@SideOnly(Side.CLIENT)
+	private final HashMap<AppEngSlot, ValidatonResult> highlightedSlots = new HashMap<>();
 	@GuiSync(0)
 	public PatternMultiToolInventories viewingInventory = PatternMultiToolInventories.PMT;
+	@GuiSync(1)
+	public PatternMultiToolTabs viewingTab = PatternMultiToolTabs.MULTIPLIER;
 	private NetworkToolViewer tbInventory;
+	private List<SlotFake> srSlots;
 
 	public ContainerPatternMultiTool(InventoryPlayer ip, ObjPatternMultiTool te, IInterfaceHost iface) {
 		super(ip, te);
@@ -59,6 +80,14 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 		// Add slots for the container
 		addSlots();
+	}
+
+	public HashMap<AppEngSlot, ValidatonResult> getHighlightedSlots() {
+		return highlightedSlots;
+	}
+
+	public List<SlotFake> getSearchReplaceSlots() {
+		return srSlots;
 	}
 
 	public boolean hasToolbox() {
@@ -84,16 +113,24 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 	@Override
 	public void onUpdate(String field, Object oldValue, Object newValue) {
-		if (field.equals("viewingInventory")) {
+		if (field.equals("viewingInventory") || field.equals("viewingTab")) {
 			this.addSlots();
+
+			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+				if (Minecraft.getMinecraft().currentScreen instanceof GuiPatternMultiTool gpmt) {
+					gpmt.setupTabSpecificButtons();
+				}
+			}
 		}
 	}
-
 
 	// Add slots for the container
 	private void addSlots() {
 		this.inventorySlots.clear();
 		this.inventoryItemStacks.clear();
+		this.patternMultiToolSlots.clear();
+		this.highlightedSlots.clear();
+		this.srSlots = null;
 
 		for (int y = 0; y < 4; ++y) {
 			for (int x = 0; x < 9; ++x) {
@@ -121,6 +158,14 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 					0, 0));
 				break;
 			}
+		}
+
+		if (this.viewingTab == PatternMultiToolTabs.SEARCH_REPLACE) {
+			this.srSlots = new ArrayList<>();
+			var inv = this.patternMultiTool.getSearchReplaceInventory();
+			this.srSlots.add((SlotFake) this.addSlotToContainer(new SlotFakeTypeOnly(inv, 0, 8, 76 + 18 + 1)));
+			this.srSlots.add((SlotFake) this.addSlotToContainer(new SlotFakeTypeOnly(inv, 1, 8 + 6 + 22 + 18,
+				76 + 18 + 1)));
 		}
 
 		if (this.hasToolbox()) {
@@ -222,6 +267,90 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			}
 		}
 
+		if (this.viewingTab == PatternMultiToolTabs.SEARCH_REPLACE) {
+			if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
+			this.highlightedSlots.clear();
+
+			var host = this;
+			var srInv = host.getSearchReplaceInventory();
+			var inv = host.getPatternMultiToolInventory();
+			if (srInv == null || inv == null) return;
+
+			var itemA = srInv.getStackInSlot(0);
+			var itemB = srInv.getStackInSlot(1);
+			if (itemA.isEmpty() || itemB.isEmpty()) return;
+
+			var itemBData = ItemStackHelper.stackToNBT(itemB);
+			var crafting = new InventoryCrafting(new ContainerNull(), 3, 3);
+
+			for (var slot : patternMultiToolSlots) {
+				var is = slot.getStack();
+				if (!(is.getItem() instanceof ItemEncodedPattern)) return;
+				NBTTagCompound nbt = is.getTagCompound();
+				if (nbt == null) {
+					// Skip this item if it has no NBT data
+					continue;
+				}
+
+				var isCrafting = nbt.getBoolean("crafting");
+				ValidatonResult result = null;
+
+				final NBTTagList tagIn = (NBTTagList) nbt.getTag("in").copy();
+				final NBTTagList tagOut = (NBTTagList) nbt.getTag("out").copy();
+
+				var lists = new ArrayList<NBTTagList>();
+				lists.add(tagIn);
+				if (!isCrafting) lists.add(tagOut);
+
+				for (var list : lists) {
+					var idx = 0;
+					for (NBTBase tag : list.copy()) {
+						NBTTagCompound compound = (NBTTagCompound) tag;
+						var stack = ItemStackHelper.stackFromNBT(compound);
+						if (itemA.isItemEqual(stack)) {
+							result = ValidatonResult.OK;
+
+							// If crafting, store validation for later.
+							if (isCrafting) {
+								var count = compound.getTag("Count").copy();
+								var data = itemBData.copy();
+								data.setTag("Count", count);
+								list.set(idx, data);
+							} else continue;
+						}
+						idx++;
+					}
+				}
+
+				if (result != null) {
+					// Validate
+					if (isCrafting) {
+						try {
+							if (tagIn.tagCount() != 9) {
+								result = ValidatonResult.ERROR;
+							}
+							var w = this.inventoryPlayer.player.world;
+
+							crafting.clear();
+							for (var j = 0; j < tagIn.tagCount(); j++) {
+								var is1 = ItemStackHelper.stackFromNBT((NBTTagCompound) tagIn.get(j));
+								crafting.setInventorySlotContents(j, is1);
+							}
+
+							if (null == CraftingManager.findMatchingRecipe(crafting, w)) {
+								result = ValidatonResult.ERROR;
+							}
+						} catch (Exception e) {
+							continue;
+						}
+					}
+
+					highlightedSlots.put(slot, result);
+				}
+			}
+		}
+
+
 		super.detectAndSendChanges();
 	}
 
@@ -293,6 +422,18 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		viewingInventory = viewingInventory == PatternMultiToolInventories.PMT ?
 			PatternMultiToolInventories.INTERFACE : PatternMultiToolInventories.PMT;
 		addSlots();
+	}
+
+	public void switchTab(PatternMultiToolTabs tab) {
+		this.viewingTab = tab;
+		addSlots();
+		detectAndSendChanges();
+	}
+
+
+	public enum ValidatonResult {
+		OK,
+		ERROR
 	}
 }
 
