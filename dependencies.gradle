@@ -22,6 +22,6 @@
  * For more details, see https://docs.gradle.org/8.0.1/userguide/java_library_plugin.html#sec:java_library_configurations_graph
  */
 dependencies {
-    implementation rfg.deobf("curse.maven:ae2-extended-life-570458:4623763")
+    implementation rfg.deobf("curse.maven:ae2-extended-life-570458:4673868")
     compileOnlyApi rfg.deobf("curse.maven:baubles-227083:2518667")
 }
