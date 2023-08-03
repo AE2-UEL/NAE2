@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -29,9 +30,10 @@ import java.util.List;
 
 import static java.util.Collections.EMPTY_LIST;
 
-@SuppressWarnings("SameReturnValue")
+@SuppressWarnings({ "SameReturnValue", "AddedMixinMembersNamePattern" })
 @Mixin(value = AEBaseGui.class)
 public class MixinAEBaseGui extends GuiContainer {
+	@Unique
 	protected List<PatternMultiToolButton> patternMultiToolButtons = null;
 	@Final
 	@Shadow
@@ -53,6 +55,7 @@ public class MixinAEBaseGui extends GuiContainer {
 		return stack;
 	}
 
+	@Unique
 	protected void initializePatternMultiTool() {
 		if (this instanceof IPatternMultiToolHostGui host && host.getPMTObject() != null) {
 			// Calculate start position for buttons
@@ -90,11 +93,7 @@ public class MixinAEBaseGui extends GuiContainer {
 	}
 
 	@Shadow
-	protected void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {
-	}
-
-	@Shadow
-	protected List<Rectangle> getJEIExclusionArea() {
+	public List<Rectangle> getJEIExclusionArea() {
 		return null;
 	}
 
@@ -111,7 +110,7 @@ public class MixinAEBaseGui extends GuiContainer {
 	@Override
 	protected boolean hasClickedOutside(int mouseX, int mouseY, int guiLeft, int guiTop) {
 		if (this instanceof IPatternMultiToolHostGui pmh) {
-			boolean outside = PatternMultiToolGUIHelper.hasClickedOutside(pmh, mouseX, mouseY, guiLeft, guiTop);
+			boolean outside = PatternMultiToolGUIHelper.hasClickedOutside(pmh, mouseX, mouseY);
 			if (!outside) return false;
 		}
 

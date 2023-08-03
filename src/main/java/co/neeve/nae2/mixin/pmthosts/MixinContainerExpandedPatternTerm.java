@@ -10,8 +10,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(ContainerExpandedProcessingPatternTerm.class)
 public class MixinContainerExpandedPatternTerm extends MixinContainerPatternEncoder implements IPatternMultiToolToolboxHost {
+	@SuppressWarnings("InjectIntoConstructor")
 	@Inject(method =
 		"Lappeng/container/implementations/ContainerExpandedProcessingPatternTerm;<init>" +
 			"(Lnet/minecraft/entity/player/InventoryPlayer;Lappeng/api/storage/ITerminalHost;)V", at = @At(value =

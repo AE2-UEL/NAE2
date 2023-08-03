@@ -17,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -25,10 +26,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-@SuppressWarnings({ "EmptyMethod", "SameReturnValue" })
+@SuppressWarnings({ "EmptyMethod", "SameReturnValue", "AddedMixinMembersNamePattern" })
 @Mixin(AEBaseContainer.class)
 public class MixinAEBaseContainer extends Container {
+	@Unique
 	protected ObjPatternMultiTool patternMultiToolObject = null;
+	@Unique
 	protected ArrayList<AppEngSlot> patternMultiToolSlots = null;
 
 	@Shadow
@@ -68,14 +71,17 @@ public class MixinAEBaseContainer extends Container {
 		selectedSlots.sort(Comparator.comparing(o -> !(o instanceof SlotPatternMultiTool)));
 	}
 
+	@Unique
 	public ObjPatternMultiTool getPatternMultiToolObject() {
 		return this.patternMultiToolObject;
 	}
 
+	@Unique
 	public List<AppEngSlot> getPatternMultiToolSlots() {
 		return this.patternMultiToolSlots;
 	}
 
+	@Unique
 	public void initializePatternMultiTool() {
 		if (this instanceof IPatternMultiToolToolboxHost host) {
 			final InventoryPlayer inventoryPlayer = this.getInventoryPlayer();

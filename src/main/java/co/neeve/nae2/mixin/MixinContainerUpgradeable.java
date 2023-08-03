@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ContainerUpgradeable.class)
 public class MixinContainerUpgradeable extends MixinAEBaseContainer {
+	@SuppressWarnings("InjectIntoConstructor")
 	@Inject(method =
 		"Lappeng/container/implementations/ContainerUpgradeable;<init>" + "(Lnet/minecraft/entity/player" +
 			"/InventoryPlayer;Lappeng/api/implementations/IUpgradeableHost;)V", at = @At(value = "INVOKE", target =

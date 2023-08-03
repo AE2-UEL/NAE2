@@ -4,6 +4,7 @@ import mezz.jei.gui.overlay.IngredientGrid;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -11,10 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.awt.*;
 import java.util.Collection;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Pseudo
 @Mixin(value = IngredientGrid.class, remap = false)
 public class MixinJEIIngredientGrid {
 
+	@Unique
 	private Collection<Rectangle> rectangles = null;
 
 	@Inject(at = @At("HEAD"), method = "shouldDeleteItemOnClick(Lnet/minecraft/client/Minecraft;II)Z", cancellable =

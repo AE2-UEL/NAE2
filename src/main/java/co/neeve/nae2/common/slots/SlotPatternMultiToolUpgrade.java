@@ -17,6 +17,6 @@ public class SlotPatternMultiToolUpgrade extends SlotRestrictedInput {
 
 	@Override
 	public boolean canTakeStack(EntityPlayer par1EntityPlayer) {
-		return this.host.canTakeStack(this, par1EntityPlayer) && super.canTakeStack(par1EntityPlayer);
+		return this.host.canTakeStack() && super.canTakeStack(par1EntityPlayer);
 	}
 }

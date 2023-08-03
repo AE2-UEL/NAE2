@@ -18,19 +18,7 @@ public class PMTSwitcherButton extends GuiButton implements ITooltip {
 	private final RenderItem itemRenderer;
 	private String message;
 	private int hideEdge = 0;
-	private int myIcon = -1;
 	private ItemStack myItem;
-
-	public PMTSwitcherButton(int x, int y, int ico, String message, RenderItem ir) {
-		super(0, 0, 16, "");
-		this.x = x;
-		this.y = y;
-		this.width = 22;
-		this.height = 22;
-		this.myIcon = ico;
-		this.message = message;
-		this.itemRenderer = ir;
-	}
 
 	public PMTSwitcherButton(int x, int y, ItemStack ico, String message, RenderItem ir) {
 		super(0, 0, 16, "");
@@ -52,11 +40,6 @@ public class PMTSwitcherButton extends GuiButton implements ITooltip {
 			int uv_x = this.hideEdge > 0 ? 11 : 13;
 			int offsetX = this.hideEdge > 0 ? 1 : 0;
 			this.drawTexturedModalRect(this.x, this.y, uv_x * 16, 0, 25, 22);
-			if (this.myIcon >= 0) {
-				int uv_y = (int) (double) (this.myIcon / 16);
-				uv_x = this.myIcon - uv_y * 16;
-				this.drawTexturedModalRect(offsetX + this.x + 3, this.y + 3, uv_x * 16, uv_y * 16, 16, 16);
-			}
 
 			this.mouseDragged(minecraft, x, y);
 			if (this.myItem != null) {
@@ -99,10 +82,6 @@ public class PMTSwitcherButton extends GuiButton implements ITooltip {
 
 	public boolean isVisible() {
 		return this.visible;
-	}
-
-	public int getHideEdge() {
-		return this.hideEdge;
 	}
 
 	public void setHideEdge(int hideEdge) {

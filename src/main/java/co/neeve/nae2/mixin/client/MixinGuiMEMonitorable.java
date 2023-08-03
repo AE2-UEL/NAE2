@@ -3,6 +3,7 @@ package co.neeve.nae2.mixin.client;
 import appeng.client.gui.implementations.GuiMEMonitorable;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -20,4 +21,7 @@ public class MixinGuiMEMonitorable extends MixinAEBaseMEGui {
 	public void injectJEIAreas(CallbackInfoReturnable<List<Rectangle>> cir) {
 		cir.getReturnValue().addAll(super.getJEIExclusionArea());
 	}
+
+	@Shadow
+	public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY) {}
 }

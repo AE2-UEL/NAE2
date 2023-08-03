@@ -1,6 +1,5 @@
 package co.neeve.nae2.mixin.client.pmthosts;
 
-import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.implementations.GuiInterfaceTerminal;
 import appeng.container.slot.AppEngSlot;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
@@ -17,13 +16,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.awt.*;
 import java.util.List;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(GuiInterfaceTerminal.class)
 public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatternMultiToolHostGui {
 	public MixinGuiInterfaceTerminal(Container inventorySlotsIn) {
 		super(inventorySlotsIn);
 	}
 
-	@Inject(method = "Lappeng/client/gui/implementations/GuiInterfaceTerminal;drawBG(IIII)V", at = @At("HEAD"), remap
+	@Inject(method = "drawBG(IIII)V", at = @At("HEAD"), remap
 		= false)
 	public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY, CallbackInfo ci) {
 		if (this.getPMTObject() != null) {
@@ -50,7 +50,7 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 	public void injectButtons(CallbackInfo ci) {
 		initializePatternMultiTool();
 		if (this.patternMultiToolButtons != null)
-			PatternMultiToolGUIHelper.repositionButtons((AEBaseGui) (Object) this, patternMultiToolButtons, 0, 11);
+			PatternMultiToolGUIHelper.repositionButtons(patternMultiToolButtons, 0, 11);
 	}
 
 	@Override

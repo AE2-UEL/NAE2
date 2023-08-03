@@ -1,6 +1,5 @@
 package co.neeve.nae2.client.gui;
 
-import appeng.client.gui.AEBaseGui;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
@@ -41,15 +40,14 @@ public class PatternMultiToolGUIHelper {
 			gui.getGuiTop() + gui.getPMTOffsetY(), PMT_WIDTH, PMT_HEIGHT));
 	}
 
-	public static <T extends IPatternMultiToolHostGui> boolean hasClickedOutside(T gui, int mouseX, int mouseY,
-	                                                                             int guiLeft, int guiTop) {
+	public static <T extends IPatternMultiToolHostGui> boolean hasClickedOutside(T gui, int mouseX, int mouseY) {
 		int offsetX = gui.getGuiLeft() + gui.getPMTOffsetX();
 		int offsetY = gui.getGuiTop() + gui.getPMTOffsetY();
 
 		return !(mouseX >= offsetX && mouseX <= offsetX + PMT_WIDTH && mouseY >= offsetY && mouseY <= offsetY + PMT_HEIGHT);
 	}
 
-	public static void repositionButtons(AEBaseGui gui, List<PatternMultiToolButton> patternMultiToolButtons,
+	public static void repositionButtons(List<PatternMultiToolButton> patternMultiToolButtons,
 	                                     int offsetX, int offsetY) {
 		for (PatternMultiToolButton button : patternMultiToolButtons) {
 			button.y = button.getY() + offsetY;

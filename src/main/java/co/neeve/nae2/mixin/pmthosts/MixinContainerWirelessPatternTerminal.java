@@ -11,8 +11,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(ContainerWirelessPatternTerminal.class)
 public class MixinContainerWirelessPatternTerminal extends MixinContainerPatternEncoder implements IPatternMultiToolToolboxHost {
+	@SuppressWarnings("InjectIntoConstructor")
 	@Inject(method =
 		"<init>(Lnet/minecraft/entity/player/InventoryPlayer;Lappeng/helpers/WirelessTerminalGuiObject;)" + "V", at =
 	@At(value = "INVOKE", target = "Lappeng/container/implementations/ContainerWirelessPatternTerminal;" +

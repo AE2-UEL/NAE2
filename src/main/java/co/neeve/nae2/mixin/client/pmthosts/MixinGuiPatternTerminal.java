@@ -1,6 +1,5 @@
 package co.neeve.nae2.mixin.client.pmthosts;
 
-import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.implementations.GuiExpandedProcessingPatternTerm;
 import appeng.client.gui.implementations.GuiPatternTerm;
 import appeng.container.slot.AppEngSlot;
@@ -16,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static co.neeve.nae2.client.gui.PatternMultiToolGUIHelper.PMT_HEIGHT;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin({ GuiPatternTerm.class, GuiExpandedProcessingPatternTerm.class })
 public class MixinGuiPatternTerminal extends MixinGuiMEMonitorable implements IPatternMultiToolHostGui {
 
@@ -45,7 +45,7 @@ public class MixinGuiPatternTerminal extends MixinGuiMEMonitorable implements IP
 	public void injectButtons(CallbackInfo ci) {
 		initializePatternMultiTool();
 		if (this.patternMultiToolButtons != null)
-			PatternMultiToolGUIHelper.repositionButtons((AEBaseGui) (Object) this, patternMultiToolButtons, 0,
+			PatternMultiToolGUIHelper.repositionButtons(patternMultiToolButtons, 0,
 				this.getPMTOffsetY() - 50);
 	}
 

@@ -28,7 +28,6 @@ import co.neeve.nae2.common.slots.SlotPatternMultiToolUpgrade;
 import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -389,12 +388,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	@Override
-	public List<AppEngSlot> getPatternMultiToolSlots() {
-		return this.patternMultiToolSlots;
-	}
-
-	@Override
-	public boolean canTakeStack(SlotPatternMultiToolUpgrade slot, EntityPlayer player) {
+	public boolean canTakeStack() {
 		// Throw because this should never happen.
 		List<ItemStack> inventory =
 			Lists.newArrayList((AppEngInternalInventory) Objects.requireNonNull(this.getPatternMultiToolInventory()));

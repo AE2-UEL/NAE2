@@ -3,9 +3,12 @@ package co.neeve.nae2.mixin.client;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.common.interfaces.IExtendedAEItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(value = AEItemStack.class)
 public class MixinAEItemStack implements IExtendedAEItemStack {
+	@Unique
 	private int extendedCount;
 
 	@Override

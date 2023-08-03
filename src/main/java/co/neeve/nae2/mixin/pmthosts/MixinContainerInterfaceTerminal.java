@@ -19,8 +19,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(value = ContainerInterfaceTerminal.class)
 public class MixinContainerInterfaceTerminal extends MixinAEBaseContainer implements IPatternMultiToolToolboxHost {
+	@SuppressWarnings("InjectIntoConstructor")
 	@Inject(at = @At(value = "INVOKE", target = "Lappeng/container/implementations/ContainerInterfaceTerminal;" +
 		"bindPlayerInventory(Lnet/minecraft/entity/player/InventoryPlayer;II)V"), method = "<init>(Lnet/minecraft" +
 		"/entity/player/InventoryPlayer;" + "Lappeng/parts" + "/reporting/PartInterfaceTerminal;)V")

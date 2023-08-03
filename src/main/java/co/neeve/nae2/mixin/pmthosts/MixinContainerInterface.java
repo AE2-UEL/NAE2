@@ -5,6 +5,7 @@ import co.neeve.nae2.common.interfaces.IPatternMultiToolToolboxHost;
 import co.neeve.nae2.mixin.MixinContainerUpgradeable;
 import org.spongepowered.asm.mixin.Mixin;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(value = ContainerInterface.class)
 public class MixinContainerInterface extends MixinContainerUpgradeable implements IPatternMultiToolToolboxHost {
 	@Override
