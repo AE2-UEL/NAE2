@@ -6,16 +6,15 @@ import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.slot.SlotRestrictedInput;
 import co.neeve.nae2.common.helpers.ItemHandlerHelper;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
-import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("SameReturnValue")
 @Mixin(ContainerPatternEncoder.class)
@@ -26,13 +25,15 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 	/**
 	 * Injects into the Pattern Encoder to try and substitute empty blank patterns.
 	 */
-	@Inject(method = "encode", at = @At(value = "INVOKE", target = "Lappeng/container/slot/SlotRestrictedInput;" +
+	@WrapOperation(method = "encode", at = @At(value = "INVOKE", target = "Lappeng/container/slot" +
+		"/SlotRestrictedInput;" +
 		"getStack()Lnet/minecraft/item/ItemStack;", ordinal = 1))
-	public void injectBlanks(CallbackInfo ci, @Local ItemStack pattern) {
+	public ItemStack injectBlanks(SlotRestrictedInput instance, Operation<ItemStack> original) {
+		var pattern = original.call(instance);
 		if (pattern.isEmpty() && this instanceof IPatternMultiToolHost pmh) {
 			// Try search for blanks in our inventory.
 			final IItemHandler pmhInv = pmh.getPatternMultiToolInventory();
-			if (pmhInv == null) return;
+			if (pmhInv == null) return pattern;
 
 			final IDefinitions definitions = AEApi.instance().definitions();
 
@@ -42,11 +43,12 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 					ItemStack newPattern = is.copy();
 					newPattern.setCount(1);
 					is.shrink(1);
-					this.patternSlotIN.putStack(newPattern);
-					return;
+					return newPattern;
 				}
 			}
 		}
+
+		return pattern;
 	}
 
 	/**
