@@ -6,6 +6,7 @@ import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.slot.SlotRestrictedInput;
 import co.neeve.nae2.common.helpers.ItemHandlerHelper;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
+import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -33,7 +34,8 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 		if (pattern.isEmpty() && this instanceof IPatternMultiToolHost pmh) {
 			// Try search for blanks in our inventory.
 			final IItemHandler pmhInv = pmh.getPatternMultiToolInventory();
-			if (pmhInv == null) return pattern;
+			final ObjPatternMultiTool pmhObj = pmh.getPatternMultiToolObject();
+			if (pmhInv == null || pmhObj == null) return pattern;
 
 			final IDefinitions definitions = AEApi.instance().definitions();
 
@@ -43,6 +45,8 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 					ItemStack newPattern = is.copy();
 					newPattern.setCount(1);
 					is.shrink(1);
+
+					pmhObj.saveChanges();
 					return newPattern;
 				}
 			}
