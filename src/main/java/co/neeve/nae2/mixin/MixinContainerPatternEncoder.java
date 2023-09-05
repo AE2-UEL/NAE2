@@ -13,16 +13,12 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @SuppressWarnings("SameReturnValue")
 @Mixin(ContainerPatternEncoder.class)
 public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
-	@Shadow
-	protected SlotRestrictedInput patternSlotIN;
-
 	/**
 	 * Injects into the Pattern Encoder to try and substitute empty blank patterns.
 	 */
