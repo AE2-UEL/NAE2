@@ -24,12 +24,20 @@ import appeng.parts.p2p.PartP2PTunnel;
 import appeng.tile.networking.TileCableBus;
 import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
+import appeng.util.inv.WrapperChainedItemHandler;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.mixin.dualityinterface.DualityAccessor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,10 +45,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IGridTickable {
+public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IItemHandler, IGridTickable {
 	private static final P2PModels MODELS = new P2PModels("part/p2p/p2p_tunnel_redstone");
 	private final MachineSource mySource;
 	private final List<ItemStack> waitingToSend = new ArrayList<>();
+	private int depth = 0;
+	private int oldSize = 0;
+	private WrapperChainedItemHandler cachedInv;
+	private boolean partVisited;
+	private boolean requested;
 
 	public PartP2PInterface(ItemStack is) {
 		super(is);
@@ -90,28 +103,37 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 
 			try {
 				this.getProxy().getTick().wakeDevice(this.getProxy().getNode());
-			} catch (GridAccessException ignored) {
-			}
+			} catch (GridAccessException ignored) {}
 		}
 	}
 
 	public @NotNull TickingRequest getTickingRequest(@NotNull IGridNode node) {
-		return new TickingRequest(TickRates.Interface.getMin(), TickRates.Interface.getMax(), !this.hasWorkToDo(),
-			true);
+		// bleh.
+		var min = Math.min(TickRates.ItemTunnel.getMin(), TickRates.Interface.getMin());
+		var max = Math.max(TickRates.ItemTunnel.getMax(), TickRates.Interface.getMax());
+
+		return new TickingRequest(min, max, false, false);
 	}
 
 	public @NotNull TickRateModulation tickingRequest(@NotNull IGridNode node, int ticksSinceLastCall) {
-		if (!this.getProxy().isActive()) {
-			return TickRateModulation.SLEEP;
-		} else {
-			var worked = false;
-			if (this.hasItemsToSend()) {
-				worked = this.pushItemsOut();
-			}
-
-			return this.hasWorkToDo() ? (worked ? TickRateModulation.URGENT : TickRateModulation.SLOWER) :
-				TickRateModulation.SLEEP;
+		// ME Interface push/pull, boring stuff. Carbon copy of item P2P.
+		boolean wasReq = this.requested;
+		if (this.requested && this.cachedInv != null) {
+			this.cachedInv.cycleOrder();
 		}
+
+		this.requested = false;
+		var reqResult = wasReq ? TickRateModulation.FASTER : TickRateModulation.SLOWER;
+
+		// ME Interface pattern pushing, not boring stuff.
+		var pushWorked = false;
+		if (this.hasItemsToSend()) {
+			pushWorked = this.pushItemsOut();
+		}
+
+		if (this.hasWorkToDo())
+			return pushWorked ? TickRateModulation.URGENT : reqResult;
+		return reqResult;
 	}
 
 	/**
@@ -129,6 +151,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 
 			var target = w.getTileEntity(tile.getPos().offset(s));
 			if (target != null) {
+				// this is so bad
 				if (target instanceof IInterfaceHost || target instanceof TileCableBus && ((TileCableBus) target).getPart(s.getOpposite()) instanceof PartInterface) {
 					try {
 						IInterfaceHost targetTE;
@@ -151,7 +174,6 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 										sm.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 									if (inv != null) {
 										Iterator<ItemStack> i = this.waitingToSend.iterator();
-
 
 										while (i.hasNext()) {
 											ItemStack whatToSend = i.next();
@@ -232,5 +254,136 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		var tile = this.getTile();
 
 		return tile.getWorld().getTileEntity(tile.getPos().offset(getSide().getFacing()));
+	}
+
+	public boolean hasCapability(Capability<?> capabilityClass) {
+		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capabilityClass);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> T getCapability(Capability<T> capabilityClass) {
+		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? (T) this :
+			super.getCapability(capabilityClass);
+	}
+
+	public int getSlots() {
+		return this.getDestination().getSlots();
+	}
+
+	public @NotNull ItemStack getStackInSlot(int i) {
+		return this.getDestination().getStackInSlot(i);
+	}
+
+	/**
+	 * Carbon copy of PartP2PItems. Except this only gathers ME Interfaces from inputs and chains them.
+	 */
+	private IItemHandler getDestination() {
+		this.requested = true;
+		if (this.cachedInv != null) {
+			return this.cachedInv;
+		} else {
+			List<IItemHandler> outs = new ArrayList<>();
+
+			TunnelCollection<PartP2PInterface> itemTunnels;
+			try {
+				itemTunnels = this.getInputs();
+			} catch (GridAccessException ignored) {
+				return EmptyHandler.INSTANCE;
+			}
+
+			for (PartP2PInterface tunnel : itemTunnels) {
+				IItemHandler inv = tunnel.getOutputInv();
+				if (inv != null && inv != this) {
+					if (Platform.getRandomInt() % 2 == 0) {
+						outs.add(inv);
+					} else {
+						outs.add(0, inv);
+					}
+				}
+			}
+
+			return this.cachedInv =
+				new WrapperChainedItemHandler(outs.toArray(new IItemHandler[outs.size()]));
+		}
+	}
+
+	/**
+	 * Gets a reference to the ME Interface directly in front of the input.
+	 */
+	@Nullable
+	private IItemHandler getOutputInv() {
+		IItemHandler ret = null;
+		if (!this.partVisited) {
+			this.partVisited = true;
+			if (this.getProxy().isActive()) {
+				EnumFacing facing = this.getSide().getFacing();
+				TileEntity te = this.getTile().getWorld().getTileEntity(this.getTile().getPos().offset(facing));
+				if ((te instanceof IInterfaceHost || te instanceof TileCableBus && ((TileCableBus) te).getPart(facing.getOpposite()) instanceof PartInterface) && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+					facing.getOpposite())) ret = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+					facing.getOpposite());
+			}
+
+			this.partVisited = false;
+		}
+
+		return ret;
+	}
+
+	public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+		if (this.depth == 1) {
+			return stack;
+		} else {
+			++this.depth;
+			ItemStack ret = this.getDestination().insertItem(slot, stack, simulate);
+			--this.depth;
+			return ret;
+		}
+	}
+
+	public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+		return this.getDestination().extractItem(slot, amount, simulate);
+	}
+
+	public int getSlotLimit(int slot) {
+		return this.getDestination().getSlotLimit(slot);
+	}
+
+	public void onTunnelNetworkChange() {
+		if (!this.isOutput()) {
+			this.cachedInv = null;
+			int olderSize = this.oldSize;
+			this.oldSize = this.getDestination().getSlots();
+			if (olderSize != this.oldSize) {
+				this.getHost().notifyNeighbors();
+			}
+		} else {
+			try {
+
+				for (PartP2PInterface partP2PInterface : this.getInputs()) {
+					if (partP2PInterface != null) {
+						partP2PInterface.getHost().notifyNeighbors();
+					}
+				}
+			} catch (GridAccessException var3) {
+				var3.printStackTrace();
+			}
+		}
+	}
+
+	public void onNeighborChanged(IBlockAccess w, BlockPos pos, BlockPos neighbor) {
+		this.cachedInv = null;
+
+		try {
+			if (this.isOutput()) {
+
+				for (PartP2PInterface partP2PInterface : this.getInputs()) {
+					if (partP2PInterface != null) {
+						partP2PInterface.onTunnelNetworkChange();
+					}
+				}
+			}
+		} catch (GridAccessException var6) {
+			var6.printStackTrace();
+		}
 	}
 }
