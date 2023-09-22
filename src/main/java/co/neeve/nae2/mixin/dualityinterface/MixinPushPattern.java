@@ -1,11 +1,16 @@
 package co.neeve.nae2.mixin.dualityinterface;
 
+import appeng.api.parts.IPartHost;
 import appeng.helpers.DualityInterface;
 import appeng.helpers.IInterfaceHost;
-import co.neeve.nae2.common.helpers.DualityInterfaceHelper;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
+import com.google.common.collect.Streams;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -19,137 +24,188 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 /**
- * PushPattern shims.
- * <p>
+ * PushPattern stuff.
  * Our primary goal here is to tell AE2 that it can push into tunnels, while preserving the default behavior.
- * <p>
- * We don't actually push items here yet. Just let AE2 know, which makes it all easier.
+ * We will supply items into tunnels when we can.
  */
+@SuppressWarnings("rawtypes")
 @Mixin(value = DualityInterface.class, remap = false)
-public class MixinPushPattern {
+public abstract class MixinPushPattern {
 	@Unique
-	public HashMap<Object, EnumFacing> nae2$visitedFaces = new HashMap<>();
+	private PartP2PInterface nae2$inputTunnel = null;
+	@Shadow
+	private EnumSet<EnumFacing> visitedFaces;
 	@Shadow
 	@Final
 	private IInterfaceHost iHost;
+	@Unique
+	private LinkedList<PartP2PInterface> nae2$tunnelsToVisit = null;
+	@Unique
+	private EnumFacing nae2$originalFacing = null;
 
-	/**
-	 * Won't be using this, so doesn't matter. Just avoid the block.
-	 */
-	@Redirect(method = "pushPattern", at = @At(value = "INVOKE", target = "Ljava/util/EnumSet;isEmpty()Z"))
-	public boolean shimPushPatternEmptyCheck(EnumSet<EnumFacing> instance) {
-		return false;
+	@ModifyExpressionValue(method = "pushPattern", at = @At(
+		value = "INVOKE",
+		target = "Lappeng/helpers/DualityInterface;acceptsItems(Lappeng/util/InventoryAdaptor;" +
+			"Lnet/minecraft/inventory/InventoryCrafting;)Z"
+	))
+	private boolean rememberPushPatternAccepts(boolean accepts, @Share("accepts") LocalBooleanRef acceptsRef) {
+		// goofy
+		acceptsRef.set(accepts);
+		return accepts;
 	}
 
-	/**
-	 * Literally doesn't matter what we do here. Return something so JVM doesn't complain.
-	 * Don't let this progress the iterator. We will progress it ourselves later on.
-	 */
-	@Redirect(method = "pushPattern", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;next()" +
-		"Ljava/lang/Object;"))
-	public Object shimPushPatternIterator(Iterator<EnumSet<EnumFacing>> ignored) {
-		return EnumFacing.UP;
-	}
+	@Inject(method = "pushPattern", at = @At(
+		value = "INVOKE",
+		shift = At.Shift.AFTER,
+		by = 1,
+		target = "Lappeng/helpers/DualityInterface;acceptsItems" +
+			"(Lappeng/util/InventoryAdaptor;Lnet/minecraft/inventory/InventoryCrafting;)Z"
+	), cancellable = true)
+	private void injectPushPatternTunnelFilling(CallbackInfoReturnable<Boolean> cir,
+	                                            @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnelRef,
+	                                            @Share("accepts") LocalBooleanRef acceptsItems,
+	                                            @Local(argsOnly = true) InventoryCrafting table) {
 
-	/**
-	 * The gathering.
-	 */
-	@Redirect(method = "pushPattern", at = @At(value = "INVOKE", target = "Ljava/util/EnumSet;iterator()" +
-		"Ljava/util/Iterator;", ordinal = 0))
-	public Iterator<Map.Entry<Object, EnumFacing>> injectPushPatternTEGathering(EnumSet<EnumFacing> instance) {
-		if (nae2$visitedFaces.isEmpty())
-			this.nae2$visitedFaces = DualityInterfaceHelper.getTileEntitiesAroundInterface(this.iHost);
-
-		return nae2$visitedFaces.entrySet().iterator();
-	}
-
-	/**
-	 * Replace all references to "s". This is the only EnumFacing variable, so...
-	 */
-	@ModifyVariable(method = "pushPattern", at = @At("LOAD"))
-	public EnumFacing replacePushPatternEnumFacing(EnumFacing original, @Share("side") LocalRef<EnumFacing> side) {
-		return side.get();
-	}
-
-	/**
-	 * Irrelevant. Shim so this doesn't raise NPE.
-	 */
-	@Redirect(method = "pushPattern", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/BlockPos;offset" +
-		"(Lnet/minecraft/util/EnumFacing;)Lnet/minecraft/util/math/BlockPos;", ordinal = 0))
-	public BlockPos shimPushPatternOffset(BlockPos instance, EnumFacing facing) {
-		return instance;
-	}
-
-	@Redirect(method = "pushPattern", at = @At(value = "INVOKE", target = "Ljava/util/EnumSet;remove" +
-		"(Ljava/lang/Object;)Z"))
-	public boolean detourPushPatternRemoval(EnumSet<EnumFacing> instance, Object ignored,
-	                                        @Local Iterator<Map.Entry<TileEntity, EnumFacing>> iterator) {
-		iterator.remove();
-		return true;
-	}
-
-	/**
-	 * We already know what TEs surround the interface.
-	 * Detour the getTileEntity method and discard all parameters.
-	 * Progress the iterator instead.
-	 */
-	@Redirect(method = "pushPattern", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getTileEntity" +
-		"(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/tileentity/TileEntity;", ordinal = 0))
-	public TileEntity detourPushPatternGetTileEntity(World instance, BlockPos ignored, @Local Iterator<Map.Entry<Object
-		, EnumFacing>> iterator, @Share("side") LocalRef<EnumFacing> side,
-	                                                 @Share("tunnel") LocalRef<PartP2PInterface> tunnel) {
-
-		var entry = (iterator).next();
-		side.set(entry.getValue());
-		var obj = entry.getKey();
-		if (obj instanceof TileEntity te) {
-			tunnel.set(null);
-			return te;
-		} else if (obj instanceof PartP2PInterface p2pi) {
-			// Suddenly full. Huh?
-			if (p2pi.hasItemsToSend()) {
-				tunnel.set(null);
-				return null;
+		// it was dio all along
+		var currentOutputTunnel = currentOutputTunnelRef.get();
+		if (currentOutputTunnel != null) {
+			if (!acceptsItems.get()) {
+				cir.setReturnValue(false);
+				return;
 			}
 
-			var te = p2pi.getFacingTileEntity();
-			tunnel.set(p2pi);
-			return te;
-		} else {
-			throw new IllegalStateException();
-		}
-	}
-
-	@Inject(method = "pushPattern", at = @At(value = "INVOKE", target = "Lappeng/helpers/DualityInterface;" +
-		"acceptsItems" +
-		"(Lappeng/util/InventoryAdaptor;Lnet/minecraft/inventory/InventoryCrafting;)Z", shift = At.Shift.AFTER),
-		cancellable = true)
-	public void injectPushPatternTunnelFilling(CallbackInfoReturnable<Boolean> cir,
-	                                           @Share("tunnel") LocalRef<PartP2PInterface> tunnel,
-	                                           @Local InventoryCrafting table) {
-		// it was dio all along
-		PartP2PInterface partP2PInterface = tunnel.get();
-		if (partP2PInterface != null) {
 			for (int x = 0; x < table.getSizeInventory(); ++x) {
 				ItemStack is = table.getStackInSlot(x);
 				if (!is.isEmpty()) {
-					partP2PInterface.addToSendList(is);
+					currentOutputTunnel.addToSendList(is);
 				}
 			}
 
-			partP2PInterface.pushItemsOut();
-
+			currentOutputTunnel.pushItemsOut();
+			currentOutputTunnelRef.set(null);
 			cir.setReturnValue(true);
+		}
+	}
+
+	@SuppressWarnings("UnstableApiUsage")
+	@WrapOperation(
+		method = "pushPattern",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/world/World;getTileEntity(Lnet/minecraft/util/math/BlockPos;)" +
+				"Lnet/minecraft/tileentity/TileEntity;",
+			ordinal = 0
+		)
+	)
+	private TileEntity wrapPushGetTE(World instance, BlockPos bp, Operation<TileEntity> operation,
+	                                 @Local LocalRef<EnumFacing> facingRef, @Local Iterator iterator,
+	                                 @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnel,
+	                                 @Local World world) {
+		// There's a pending inputTunnel to be iterated. Iterate it instead.
+		if (nae2$tunnelsToVisit != null) {
+			// Are we still the same?
+			var te = world.getTileEntity(nae2$inputTunnel.getHost().getTile().getPos());
+			if (!(te instanceof IPartHost ph && ph.getPart(nae2$originalFacing.getOpposite()) == nae2$inputTunnel)) {
+				nae2$tunnelsToVisit = null;
+				visitedFaces.remove(nae2$originalFacing);
+				return null;
+			}
+
+			// Pop one inputTunnel and feed it instead, supplying the output inputTunnel's facing value.
+			// If the list is empty, dereference it to restore AE2 behavior.
+			PartP2PInterface tunnel = nae2$tunnelsToVisit.removeFirst();
+			var input = nae2$inputTunnel;
+			if (nae2$tunnelsToVisit.isEmpty()) {
+				visitedFaces.remove(nae2$originalFacing);
+				nae2$tunnelsToVisit = null;
+				nae2$inputTunnel = null;
+				nae2$originalFacing = null;
+			}
+
+			// Do we still belong?
+			if (!input.isValidDestination(tunnel))
+				return null;
+
+			// Are we busy?
+			if (tunnel.hasItemsToSend())
+				return null;
+
+			facingRef.set(tunnel.getSide().getFacing());
+			currentOutputTunnel.set(tunnel);
+			return tunnel.getFacingTileEntity();
+		}
+
+		// Fetch entity using the original method. Get current facing.
+		var te = operation.call(instance, bp);
+		var facing = facingRef.get();
+
+		// Is the entity an input tunnel?
+		if (te instanceof IPartHost ph && ph.getPart(facing.getOpposite()) instanceof PartP2PInterface inputTunnel && !inputTunnel.isOutput()) {
+			var outputs = inputTunnel.getOutputs();
+			if (outputs != null) {
+				var outputTunnels = Streams.stream(outputs)
+					.collect(Collectors.toCollection(LinkedList::new));
+
+				// Sure it is, and we have TEs. Let the other part of this method know we're iterating them next.
+				if (!outputTunnels.isEmpty()) {
+					nae2$tunnelsToVisit = outputTunnels;
+					nae2$originalFacing = facing;
+					nae2$inputTunnel = inputTunnel;
+				}
+			}
+
+			return null; // Skip. :)
+		}
+
+		currentOutputTunnel.set(null);
+		nae2$tunnelsToVisit = null;
+		nae2$inputTunnel = null;
+		nae2$originalFacing = null;
+		return te;
+	}
+
+	@WrapOperation(method = "pushPattern", at = @At(
+		value = "INVOKE",
+		target = "Ljava/util/EnumSet;remove(Ljava/lang/Object;)Z"
+	))
+	private boolean wrapPushRemove(EnumSet<EnumFacing> instance, Object obj, Operation<Boolean> operation,
+	                               @Local Iterator iterator) {
+		if (nae2$tunnelsToVisit == null) {
+			return operation.call(instance, obj);
+		}
+
+		// Do not remove yet! We're iterating tunnels.
+		return false;
+	}
+
+	@ModifyExpressionValue(method = "pushPattern", at = @At(
+		value = "INVOKE",
+		target = "Ljava/util/Iterator;hasNext()Z"
+	))
+	private boolean wrapPushHasNext(boolean original) {
+		// Continue iterating even if there's no next value, if we're supplying tunnel ents.
+		return original || nae2$tunnelsToVisit != null;
+	}
+
+	@WrapOperation(method = "pushPattern", at = @At(
+		value = "INVOKE",
+		target = "Ljava/util/Iterator;next()Ljava/lang/Object;"
+	))
+	private Object wrapPushNext(Iterator iterator, Operation<Object> operation) {
+		// Check if we're iterating tunnels. If we are, the value returned doesn't matter, since we supply our own
+		// in the next method. Return something bogus to keep JVM happy.
+		if (nae2$tunnelsToVisit != null) {
+			return EnumFacing.UP;
+		} else {
+			return operation.call(iterator);
 		}
 	}
 }

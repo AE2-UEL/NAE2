@@ -1,9 +1,12 @@
 package co.neeve.nae2.mixin.dualityinterface;
 
+import appeng.api.parts.IPartHost;
 import appeng.helpers.DualityInterface;
-import appeng.helpers.IInterfaceHost;
-import co.neeve.nae2.common.helpers.DualityInterfaceHelper;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
+import com.google.common.collect.Streams;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
@@ -11,89 +14,101 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
+import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.EnumSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
- * isBusy shims.
- * <p>
- * Main goal is replacing the iterator. Instead of looping over six sides by default,
- * we gather all possible TEs around while also looking into tunnels for extra TEs and loop over TEs instead.
- * <p>
- * Gross, but should be perfectly compatible with the current PAE2 logic.
+ * isBusy stuff.
+ * Instead of looping over just the six sides, we check if the entity being looked at is a tunnel.
+ * If it is, we hijack the entire thing.
+ * This virtually doesn't affect the default behavior.
  */
 @SuppressWarnings("rawtypes")
 @Mixin(value = DualityInterface.class, remap = false)
 public class MixinBlocking {
-	@Shadow
-	@Final
-	private IInterfaceHost iHost;
+	@WrapOperation(
+		method = "isBusy",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraft/world/World;getTileEntity(Lnet/minecraft/util/math/BlockPos;)" +
+				"Lnet/minecraft/tileentity/TileEntity;",
+			ordinal = 0
+		)
+	)
+	private TileEntity wrapBusyGetTE(World instance, BlockPos bp, Operation<TileEntity> operation,
+	                                 @Local LocalRef<EnumFacing> facingRef, @Local Iterator iterator,
+	                                 @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
+		var tiles = tunnelTEs.get();
 
-	/**
-	 * Literally doesn't matter what we do here. Return something so JVM doesn't complain.
-	 * Don't let this progress the iterator. We will progress it ourselves later on.
-	 */
-	@Redirect(method = "isBusy", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;next()Ljava/lang/Object;"))
-	public Object shimBusyIterator(Iterator ignored) {
-		return EnumFacing.UP;
-	}
+		// There's a pending tunnel to be iterated. Iterate it instead.
+		if (tiles != null) {
+			// Pop one entity and feed it instead, supplying the output tunnel's facing value.
+			var pair = tiles.removeFirst();
+			if (tiles.isEmpty())
+				tunnelTEs.set(null);
 
-	/**
-	 * We already know what TEs surround the interface.
-	 * Detour the getTileEntity method and discard all parameters.
-	 * Progress the iterator instead.
-	 */
-	@Redirect(method = "isBusy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getTileEntity" +
-		"(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/tileentity/TileEntity;", ordinal = 0))
-	public TileEntity detourIsBusyGetTileEntity(World instance, BlockPos ignored, @Local Iterator<Map.Entry<Object
-		, EnumFacing>> iterator, @Share("side") LocalRef<EnumFacing> side) {
-
-		var entry = (iterator).next();
-		side.set(entry.getValue());
-		var obj = entry.getKey();
-		if (obj instanceof TileEntity te) {
-			return te;
-		} else if (obj instanceof PartP2PInterface p2pi) {
-			return p2pi.getFacingTileEntity();
-		} else {
-			throw new IllegalStateException();
+			facingRef.set(pair.getLeft());
+			return pair.getRight();
 		}
+
+		// Fetch entity using the original method. Get current facing.
+		var te = operation.call(instance, bp);
+		var facing = facingRef.get();
+
+		// Is the entity an input tunnel?
+		if (te instanceof IPartHost ph && ph.getPart(facing.getOpposite()) instanceof PartP2PInterface tunnel && !tunnel.isOutput()) {
+			var outputs = tunnel.getOutputs();
+			if (outputs != null) {
+				var outputTiles = Streams.stream(outputs)
+					.filter(x -> !x.hasItemsToSend())
+					.map((output) -> {
+						var outputTile = output.getFacingTileEntity();
+						return outputTile == null ? null : Pair.of(output.getSide().getFacing(),
+							outputTile);
+					})
+					.filter(Objects::nonNull)
+					.collect(Collectors.toCollection(LinkedList::new));
+
+				// Sure it is, and we have TEs. Let the other part of this method know we're iterating them next.
+				if (!outputTiles.isEmpty()) {
+					tunnelTEs.set(outputTiles);
+				}
+			}
+
+			return null; // Skip. :)
+		}
+
+		return te;
 	}
 
-	/**
-	 * Replace all references to "s". This is the only EnumFacing variable, so...
-	 */
-	@ModifyVariable(method = "isBusy", at = @At("LOAD"))
-	public EnumFacing replaceIsBusyEnumFacing(EnumFacing original, @Share("side") LocalRef<EnumFacing> side) {
-		return side.get();
+	@ModifyExpressionValue(method = "isBusy", at = @At(
+		value = "INVOKE",
+		target = "Ljava/util/Iterator;hasNext()Z"
+	))
+	private boolean wrapBusyHasNext(boolean original,
+	                                @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
+		// Continue iterating even if there's no next value, if we're supplying tunnel ents.
+		return original || tunnelTEs.get() != null;
 	}
 
-	/**
-	 * Irrelevant. Shim so this doesn't raise NPE.
-	 */
-	@Redirect(method = "isBusy", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/BlockPos;offset" +
-		"(Lnet/minecraft/util/EnumFacing;)Lnet/minecraft/util/math/BlockPos;", ordinal = 0))
-	public BlockPos shimIsBusyOffset(BlockPos instance, EnumFacing facing) {
-		return instance;
-	}
-
-	/**
-	 * This is where the fun begins.
-	 * Loop over all provided directions and gather all TEs we see.
-	 * We don't care about WHAT TEs we see, just so that it's a TE.
-	 * AE2 will check everything for us.
-	 */
-	@Redirect(method = "isBusy", at = @At(value = "INVOKE", target = "Ljava/util/EnumSet;iterator()" +
-		"Ljava/util/Iterator;"))
-	public Iterator<Map.Entry<Object, EnumFacing>> replaceBusyIterator(EnumSet<EnumFacing> instance) {
-		return DualityInterfaceHelper.getTileEntitiesAroundInterface(this.iHost).entrySet().iterator();
+	@WrapOperation(method = "isBusy", at = @At(
+		value = "INVOKE",
+		target = "Ljava/util/Iterator;next()Ljava/lang/Object;"
+	))
+	private Object wrapBusyNext(Iterator iterator, Operation<Object> operation,
+	                            @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
+		// Check if we're iterating tunnels. If we are, the value returned doesn't matter, since we supply our own
+		// in the next method. Return something bogus to keep JVM happy.
+		if (tunnelTEs.get() != null) {
+			return EnumFacing.UP;
+		} else {
+			return operation.call(iterator);
+		}
 	}
 }

@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,6 +55,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	private WrapperChainedItemHandler cachedInv;
 	private boolean partVisited;
 	private boolean requested;
+	private HashSet<PartP2PInterface> cachedOutputs;
 
 	public PartP2PInterface(ItemStack is) {
 		super(is);
@@ -348,9 +350,24 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		return this.getDestination().getSlotLimit(slot);
 	}
 
+	public boolean isValidDestination(PartP2PInterface tunnel) {
+		if (this.cachedOutputs == null) {
+			var outputs = this.getOutputs();
+
+			if (outputs != null) {
+				var hs = new HashSet<PartP2PInterface>();
+				outputs.forEach(hs::add);
+				this.cachedOutputs = hs;
+			}
+		}
+
+		return this.cachedOutputs != null && this.cachedOutputs.contains(tunnel);
+	}
+
 	public void onTunnelNetworkChange() {
 		if (!this.isOutput()) {
 			this.cachedInv = null;
+			this.cachedOutputs = null;
 			int olderSize = this.oldSize;
 			this.oldSize = this.getDestination().getSlots();
 			if (olderSize != this.oldSize) {
