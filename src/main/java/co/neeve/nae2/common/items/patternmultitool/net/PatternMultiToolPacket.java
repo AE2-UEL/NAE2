@@ -1,4 +1,4 @@
-package co.neeve.nae2.items.patternmultitool.net;
+package co.neeve.nae2.common.items.patternmultitool.net;
 
 import co.neeve.nae2.common.enums.PatternMultiToolActionTypes;
 import io.netty.buffer.ByteBuf;

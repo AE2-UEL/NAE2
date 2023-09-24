@@ -1,6 +1,6 @@
 package co.neeve.nae2.common.interfaces;
 
-import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
+import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;

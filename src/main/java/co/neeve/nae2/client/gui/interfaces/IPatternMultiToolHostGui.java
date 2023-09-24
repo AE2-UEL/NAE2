@@ -1,7 +1,7 @@
 package co.neeve.nae2.client.gui.interfaces;
 
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
-import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
+import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import net.minecraft.client.gui.inventory.GuiContainer;
 
 import javax.annotation.Nullable;

@@ -1,5 +1,3 @@
-#PARSE_ESCAPES
-
 item.nae2.pattern_multiplier.name=Pattern Multi-Tool
 
 nae2.pattern_multiplier.unencode=Clear
@@ -9,3 +7,6 @@ nae2.pattern_multiplier.replace.desc=Replaces the item in the first slot with th
 
 nae2.pattern_multiplier.tab.multiply=Multiply
 nae2.pattern_multiplier.tab.replace=Replace
+
+nae2.part.beam_former.name=ME Beam Former
+itemGroup.nae2=Neeve's AE2:EL Additions
