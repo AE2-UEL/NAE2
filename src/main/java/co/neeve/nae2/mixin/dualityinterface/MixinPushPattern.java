@@ -85,13 +85,14 @@ public abstract class MixinPushPattern {
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/World;getTileEntity(Lnet/minecraft/util/math/BlockPos;)" +
 				"Lnet/minecraft/tileentity/TileEntity;",
-			ordinal = 0
+			ordinal = 0,
+			remap = true
 		)
 	)
 	private TileEntity wrapPushGetTE(World instance, BlockPos bp, Operation<TileEntity> operation,
 	                                 @Local LocalRef<EnumFacing> facingRef, @Local Iterator iterator,
-	                                 @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnel,
-	                                 @Local World world) {
+	                                 @Local World world,
+	                                 @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnel) {
 		// There's a pending inputTunnel to be iterated. Iterate it instead.
 		if (nae2$tunnelsToVisit != null) {
 			// Are we still the same?

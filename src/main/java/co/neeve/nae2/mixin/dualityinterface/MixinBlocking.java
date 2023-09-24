@@ -38,7 +38,8 @@ public class MixinBlocking {
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/World;getTileEntity(Lnet/minecraft/util/math/BlockPos;)" +
 				"Lnet/minecraft/tileentity/TileEntity;",
-			ordinal = 0
+			ordinal = 0,
+			remap = true
 		)
 	)
 	private TileEntity wrapBusyGetTE(World instance, BlockPos bp, Operation<TileEntity> operation,
