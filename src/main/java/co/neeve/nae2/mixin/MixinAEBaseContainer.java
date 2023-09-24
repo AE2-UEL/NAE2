@@ -2,13 +2,12 @@ package co.neeve.nae2.mixin;
 
 import appeng.container.AEBaseContainer;
 import appeng.container.slot.AppEngSlot;
-import co.neeve.nae2.common.containers.ContainerPatternMultiTool;
+import appeng.container.slot.SlotDisabled;
 import co.neeve.nae2.common.helpers.PlayerHelper;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolToolboxHost;
 import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
 import co.neeve.nae2.common.slots.SlotPatternMultiTool;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -18,12 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @SuppressWarnings({ "EmptyMethod", "SameReturnValue", "AddedMixinMembersNamePattern" })
@@ -53,24 +48,6 @@ public class MixinAEBaseContainer extends Container {
 		return null;
 	}
 
-	@SuppressWarnings("ConstantValue")
-	@Inject(method = "transferStackInSlot(Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;",
-		at = @At(value = "INVOKE", target = "Lappeng/container/slot/AppEngSlot;isPlayerSide()Z", ordinal = 2))
-	public void injectPMTSlots(EntityPlayer p, int idx, CallbackInfoReturnable<ItemStack> cir,
-	                           @Local(ordinal = 1) AppEngSlot cs, @Local List<AppEngSlot> selectedSlots,
-	                           @Local ItemStack tis) {
-		if (!(((Object) this) instanceof ContainerPatternMultiTool) && cs instanceof SlotPatternMultiTool && cs.isItemValid(tis)) {
-			selectedSlots.add(cs);
-		}
-	}
-
-	@Inject(method = "transferStackInSlot(Lnet/minecraft/entity/player/EntityPlayer;I)Lnet/minecraft/item/ItemStack;",
-		at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;isEmpty()Z", ordinal = 4))
-	public void sortPMTSlots(EntityPlayer p, int idx, CallbackInfoReturnable<ItemStack> cir,
-	                         @Local List<Slot> selectedSlots) {
-		selectedSlots.sort(Comparator.comparing(o -> !(o instanceof SlotPatternMultiTool)));
-	}
-
 	@Unique
 	public ObjPatternMultiTool getPatternMultiToolObject() {
 		return this.patternMultiToolObject;
@@ -88,21 +65,30 @@ public class MixinAEBaseContainer extends Container {
 			final ItemStack patternMultiTool = PlayerHelper.getPatternMultiTool(inventoryPlayer.player);
 			if (patternMultiTool == null) return;
 
-			int slot = PlayerHelper.getSlotFor(inventoryPlayer, patternMultiTool);
-			if (slot != -1)
-				this.lockPlayerInventorySlot(slot);
+			int slotId = PlayerHelper.getSlotFor(inventoryPlayer, patternMultiTool);
+			if (slotId != -1)
+				this.lockPlayerInventorySlot(slotId);
 
 			this.patternMultiToolObject = ToolPatternMultiTool.getGuiObject(patternMultiTool);
 			this.patternMultiToolSlots = new ArrayList<>();
 
-			for (int v = 0; v < 9; v++) {
-				for (int u = 0; u < 4; u++) {
-					Slot slotPatternMultiTool =
-						(new SlotPatternMultiTool(this.patternMultiToolObject.getPatternInventory(), host, v + u * 9,
-							host.getPatternMultiToolToolboxOffsetX() + u * 18,
-							host.getPatternMultiToolToolboxOffsetY() + v * 18, u, inventoryPlayer)).setPlayerSide();
-					this.addSlotToContainer(slotPatternMultiTool);
-					this.patternMultiToolSlots.add((AppEngSlot) slotPatternMultiTool);
+			var lines = this.patternMultiToolObject.getInstalledCapacityUpgrades();
+			for (int u = 0; u < 4; u++) {
+				for (int v = 0; v < 9; v++) {
+					AppEngSlot slot;
+					int slotIndex = v + u * 9;
+					int x = host.getPatternMultiToolToolboxOffsetX() + u * 18;
+					int y = host.getPatternMultiToolToolboxOffsetY() + v * 18;
+					if (u <= lines)
+						slot = (new SlotPatternMultiTool(this.patternMultiToolObject.getPatternInventory(), host,
+							slotIndex, x, y, u, inventoryPlayer));
+					else
+						slot = (new SlotDisabled(this.patternMultiToolObject.getPatternInventory(),
+							slotIndex, x, y));
+
+					slot.setPlayerSide();
+					this.addSlotToContainer(slot);
+					this.patternMultiToolSlots.add(slot);
 				}
 			}
 		}
