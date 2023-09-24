@@ -5,7 +5,7 @@ import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.common.enums.PatternMultiToolActionTypes;
 import co.neeve.nae2.common.enums.PatternMultiToolActions;
-import co.neeve.nae2.items.patternmultitool.net.PatternMultiToolPacket;
+import co.neeve.nae2.common.items.patternmultitool.net.PatternMultiToolPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraftforge.client.event.GuiScreenEvent;

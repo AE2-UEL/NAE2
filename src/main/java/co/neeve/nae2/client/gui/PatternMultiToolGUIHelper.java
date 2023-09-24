@@ -3,7 +3,7 @@ package co.neeve.nae2.client.gui;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
-import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
+import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;

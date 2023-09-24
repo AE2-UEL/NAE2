@@ -1,8 +1,8 @@
 package co.neeve.nae2.common.registries;
 
 import co.neeve.nae2.Tags;
-import co.neeve.nae2.items.parts.NAEBaseItemPart;
-import co.neeve.nae2.items.patternmultitool.ToolPatternMultiTool;
+import co.neeve.nae2.common.items.NAEBaseItemPart;
+import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 

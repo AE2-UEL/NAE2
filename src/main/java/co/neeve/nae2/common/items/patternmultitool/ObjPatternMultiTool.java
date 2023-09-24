@@ -1,4 +1,4 @@
-package co.neeve.nae2.items.patternmultitool;
+package co.neeve.nae2.common.items.patternmultitool;
 
 import appeng.api.config.Upgrades;
 import appeng.api.implementations.guiobjects.IGuiItemObject;

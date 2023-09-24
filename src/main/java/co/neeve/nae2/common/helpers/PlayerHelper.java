@@ -1,7 +1,7 @@
 package co.neeve.nae2.common.helpers;
 
 import baubles.api.BaublesApi;
-import co.neeve.nae2.items.patternmultitool.ToolPatternMultiTool;
+import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;

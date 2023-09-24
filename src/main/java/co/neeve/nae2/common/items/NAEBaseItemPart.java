@@ -1,4 +1,4 @@
-package co.neeve.nae2.items.parts;
+package co.neeve.nae2.common.items;
 
 import appeng.api.AEApi;
 import appeng.api.parts.IPart;

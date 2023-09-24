@@ -1,4 +1,4 @@
-package co.neeve.nae2.items.patternmultitool;
+package co.neeve.nae2.common.items.patternmultitool;
 
 import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;

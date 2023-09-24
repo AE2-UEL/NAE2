@@ -6,7 +6,7 @@ import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.slot.SlotRestrictedInput;
 import co.neeve.nae2.common.helpers.ItemHandlerHelper;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
-import co.neeve.nae2.items.patternmultitool.ObjPatternMultiTool;
+import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.player.InventoryPlayer;
