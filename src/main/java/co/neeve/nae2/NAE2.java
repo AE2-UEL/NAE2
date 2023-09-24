@@ -33,7 +33,7 @@ public class NAE2 {
 
 		if (event.getSide() == Side.CLIENT) {
 			MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
-			ModelManager.register();
+			MinecraftForge.EVENT_BUS.register(new ModelManager());
 		}
 	}
 

@@ -26,6 +26,7 @@ import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
 import appeng.util.inv.WrapperChainedItemHandler;
 import appeng.util.item.AEItemStack;
+import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.mixin.dualityinterface.DualityAccessor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -46,8 +47,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IItemHandler, IGridTickable {
-	private static final P2PModels MODELS = new P2PModels("part/p2p/p2p_tunnel_redstone");
+public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IItemHandler, IGridTickable,
+	IPartModelProvider {
+	private static final P2PModels MODELS = new P2PModels("part/p2p/p2p_tunnel_interface");
 	private final MachineSource mySource;
 	private final List<ItemStack> waitingToSend = new ArrayList<>();
 	private int depth = 0;
@@ -61,6 +63,10 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		super(is);
 
 		this.mySource = new MachineSource(this);
+	}
+
+	public static List<IPartModel> getModels() {
+		return MODELS.getModels();
 	}
 
 	public @NotNull IPartModel getStaticModels() {

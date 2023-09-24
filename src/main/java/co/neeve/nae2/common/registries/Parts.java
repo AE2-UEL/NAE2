@@ -45,10 +45,9 @@ public enum Parts {
 		this.id = id;
 		this.clazz = clazz;
 		this.translationKey = Tags.MODID + ".part." + this.id;
-		if (Platform.isClient()) {
+		if (Platform.isClientInstall()) {
 			this.modelResourceLocation = new ModelResourceLocation(Tags.MODID + ":part/" + this.id, "inventory");
 		}
-
 	}
 
 	Parts(String id, Class<? extends AEBasePart> clazz, GuiText extraName) {

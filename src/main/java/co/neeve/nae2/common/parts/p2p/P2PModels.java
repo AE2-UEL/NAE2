@@ -22,7 +22,7 @@ class P2PModels {
 	private final IPartModel modelsHasChannel;
 
 	public P2PModels(String frontModelPath) {
-		ResourceLocation frontModel = new ResourceLocation("appliedenergistics2", frontModelPath);
+		ResourceLocation frontModel = new ResourceLocation("nae2", frontModelPath);
 		this.modelsOff = new PartModel(MODEL_STATUS_OFF, MODEL_FREQUENCY, frontModel);
 		this.modelsOn = new PartModel(MODEL_STATUS_ON, MODEL_FREQUENCY, frontModel);
 		this.modelsHasChannel = new PartModel(MODEL_STATUS_HAS_CHANNEL, MODEL_FREQUENCY,
