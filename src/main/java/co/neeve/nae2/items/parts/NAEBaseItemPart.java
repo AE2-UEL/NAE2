@@ -1,14 +1,21 @@
 package co.neeve.nae2.items.parts;
 
+import appeng.api.AEApi;
 import appeng.api.parts.IPart;
 import appeng.api.parts.IPartItem;
 import appeng.items.AEBaseItem;
 import co.neeve.nae2.common.registries.Parts;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,5 +71,11 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 		return pt.getExtraName() != null ?
 			name + " - " + pt.getExtraName().getLocal() :
 			name;
+	}
+
+	public @NotNull EnumActionResult onItemUse(@NotNull EntityPlayer player, @NotNull World w, @NotNull BlockPos pos,
+	                                           @NotNull EnumHand hand, @NotNull EnumFacing side, float hitX,
+	                                           float hitY, float hitZ) {
+		return AEApi.instance().partHelper().placeBus(player.getHeldItem(hand), pos, side, player, hand, w);
 	}
 }
