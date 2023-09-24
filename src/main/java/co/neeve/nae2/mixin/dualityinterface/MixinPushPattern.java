@@ -10,9 +10,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -23,8 +21,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -51,47 +47,34 @@ public abstract class MixinPushPattern {
 	@Unique
 	private EnumFacing nae2$originalFacing = null;
 
-	@ModifyExpressionValue(method = "pushPattern", at = @At(
+	@WrapOperation(method = "pushPattern", at = @At(
 		value = "INVOKE",
-		target = "Lappeng/helpers/DualityInterface;acceptsItems(Lappeng/util/InventoryAdaptor;" +
-			"Lnet/minecraft/inventory/InventoryCrafting;)Z"
+		target = "Lappeng/helpers/DualityInterface;addToSendListFacing(Lnet/minecraft/item/ItemStack;" +
+			"Lnet/minecraft/util/EnumFacing;)V"
 	))
-	private boolean rememberPushPatternAccepts(boolean accepts, @Share("accepts") LocalBooleanRef acceptsRef) {
-		// goofy
-		acceptsRef.set(accepts);
-		return accepts;
-	}
-
-	@Inject(method = "pushPattern", at = @At(
-		value = "INVOKE",
-		shift = At.Shift.AFTER,
-		by = 1,
-		target = "Lappeng/helpers/DualityInterface;acceptsItems" +
-			"(Lappeng/util/InventoryAdaptor;Lnet/minecraft/inventory/InventoryCrafting;)Z"
-	), cancellable = true)
-	private void injectPushPatternTunnelFilling(CallbackInfoReturnable<Boolean> cir,
-	                                            @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnelRef,
-	                                            @Share("accepts") LocalBooleanRef acceptsItems,
-	                                            @Local(argsOnly = true) InventoryCrafting table) {
-
-		// it was dio all along
+	private void wrapPushAddToSendListFacing(DualityInterface instance, ItemStack is, EnumFacing facing,
+	                                         Operation<Void> operation,
+	                                         @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnelRef) {
 		var currentOutputTunnel = currentOutputTunnelRef.get();
 		if (currentOutputTunnel != null) {
-			if (!acceptsItems.get()) {
-				cir.setReturnValue(false);
-				return;
-			}
+			currentOutputTunnel.addToSendList(is);
+		} else {
+			operation.call(instance, is, facing);
+		}
+	}
 
-			for (int x = 0; x < table.getSizeInventory(); ++x) {
-				ItemStack is = table.getStackInSlot(x);
-				if (!is.isEmpty()) {
-					currentOutputTunnel.addToSendList(is);
-				}
-			}
-
+	@WrapOperation(method = "pushPattern", at = @At(
+		value = "INVOKE",
+		target = "Lappeng/helpers/DualityInterface;pushItemsOut(Lnet/minecraft/util/EnumFacing;)V"
+	))
+	private void wrapPushOut(DualityInterface instance, EnumFacing facing,
+	                         Operation<Void> operation,
+	                         @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnelRef) {
+		var currentOutputTunnel = currentOutputTunnelRef.get();
+		if (currentOutputTunnel != null) {
 			currentOutputTunnel.pushItemsOut();
-			currentOutputTunnelRef.set(null);
-			cir.setReturnValue(true);
+		} else {
+			operation.call(instance, facing);
 		}
 	}
 
