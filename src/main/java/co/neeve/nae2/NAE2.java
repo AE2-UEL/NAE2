@@ -17,7 +17,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
-	dependencies = "required-after:appliedenergistics2;required-after:mixinbooter")
+	dependencies = "required-after:appliedenergistics2@[rv6-stable-7-extended_life-v0.55.13,);" +
+		"required-after:mixinbooter@[8.3,)")
 public class NAE2 {
 	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 	public static NAE2 instance;
@@ -35,6 +36,8 @@ public class NAE2 {
 			MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
 			MinecraftForge.EVENT_BUS.register(new ModelManager());
 		}
+
+
 	}
 
 	@EventHandler
