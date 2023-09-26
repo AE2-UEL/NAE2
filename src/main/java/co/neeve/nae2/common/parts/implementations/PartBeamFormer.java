@@ -41,7 +41,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import static appeng.parts.automation.PartLevelEmitter.MODEL_OFF_OFF;
 import static appeng.parts.automation.PartLevelEmitter.MODEL_ON_HAS_CHANNEL;
@@ -113,20 +113,30 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		WorldListener.instance.unregisterBlockStateListener(this);
 	}
 
-	private void recalcListener(HashSet<BlockPos> locs) {
+	private void connect(PartBeamFormer potentialFormer, Iterable<BlockPos> locs) throws FailedConnectionException {
+		// Form the connection.
+		var myNode = this.getGridNode();
+		this.connection = AEApi.instance().grid().createGridConnection(myNode,
+			potentialFormer.getGridNode());
+
+		potentialFormer.connection = this.connection;
+		this.otherBeamFormer = potentialFormer;
+		potentialFormer.otherBeamFormer = this;
+
+		// Re-register and rehash block positions for world listening.
 		this.unregisterListener();
 		listenerLinkedList = new Long2ObjectLinkedOpenHashMap<>();
-		for (var loc : locs) {
+		for (var loc : locs)
 			listenerLinkedList.put(loc.toLong(), loc);
-		}
-
-		var otherpos = otherBeamFormer.getTile().getPos();
-		this.beamLength = this.getTile().getPos().getDistance(otherpos.getX(), otherpos.getY(), otherpos.getZ()) - 1;
-		this.otherBeamFormer.beamLength = 0;
 
 		WorldListener.instance.registerBlockStateListener(this, locs);
-	}
 
+		this.beamLength = listenerLinkedList.size();
+		this.otherBeamFormer.beamLength = 0;
+
+		this.getHost().markForUpdate();
+		this.otherBeamFormer.getHost().markForUpdate();
+	}
 
 	@Override
 	public void renderDynamic(double x, double y, double z, float partialTicks, int destroyStage) {
@@ -276,7 +286,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		var dir = side.getFacing();
 		var world = host.getLocation().getWorld();
 		var opposite = side.getOpposite();
-		var blockSet = new HashSet<BlockPos>();
+		var blockSet = new LinkedHashSet<BlockPos>();
 
 		for (int i = 0; i < 32; i++) {
 			loc = loc.offset(dir);
@@ -295,14 +305,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 					if (potentialFormer.getProxy().isReady()) {
 						try {
-							this.connection = AEApi.instance().grid().createGridConnection(myNode,
-								potentialFormer.getGridNode());
-
-							potentialFormer.connection = this.connection;
-							this.otherBeamFormer = potentialFormer;
-							potentialFormer.otherBeamFormer = this;
-
-							recalcListener(blockSet);
+							connect(potentialFormer, blockSet);
 
 						} catch (final FailedConnectionException | NullPointerException e) {
 							// We tried. We found the beam former, but couldn't establish the connection.

@@ -14,8 +14,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-
 public class WorldListener implements IWorldEventListener {
 	public static WorldListener instance;
 	private final Long2ObjectOpenHashMap<IBlockStateListener> blockStateListeners = new Long2ObjectOpenHashMap<>();
@@ -24,7 +22,7 @@ public class WorldListener implements IWorldEventListener {
 		instance = this;
 	}
 
-	public void registerBlockStateListener(IBlockStateListener listener, HashSet<BlockPos> blocks) {
+	public void registerBlockStateListener(IBlockStateListener listener, Iterable<BlockPos> blocks) {
 		for (var bp : blocks) {
 			blockStateListeners.put(bp.toLong(), listener);
 		}
