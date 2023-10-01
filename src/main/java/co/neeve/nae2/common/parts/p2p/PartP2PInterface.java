@@ -6,6 +6,7 @@ import appeng.api.networking.IGridNode;
 import appeng.api.networking.ticking.IGridTickable;
 import appeng.api.networking.ticking.TickRateModulation;
 import appeng.api.networking.ticking.TickingRequest;
+import appeng.api.parts.IPartHost;
 import appeng.api.parts.IPartModel;
 import appeng.api.storage.IMEMonitor;
 import appeng.api.storage.IStorageMonitorable;
@@ -14,6 +15,7 @@ import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.capabilities.Capabilities;
 import appeng.core.settings.TickRates;
+import appeng.fluids.helper.IFluidInterfaceHost;
 import appeng.helpers.IInterfaceHost;
 import appeng.helpers.ItemStackHelper;
 import appeng.me.GridAccessException;
@@ -28,6 +30,7 @@ import appeng.util.inv.WrapperChainedItemHandler;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.mixin.dualityinterface.DualityAccessor;
+import com.glodblock.github.inventory.FluidConvertingInventoryAdaptor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -36,20 +39,25 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fluids.capability.FluidTankProperties;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IItemHandler, IGridTickable,
-	IPartModelProvider {
+	IPartModelProvider, IFluidHandler {
 	private static final P2PModels MODELS = new P2PModels("part/p2p/p2p_tunnel_interface");
+	private static final FluidTankProperties[] INACTIVE_TANK =
+		new FluidTankProperties[]{ new FluidTankProperties(null, 0, false, false) };
 	private final MachineSource mySource;
 	private final List<ItemStack> waitingToSend = new ArrayList<>();
 	private int depth = 0;
@@ -58,6 +66,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	private boolean partVisited;
 	private boolean requested;
 	private HashSet<PartP2PInterface> cachedOutputs;
+	private IFluidHandler cachedTank;
 
 	public PartP2PInterface(ItemStack is) {
 		super(is);
@@ -209,7 +218,13 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 						throw new RuntimeException(var12);
 					}
 				} else {
-					InventoryAdaptor ad = InventoryAdaptor.getAdaptor(target, s.getOpposite());
+					InventoryAdaptor ad;
+					if (Platform.isModLoaded("ae2fc")) {
+						ad = FluidConvertingInventoryAdaptor.wrap(target, s.getOpposite());
+					} else {
+						ad = InventoryAdaptor.getAdaptor(target, s.getOpposite());
+					}
+
 					Iterator<ItemStack> i = this.waitingToSend.iterator();
 
 					while (i.hasNext()) {
@@ -251,6 +266,16 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	}
 
 	@Override
+	@Nullable
+	public TunnelCollection<PartP2PInterface> getInputs() {
+		try {
+			return super.getInputs();
+		} catch (GridAccessException ignored) {
+			return null;
+		}
+	}
+
+	@Override
 	public void getDrops(List<ItemStack> drops, boolean wrenched) {
 		super.getDrops(drops, wrenched);
 
@@ -265,12 +290,15 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	}
 
 	public boolean hasCapability(Capability<?> capabilityClass) {
-		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capabilityClass);
+		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+			|| capabilityClass == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
+			|| super.hasCapability(capabilityClass);
 	}
 
 	@SuppressWarnings("unchecked")
 	public <T> T getCapability(Capability<T> capabilityClass) {
-		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY ? (T) this :
+		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+			|| capabilityClass == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY ? (T) this :
 			super.getCapability(capabilityClass);
 	}
 
@@ -292,12 +320,8 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		} else {
 			List<IItemHandler> outs = new ArrayList<>();
 
-			TunnelCollection<PartP2PInterface> itemTunnels;
-			try {
-				itemTunnels = this.getInputs();
-			} catch (GridAccessException ignored) {
-				return EmptyHandler.INSTANCE;
-			}
+			TunnelCollection<PartP2PInterface> itemTunnels = this.getInputs();
+			if (itemTunnels == null) return EmptyHandler.INSTANCE;
 
 			for (PartP2PInterface tunnel : itemTunnels) {
 				IItemHandler inv = tunnel.getOutputInv();
@@ -380,33 +404,177 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 				this.getHost().notifyNeighbors();
 			}
 		} else {
-			try {
-
-				for (PartP2PInterface partP2PInterface : this.getInputs()) {
-					if (partP2PInterface != null) {
-						partP2PInterface.getHost().notifyNeighbors();
-					}
+			var inputs = this.getInputs();
+			if (inputs == null) return;
+			for (PartP2PInterface partP2PInterface : this.getInputs()) {
+				if (partP2PInterface != null) {
+					partP2PInterface.getHost().notifyNeighbors();
 				}
-			} catch (GridAccessException var3) {
-				var3.printStackTrace();
 			}
 		}
 	}
 
 	public void onNeighborChanged(IBlockAccess w, BlockPos pos, BlockPos neighbor) {
 		this.cachedInv = null;
+		this.cachedTank = null;
 
-		try {
-			if (this.isOutput()) {
+		if (this.isOutput()) {
+			var inputs = this.getInputs();
+			if (inputs == null) return;
 
-				for (PartP2PInterface partP2PInterface : this.getInputs()) {
-					if (partP2PInterface != null) {
-						partP2PInterface.onTunnelNetworkChange();
+			for (PartP2PInterface partP2PInterface : inputs) {
+				if (partP2PInterface != null) {
+					partP2PInterface.onTunnelNetworkChange();
+				}
+			}
+		}
+	}
+
+	@Nullable
+	private IFluidHandler getFacingTileEntityFluidHandler() {
+		if (!this.getProxy().isActive()) {
+			return null;
+		} else if (this.cachedTank != null) {
+			return this.cachedTank;
+		} else {
+			TileEntity te = this.getFacingTileEntity();
+
+			EnumFacing opposite = this.getSide().getFacing().getOpposite();
+			if (!(te instanceof IFluidInterfaceHost || te instanceof IPartHost ph && ph.getPart(opposite) instanceof IFluidInterfaceHost))
+				return null;
+
+			return this.cachedTank = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, opposite);
+		}
+	}
+
+	@Override
+	public IFluidTankProperties[] getTankProperties() {
+		if (!this.isOutput() || this.depth == 1) return INACTIVE_TANK;
+		this.depth++;
+
+		var props = new ArrayList<IFluidTankProperties>();
+		var inputs = this.getInputs();
+
+		if (inputs != null) {
+			for (var input : inputs) {
+				var fh = input.getFacingTileEntityFluidHandler();
+				if (fh != null) {
+					//noinspection SimplifyStreamApiCallChains
+					props.addAll(Arrays.stream(fh.getTankProperties()).collect(Collectors.toList()));
+				}
+			}
+		}
+		this.depth--;
+
+		return props.toArray(new IFluidTankProperties[0]);
+	}
+
+	@Override
+	public int fill(FluidStack resource, boolean doFill) {
+		if (depth == 1) return 0;
+		depth++;
+
+		var used = 0;
+		var inputs = this.getInputs();
+		if (inputs != null) {
+			for (var input : inputs) {
+				var fh = input.getFacingTileEntityFluidHandler();
+				if (fh == null) continue;
+
+				var fs = resource.copy();
+				fs.amount -= used;
+				if (fs.amount <= 0) break;
+				used += fh.fill(fs, doFill);
+			}
+		}
+
+		depth--;
+		return used;
+	}
+
+	@Nullable
+	@Override
+	public FluidStack drain(FluidStack fluid, boolean doDrain) {
+		if (this.depth == 1) return null;
+		this.depth++;
+
+		if (fluid != null && fluid.amount > 0) {
+			FluidStack resource = fluid.copy();
+			FluidStack totalDrained = null;
+
+			var inputs = this.getInputs();
+			if (inputs != null) {
+				for (var input : inputs) {
+					var fh = input.getFacingTileEntityFluidHandler();
+					if (fh == null) continue;
+
+					FluidStack drain = fh.drain(resource, doDrain);
+					if (drain != null) {
+						if (totalDrained == null) {
+							totalDrained = drain;
+						} else {
+							totalDrained.amount += drain.amount;
+						}
+
+						resource.amount -= drain.amount;
+						if (resource.amount <= 0) {
+							break;
+						}
 					}
 				}
 			}
-		} catch (GridAccessException var6) {
-			var6.printStackTrace();
+
+			this.depth--;
+			return totalDrained;
+		} else {
+			this.depth--;
+			return null;
+		}
+	}
+
+	@Nullable
+	@Override
+	public FluidStack drain(int maxDrain, boolean doDrain) {
+		if (this.depth == 1) return null;
+		this.depth++;
+
+		if (maxDrain == 0) {
+			this.depth--;
+			return null;
+		} else {
+			FluidStack totalDrained = null;
+			int toDrain = maxDrain;
+
+			var inputs = this.getInputs();
+			if (inputs != null) {
+				for (var input : inputs) {
+					var fh = input.getFacingTileEntityFluidHandler();
+					if (fh == null) continue;
+
+					if (totalDrained == null) {
+						totalDrained = fh.drain(toDrain, doDrain);
+						if (totalDrained != null) {
+							toDrain -= totalDrained.amount;
+						}
+					} else {
+						FluidStack copy = totalDrained.copy();
+						copy.amount = toDrain;
+						FluidStack drain = fh.drain(copy, doDrain);
+						if (drain != null) {
+							totalDrained.amount += drain.amount;
+							toDrain -= drain.amount;
+						}
+					}
+
+					if (toDrain <= 0) {
+						break;
+					}
+
+				}
+			}
+
+			this.depth--;
+			return totalDrained;
 		}
 	}
 }
