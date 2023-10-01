@@ -5,40 +5,29 @@
     "particle": "appliedenergistics2:blocks/wireless_access_point_inside",
     "inside": "appliedenergistics2:blocks/wireless_access_point_inside",
     "sides": "appliedenergistics2:parts/monitor_sides",
-    "sidesStatus": "appliedenergistics2:parts/monitor_sides_status",
-    "indicator": "appliedenergistics2:parts/monitor_sides_status_off",
-    "glass": "nae2:part/beam_former_glass"
+    "sidesStatus": "appliedenergistics2:parts/monitor_sides_status"
   },
   "elements": [
     {
       "from": [
         6,
         6,
-        6
+        4
       ],
       "to": [
         10,
-        7,
-        10
+        10,
+        5
       ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
       "faces": {
         "north": {
           "uv": [
             6,
-            11,
+            6,
             10,
-            12
+            10
           ],
-          "texture": "#sidesStatus"
+          "texture": "#sides"
         },
         "east": {
           "uv": [
@@ -47,10 +36,27 @@
             12,
             10
           ],
-          "rotation": 270,
           "texture": "#sidesStatus"
         },
         "south": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "west": {
+          "uv": [
+            4,
+            6,
+            5,
+            10
+          ],
+          "texture": "#sidesStatus"
+        },
+        "up": {
           "uv": [
             6,
             4,
@@ -60,1127 +66,7 @@
           "rotation": 180,
           "texture": "#sidesStatus"
         },
-        "west": {
-          "uv": [
-            4,
-            6,
-            5,
-            10
-          ],
-          "rotation": 90,
-          "texture": "#sidesStatus"
-        },
-        "up": {
-          "uv": [
-            6,
-            6,
-            10,
-            10
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
         "down": {
-          "uv": [
-            6,
-            6,
-            10,
-            10
-          ],
-          "texture": "#sides"
-        }
-      }
-    },
-    {
-      "from": [
-        6,
-        7,
-        6
-      ],
-      "to": [
-        10,
-        8,
-        10
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            6,
-            12,
-            10,
-            13
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            12,
-            6,
-            13,
-            10
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            6,
-            3,
-            10,
-            4
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            3,
-            6,
-            4,
-            10
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            6,
-            6,
-            10,
-            10
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            6,
-            6,
-            10,
-            10
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I Up",
-      "from": [
-        6,
-        8,
-        10
-      ],
-      "to": [
-        10,
-        9,
-        11
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            6,
-            13,
-            10,
-            14
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            5,
-            14,
-            6
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            6,
-            2,
-            10,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            2,
-            5,
-            3,
-            6
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            6,
-            5,
-            10,
-            6
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            6,
-            5,
-            10,
-            6
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I East",
-      "from": [
-        5,
-        9,
-        7
-      ],
-      "to": [
-        6,
-        12,
-        9
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            5,
-            13,
-            6,
-            16
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            7,
-            16,
-            9
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            5,
-            0,
-            6,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            0,
-            7,
-            3,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            10,
-            7,
-            11,
-            9
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            5,
-            7,
-            6,
-            9
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I Down",
-      "from": [
-        7,
-        9,
-        5
-      ],
-      "to": [
-        9,
-        12,
-        6
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            7,
-            13,
-            9,
-            16
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            10,
-            16,
-            11
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            7,
-            0,
-            9,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            0,
-            10,
-            3,
-            11
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            7,
-            10,
-            9,
-            11
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            7,
-            10,
-            9,
-            11
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I West",
-      "from": [
-        10,
-        9,
-        7
-      ],
-      "to": [
-        11,
-        12,
-        9
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            10,
-            13,
-            11,
-            16
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            7,
-            16,
-            9
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            10,
-            0,
-            11,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            0,
-            7,
-            3,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            5,
-            7,
-            6,
-            9
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            10,
-            7,
-            11,
-            9
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I Up",
-      "from": [
-        7,
-        9,
-        10
-      ],
-      "to": [
-        9,
-        12,
-        11
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            7,
-            13,
-            9,
-            16
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            5,
-            16,
-            6
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            7,
-            0,
-            9,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            0,
-            5,
-            3,
-            6
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            7,
-            5,
-            9,
-            6
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            7,
-            5,
-            9,
-            6
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I Down",
-      "from": [
-        6,
-        8,
-        5
-      ],
-      "to": [
-        10,
-        9,
-        6
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            6,
-            13,
-            10,
-            14
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            10,
-            14,
-            11
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            6,
-            2,
-            10,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            2,
-            10,
-            3,
-            11
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            6,
-            10,
-            10,
-            11
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            6,
-            10,
-            10,
-            11
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I West",
-      "from": [
-        10,
-        8,
-        6
-      ],
-      "to": [
-        11,
-        9,
-        10
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            10,
-            13,
-            11,
-            14
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            6,
-            14,
-            10
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            10,
-            2,
-            11,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            2,
-            6,
-            3,
-            10
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            5,
-            6,
-            6,
-            10
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            10,
-            6,
-            11,
-            10
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I East",
-      "from": [
-        5,
-        7,
-        7
-      ],
-      "to": [
-        6,
-        8,
-        9
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            5,
-            12,
-            6,
-            13
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            12,
-            7,
-            13,
-            9
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            5,
-            3,
-            6,
-            4
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            3,
-            7,
-            4,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            10,
-            7,
-            11,
-            9
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            5,
-            7,
-            6,
-            9
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I West",
-      "from": [
-        10,
-        7,
-        7
-      ],
-      "to": [
-        11,
-        8,
-        9
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            10,
-            12,
-            11,
-            13
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            12,
-            7,
-            13,
-            9
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            10,
-            3,
-            11,
-            4
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            3,
-            7,
-            4,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            5,
-            7,
-            6,
-            9
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            10,
-            7,
-            11,
-            9
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I East",
-      "from": [
-        7,
-        7,
-        10
-      ],
-      "to": [
-        9,
-        8,
-        11
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            7,
-            13,
-            9
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            5,
-            3,
-            6,
-            4
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            3,
-            7,
-            4,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            5,
-            12,
-            6,
-            13
-          ],
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            10,
-            7,
-            11,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            5,
-            7,
-            6,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I West",
-      "from": [
-        7,
-        7,
-        5
-      ],
-      "to": [
-        9,
-        8,
-        6
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            12,
-            7,
-            13,
-            9
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            10,
-            3,
-            11,
-            4
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            3,
-            7,
-            4,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            10,
-            12,
-            11,
-            13
-          ],
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            5,
-            7,
-            6,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            10,
-            7,
-            11,
-            9
-          ],
-          "rotation": 90,
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "Side Antenna I East",
-      "from": [
-        5,
-        8,
-        6
-      ],
-      "to": [
-        6,
-        9,
-        10
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
-          "uv": [
-            5,
-            13,
-            6,
-            14
-          ],
-          "texture": "#sides"
-        },
-        "east": {
-          "uv": [
-            13,
-            6,
-            14,
-            10
-          ],
-          "rotation": 270,
-          "texture": "#sides"
-        },
-        "south": {
-          "uv": [
-            5,
-            2,
-            6,
-            3
-          ],
-          "rotation": 180,
-          "texture": "#sides"
-        },
-        "west": {
-          "uv": [
-            2,
-            6,
-            3,
-            10
-          ],
-          "rotation": 90,
-          "texture": "#sides"
-        },
-        "up": {
-          "uv": [
-            10,
-            6,
-            11,
-            10
-          ],
-          "rotation": 180,
-          "texture": "#inside"
-        },
-        "down": {
-          "uv": [
-            5,
-            6,
-            6,
-            10
-          ],
-          "texture": "#inside"
-        }
-      }
-    },
-    {
-      "name": "status",
-      "from": [
-        6,
-        6,
-        6
-      ],
-      "to": [
-        10,
-        7,
-        10
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "x",
-        "origin": [
-          -1,
-          0,
-          0
-        ]
-      },
-      "faces": {
-        "north": {
           "uv": [
             6,
             11,
@@ -1188,159 +74,959 @@
             12
           ],
           "rotation": 180,
-          "texture": "#indicator",
-          "tintindex": 3
-        },
-        "east": {
-          "uv": [
-            11,
-            6,
-            12,
-            10
-          ],
-          "rotation": 270,
-          "texture": "#indicator",
-          "tintindex": 3
-        },
-        "south": {
-          "uv": [
-            6,
-            4,
-            10,
-            5
-          ],
-          "texture": "#indicator",
-          "tintindex": 3
-        },
-        "west": {
-          "uv": [
-            4,
-            6,
-            5,
-            10
-          ],
-          "rotation": 90,
-          "texture": "#indicator",
-          "tintindex": 3
+          "texture": "#sidesStatus"
         }
       }
     },
     {
-      "name": "glass",
+      "from": [
+        6,
+        6,
+        3
+      ],
+      "to": [
+        10,
+        10,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            12,
+            6,
+            13,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            6,
+            6,
+            10,
+            10
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            3,
+            6,
+            4,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            6,
+            3,
+            10,
+            4
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            6,
+            12,
+            10,
+            13
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I Up",
+      "from": [
+        6,
+        10,
+        2
+      ],
+      "to": [
+        10,
+        11,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            5,
+            10,
+            6
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            5,
+            14,
+            6
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            6,
+            5,
+            10,
+            6
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            2,
+            5,
+            3,
+            6
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            10,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            6,
+            13,
+            10,
+            14
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I East",
+      "from": [
+        5,
+        7,
+        -1
+      ],
+      "to": [
+        6,
+        9,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10,
+            7,
+            11,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            7,
+            16,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            5,
+            7,
+            6,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            0,
+            7,
+            3,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            5,
+            0,
+            6,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            5,
+            13,
+            6,
+            16
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I Down",
       "from": [
         7,
-        8,
-        7
+        5,
+        -1
       ],
       "to": [
         9,
-        13,
-        9
+        6,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7,
+            10,
+            9,
+            11
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            10,
+            16,
+            11
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            7,
+            10,
+            9,
+            11
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            0,
+            10,
+            3,
+            11
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            7,
+            0,
+            9,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            7,
+            13,
+            9,
+            16
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I West",
+      "from": [
+        10,
+        7,
+        -1
+      ],
+      "to": [
+        11,
+        9,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5,
+            7,
+            6,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            7,
+            16,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            10,
+            7,
+            11,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            0,
+            7,
+            3,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            10,
+            0,
+            11,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            10,
+            13,
+            11,
+            16
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I Up",
+      "from": [
+        7,
+        10,
+        -1
+      ],
+      "to": [
+        9,
+        11,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            7,
+            5,
+            9,
+            6
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            5,
+            16,
+            6
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            7,
+            5,
+            9,
+            6
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            0,
+            5,
+            3,
+            6
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            7,
+            0,
+            9,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            7,
+            13,
+            9,
+            16
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I Down",
+      "from": [
+        6,
+        5,
+        2
+      ],
+      "to": [
+        10,
+        6,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6,
+            10,
+            10,
+            11
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            10,
+            14,
+            11
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            6,
+            10,
+            10,
+            11
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            2,
+            10,
+            3,
+            11
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            6,
+            2,
+            10,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            6,
+            13,
+            10,
+            14
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I West",
+      "from": [
+        10,
+        6,
+        2
+      ],
+      "to": [
+        11,
+        10,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5,
+            6,
+            6,
+            10
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            6,
+            14,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            10,
+            6,
+            11,
+            10
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            2,
+            6,
+            3,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            10,
+            2,
+            11,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            10,
+            13,
+            11,
+            14
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I East",
+      "from": [
+        5,
+        7,
+        3
+      ],
+      "to": [
+        6,
+        9,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10,
+            7,
+            11,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            12,
+            7,
+            13,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            5,
+            7,
+            6,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            3,
+            7,
+            4,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            5,
+            3,
+            6,
+            4
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            5,
+            12,
+            6,
+            13
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I West",
+      "from": [
+        10,
+        7,
+        3
+      ],
+      "to": [
+        11,
+        9,
+        4
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5,
+            7,
+            6,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            12,
+            7,
+            13,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            10,
+            7,
+            11,
+            9
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            3,
+            7,
+            4,
+            9
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            10,
+            3,
+            11,
+            4
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            10,
+            12,
+            11,
+            13
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I East",
+      "from": [
+        7,
+        10,
+        3
+      ],
+      "to": [
+        9,
+        11,
+        4
       ],
       "rotation": {
         "angle": 0,
-        "axis": "x",
+        "axis": "z",
         "origin": [
-          -1,
-          0,
+          8,
+          8,
           0
         ]
       },
       "faces": {
         "north": {
           "uv": [
-            0,
-            0,
-            1,
-            1
+            10,
+            7,
+            11,
+            9
           ],
-          "rotation": 180,
-          "texture": "#glass"
+          "rotation": 270,
+          "texture": "#inside"
         },
         "east": {
           "uv": [
-            0,
-            0,
-            1,
-            1
+            5,
+            3,
+            6,
+            4
           ],
           "rotation": 270,
-          "texture": "#glass"
+          "texture": "#sides"
         },
         "south": {
           "uv": [
-            0,
-            0,
-            1,
-            1
+            5,
+            7,
+            6,
+            9
           ],
-          "texture": "#glass"
+          "rotation": 90,
+          "texture": "#inside"
         },
         "west": {
           "uv": [
-            0,
-            0,
-            1,
-            1
+            5,
+            12,
+            6,
+            13
           ],
-          "rotation": 90,
-          "texture": "#glass"
+          "rotation": 270,
+          "texture": "#sides"
         },
         "up": {
           "uv": [
-            0,
-            0,
-            1,
-            1
+            3,
+            7,
+            4,
+            9
           ],
-          "rotation": 180,
-          "texture": "#glass"
+          "rotation": 90,
+          "texture": "#sides"
         },
         "down": {
           "uv": [
-            0,
-            0,
-            1,
-            1
+            12,
+            7,
+            13,
+            9
           ],
-          "texture": "#glass"
+          "rotation": 90,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I West",
+      "from": [
+        7,
+        5,
+        3
+      ],
+      "to": [
+        9,
+        6,
+        4
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "z",
+        "origin": [
+          8,
+          8,
+          0
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            5,
+            7,
+            6,
+            9
+          ],
+          "rotation": 270,
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            10,
+            3,
+            11,
+            4
+          ],
+          "rotation": 270,
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            10,
+            7,
+            11,
+            9
+          ],
+          "rotation": 90,
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            10,
+            12,
+            11,
+            13
+          ],
+          "rotation": 270,
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            3,
+            7,
+            4,
+            9
+          ],
+          "rotation": 90,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            12,
+            7,
+            13,
+            9
+          ],
+          "rotation": 90,
+          "texture": "#sides"
+        }
+      }
+    },
+    {
+      "name": "Side Antenna I East",
+      "from": [
+        5,
+        6,
+        2
+      ],
+      "to": [
+        6,
+        10,
+        3
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10,
+            6,
+            11,
+            10
+          ],
+          "texture": "#inside"
+        },
+        "east": {
+          "uv": [
+            13,
+            6,
+            14,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "south": {
+          "uv": [
+            5,
+            6,
+            6,
+            10
+          ],
+          "texture": "#inside"
+        },
+        "west": {
+          "uv": [
+            2,
+            6,
+            3,
+            10
+          ],
+          "texture": "#sides"
+        },
+        "up": {
+          "uv": [
+            5,
+            2,
+            6,
+            3
+          ],
+          "rotation": 180,
+          "texture": "#sides"
+        },
+        "down": {
+          "uv": [
+            5,
+            13,
+            6,
+            14
+          ],
+          "rotation": 180,
+          "texture": "#sides"
         }
       }
     }
   ],
-  "display": {
-    "thirdperson_righthand": {
-      "translation": [
-        0,
-        0,
-        -2
-      ]
-    },
-    "gui": {
-      "rotation": [
-        45,
-        -45,
-        0
-      ],
-      "translation": [
-        0,
-        -1.25,
-        0
-      ],
-      "scale": [
-        1.5,
-        1.5,
-        1.5
-      ]
-    },
-    "head": {
-      "translation": [
-        0,
-        8.5,
-        0
-      ]
-    }
-  },
   "groups": [
     {
       "name": "group",
@@ -1364,9 +1050,7 @@
         10,
         11,
         12,
-        13,
-        14,
-        15
+        13
       ]
     }
   ],

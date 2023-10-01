@@ -9,4 +9,7 @@ nae2.pattern_multiplier.tab.multiply=Multiply
 nae2.pattern_multiplier.tab.replace=Replace
 
 nae2.part.beam_former.name=ME Beam Former
+nae2.part.beam_former.hide=Hiding beam.
+nae2.part.beam_former.show=Showing beam.
+
 itemGroup.nae2=Neeve's AE2:EL Additions

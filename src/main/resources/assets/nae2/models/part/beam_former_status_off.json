@@ -1,0 +1,65 @@
+{
+  "parent": "block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "indicator": "appliedenergistics2:parts/monitor_sides_status_off"
+  },
+  "elements": [
+    {
+      "name": "status",
+      "from": [
+        6,
+        6,
+        4
+      ],
+      "to": [
+        10,
+        10,
+        5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            11,
+            6,
+            12,
+            10
+          ],
+          "texture": "#indicator",
+          "tintindex": 3
+        },
+        "west": {
+          "uv": [
+            4,
+            6,
+            5,
+            10
+          ],
+          "texture": "#indicator",
+          "tintindex": 3
+        },
+        "up": {
+          "uv": [
+            6,
+            4,
+            10,
+            5
+          ],
+          "texture": "#indicator",
+          "tintindex": 3
+        },
+        "down": {
+          "uv": [
+            6,
+            11,
+            10,
+            12
+          ],
+          "texture": "#indicator",
+          "tintindex": 3
+        }
+      }
+    }
+  ],
+  "ae2_uvl_marker": true
+}
