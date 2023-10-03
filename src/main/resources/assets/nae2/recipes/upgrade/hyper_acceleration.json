@@ -1,0 +1,53 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.calculation_processor"
+        },
+        {
+          "type": "minecraft:item_exists",
+          "item": "appliedenergistics2:quartz_glass"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.card_speed"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.singularity"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:upgrade",
+    "data": 0,
+    "count": 1
+  },
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "gcg",
+    "asa",
+    "gag"
+  ],
+  "key": {
+    "a": {
+      "type": "appliedenergistics2:part",
+      "part": "material.card_speed"
+    },
+    "g": {
+      "item": "appliedenergistics2:quartz_glass"
+    },
+    "c": {
+      "type": "appliedenergistics2:part",
+      "part": "material.calculation_processor"
+    },
+    "s": {
+      "type": "appliedenergistics2:part",
+      "part": "material.singularity"
+    }
+  }
+}

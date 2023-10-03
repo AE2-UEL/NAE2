@@ -12,4 +12,6 @@ nae2.part.beam_former.name=ME Beam Former
 nae2.part.beam_former.hide=Hiding beam.
 nae2.part.beam_former.show=Showing beam.
 
+nae2.upgrade.hyper_acceleration.name=Hyper-Acceleration Card
+
 itemGroup.nae2=Neeve's AE2:EL Additions

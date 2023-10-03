@@ -18,7 +18,14 @@
     "pmthosts.MixinContainerInterface",
     "pmthosts.MixinContainerInterfaceTerminal",
     "pmthosts.MixinContainerPatternTerm",
-    "pmthosts.MixinContainerWirelessPatternTerminal"
+    "pmthosts.MixinContainerWirelessPatternTerminal",
+    "upgrades.MixinNetworkTool",
+    "upgrades.MixinSlotRestrictedInput",
+    "upgrades.MixinUpgradeInventory",
+    "upgrades.MixinUpgradeInvFilter",
+    "upgrades.machine.MixinBlockUpgradeInventory",
+    "upgrades.machine.MixinStackUpgradeInventory",
+    "upgrades.machine.MixinTileIOPort"
   ],
   "client": [
     "client.MixinAEBaseGui",

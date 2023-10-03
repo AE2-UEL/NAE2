@@ -6,6 +6,7 @@ import appeng.api.parts.IPartModels;
 import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.common.registries.Items;
 import co.neeve.nae2.common.registries.Parts;
+import co.neeve.nae2.common.registries.Upgrades;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -41,6 +42,11 @@ public class ModelManager {
 					}
 				}
 			}
+		}
+
+		for (var upgrade : Upgrades.values()) {
+			ModelLoader.setCustomModelResourceLocation(Items.BASE_UPGRADE.getItem(), upgrade.ordinal(),
+				upgrade.getModelResourceLocation());
 		}
 	}
 }

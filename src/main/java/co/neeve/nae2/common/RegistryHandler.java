@@ -1,6 +1,10 @@
 package co.neeve.nae2.common;
 
 import appeng.api.config.Upgrades;
+import appeng.api.definitions.IBlocks;
+import appeng.api.definitions.IParts;
+import appeng.core.Api;
+import appeng.core.ApiDefinitions;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.registries.Items;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -22,6 +26,14 @@ public class RegistryHandler {
 
 	public void postInit() {
 		Upgrades.CAPACITY.registerItem(new ItemStack(Items.PATTERN_MULTI_TOOL.getItem()), 3);
+
+		ApiDefinitions definitions = Api.INSTANCE.definitions();
+		final IParts parts = definitions.parts();
+		final IBlocks blocks = definitions.blocks();
+
+		// Hyper-Acceleration.
+		var hyper = co.neeve.nae2.common.registries.Upgrades.HYPER_ACCELERATION;
+		hyper.registerItem(blocks.iOPort(), 3);
 	}
 
 	@SubscribeEvent
