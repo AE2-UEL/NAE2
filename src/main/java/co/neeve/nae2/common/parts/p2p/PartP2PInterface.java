@@ -29,7 +29,7 @@ import appeng.util.Platform;
 import appeng.util.inv.WrapperChainedItemHandler;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.common.interfaces.IPartModelProvider;
-import co.neeve.nae2.mixin.dualityinterface.DualityAccessor;
+import co.neeve.nae2.mixin.ifacep2p.shared.DualityAccessor;
 import com.glodblock.github.inventory.FluidConvertingInventoryAdaptor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
