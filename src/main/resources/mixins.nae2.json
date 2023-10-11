@@ -25,7 +25,9 @@
     "upgrades.MixinUpgradeInvFilter",
     "upgrades.machine.MixinBlockUpgradeInventory",
     "upgrades.machine.MixinStackUpgradeInventory",
-    "upgrades.machine.MixinTileIOPort"
+    "upgrades.machine.MixinTileIOPort",
+    "voidcell.MixinContainerTileCondenser",
+    "voidcell.MixinTileCondenser"
   ],
   "client": [
     "client.MixinAEBaseGui",
@@ -42,7 +44,8 @@
     "client.MixinTileCableBusTESR",
     "client.pmthosts.MixinGuiInterface",
     "client.pmthosts.MixinGuiInterfaceTerminal",
-    "client.pmthosts.MixinGuiPatternTerminal"
+    "client.pmthosts.MixinGuiPatternTerminal",
+    "voidcell.client.MixinGuiCondenser"
   ],
   "server": []
 }
