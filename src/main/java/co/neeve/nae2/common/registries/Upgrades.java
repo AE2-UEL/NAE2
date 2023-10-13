@@ -3,6 +3,7 @@ package co.neeve.nae2.common.registries;
 import appeng.api.definitions.IItemDefinition;
 import appeng.util.Platform;
 import co.neeve.nae2.Tags;
+import co.neeve.nae2.common.features.subfeatures.UpgradeFeatures;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
@@ -12,19 +13,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum Upgrades {
-	HYPER_ACCELERATION("hyper_acceleration");
+	HYPER_ACCELERATION("hyper_acceleration", UpgradeFeatures.HYPER_ACCELERATION);
 
-	private final String id;
 	private final String translationKey;
 	private final Map<ItemStack, Integer> supportedMax = new HashMap<>();
+	private UpgradeFeatures feature;
 	private ModelResourceLocation modelResourceLocation = null;
 
 	Upgrades(String id) {
-		this.id = id;
-		this.translationKey = Tags.MODID + ".upgrade." + this.id + ".name";
+		this.translationKey = Tags.MODID + ".upgrade." + id + ".name";
 		if (Platform.isClientInstall()) {
-			this.modelResourceLocation = new ModelResourceLocation(Tags.MODID + ":upgrade/" + this.id, "inventory");
+			this.modelResourceLocation = new ModelResourceLocation(Tags.MODID + ":upgrade/" + id, "inventory");
 		}
+	}
+
+	Upgrades(String id, UpgradeFeatures upgradeFeature) {
+		this(id);
+		this.feature = upgradeFeature;
 	}
 
 	public static Upgrades getByID(int id) {
@@ -40,10 +45,6 @@ public enum Upgrades {
 		return this.translationKey;
 	}
 
-	public String getId() {
-		return id;
-	}
-
 	public Map<ItemStack, Integer> getSupported() {
 		return this.supportedMax;
 	}
@@ -56,6 +57,9 @@ public enum Upgrades {
 		if (stack != null) {
 			this.supportedMax.put(stack, maxSupported);
 		}
+	}
 
+	public boolean isEnabled() {
+		return this.feature == null || this.feature.isEnabled();
 	}
 }

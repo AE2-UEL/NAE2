@@ -32,6 +32,8 @@ public class NAEMaterial extends AEBaseItem {
 		if (!this.isInCreativeTab(creativeTab)) return;
 
 		for (Materials material : Materials.values()) {
+			if (!material.isEnabled()) continue;
+			
 			itemStacks.add(new ItemStack(this, 1, material.ordinal()));
 		}
 	}

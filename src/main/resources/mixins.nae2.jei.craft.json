@@ -1,0 +1,19 @@
+{
+  "package": "co.neeve.nae2.mixin",
+  "required": true,
+  "refmap": "mixins.nae2.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "jei.craft.shared.MixinCraftingCPUCluster",
+    "jei.craft.shared.MixinCraftingGridCache",
+    "jei.craft.shared.MixinCraftingTreeNode",
+    "jei.craft.shared.MixinPacketJEIRecipe"
+  ],
+  "client": [
+    "jei.craft.client.MixinJEIMissingItem",
+    "jei.craft.client.MixinRecipeTransferHandler"
+  ],
+  "server": []
+}

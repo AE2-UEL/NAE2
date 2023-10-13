@@ -15,6 +15,7 @@ import appeng.items.AEBaseItem;
 import appeng.items.contents.CellConfig;
 import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
+import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
 import co.neeve.nae2.common.registries.Materials;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
@@ -88,28 +89,36 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 				GuiText.CellWorkbench.getLocal()));
 		}
 
-		var compound = stack.getTagCompound();
-		if (compound != null) {
-			lines.add("");
-			lines.add(I18n.format("nae2.storage_cell_void.count", this.getCondenserPower(stack),
-				GuiText.Condenser.getLocal()));
+		if (VoidCellFeatures.CONDENSER_POWER.isEnabled()) {
+			var compound = stack.getTagCompound();
+			if (compound != null) {
+				lines.add("");
+				lines.add(I18n.format("nae2.storage_cell_void.count", this.getCondenserPower(stack),
+					GuiText.Condenser.getLocal()));
+			}
 		}
 
 	}
 
 	public double getCondenserPower(ItemStack stack) {
+		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return 0;
+
 		var compound = stack.getTagCompound();
 		if (compound == null) return 0;
 		return compound.getDouble("power");
 	}
 
 	public void setCondenserPower(ItemStack stack, double power) {
+		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
+
 		NBTTagCompound compound = stack.getTagCompound();
 		if (compound == null) stack.setTagCompound(compound = new NBTTagCompound());
 		compound.setDouble("power", power);
 	}
 
 	public void addCondenserPowerFromInput(ItemStack stack, double power) {
+		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
+
 		this.setCondenserPower(stack,
 			getCondenserPower(stack) + power / (double) getStorageChannel().transferFactor());
 	}
@@ -132,7 +141,7 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 				if (this.getCondenserPower(stack) < 1) {
 					var ia = InventoryAdaptor.getAdaptor(player);
 					playerInventory.setInventorySlotContents(playerInventory.currentItem, ItemStack.EMPTY);
-					ItemStack extraB = ia.addItems(Materials.VOID_CELL_COMPONENT.getStack());
+					ItemStack extraB = ia.addItems(Materials.CELL_VOID_PART.getStack());
 					if (!extraB.isEmpty()) {
 						player.dropItem(extraB, false);
 					}

@@ -52,6 +52,8 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 		if (!this.isInCreativeTab(creativeTab)) return;
 
 		for (Upgrades upgrade : Upgrades.values()) {
+			if (!upgrade.isEnabled()) continue;
+			
 			itemStacks.add(new ItemStack(this, 1, upgrade.ordinal()));
 		}
 	}

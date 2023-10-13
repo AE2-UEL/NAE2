@@ -4,6 +4,8 @@ import appeng.core.localization.GuiText;
 import appeng.parts.AEBasePart;
 import appeng.util.Platform;
 import co.neeve.nae2.Tags;
+import co.neeve.nae2.common.features.Features;
+import co.neeve.nae2.common.items.NAEBaseItemPart;
 import co.neeve.nae2.common.parts.implementations.PartBeamFormer;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -17,8 +19,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public enum Parts {
-	BEAM_FORMER("beam_former", PartBeamFormer.class),
-	P2P_TUNNEL_INTERFACE("p2p_tunnel_interface", PartP2PInterface.class, GuiText.Interface) {
+	BEAM_FORMER("beam_former", PartBeamFormer.class, Features.BEAM_FORMERS),
+	P2P_TUNNEL_INTERFACE("p2p_tunnel_interface", PartP2PInterface.class, GuiText.Interface, Features.INTERFACE_P2P) {
 		@Override
 		public String getTranslationKey() {
 			return "p2p_tunnel";
@@ -37,6 +39,7 @@ public enum Parts {
 	private final String id;
 	private final Class<? extends AEBasePart> clazz;
 	private final String translationKey;
+	private Features feature;
 	private GuiText extraName = null;
 
 	private ModelResourceLocation modelResourceLocation = null;
@@ -50,14 +53,35 @@ public enum Parts {
 		}
 	}
 
+	Parts(String id, Class<? extends AEBasePart> clazz, Features feature) {
+		this(id, clazz);
+		this.feature = feature;
+	}
+
 	Parts(String id, Class<? extends AEBasePart> clazz, GuiText extraName) {
 		this(id, clazz);
 
 		this.extraName = extraName;
 	}
 
+	Parts(String id, Class<? extends AEBasePart> clazz, GuiText extraName, Features feature) {
+		this(id, clazz, extraName);
+		this.feature = feature;
+	}
+
 	public static Parts getByID(int id) {
 		return values()[id];
+	}
+
+	@Nullable
+	public static Parts getByName(String name) {
+		name = name.toUpperCase();
+
+		try {
+			return Parts.valueOf(name);
+		} catch (IllegalArgumentException err) {
+			return null;
+		}
 	}
 
 	public static int getPartID(AEBasePart part) {
@@ -93,5 +117,13 @@ public enum Parts {
 	@Nullable
 	public GuiText getExtraName() {
 		return extraName;
+	}
+
+	public boolean isEnabled() {
+		return this.feature == null || this.feature.isEnabled();
+	}
+
+	public ItemStack getStack() {
+		return NAEBaseItemPart.instance.getPartStack(this);
 	}
 }

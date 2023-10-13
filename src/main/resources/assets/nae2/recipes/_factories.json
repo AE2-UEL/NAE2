@@ -1,0 +1,13 @@
+{
+  "conditions": {
+    "part_exists": "co.neeve.nae2.common.recipes.factories.conditions.PartExists",
+    "material_exists": "co.neeve.nae2.common.recipes.factories.conditions.MaterialExists"
+  },
+  "ingredients": {
+    "part": "co.neeve.nae2.common.recipes.factories.ingredients.PartFactory",
+    "material": "co.neeve.nae2.common.recipes.factories.ingredients.MaterialFactory"
+  },
+  "recipes": {
+    "shaped_recipe": "co.neeve.nae2.common.recipes.factories.recipes.ShapedRecipeFactory"
+  }
+}

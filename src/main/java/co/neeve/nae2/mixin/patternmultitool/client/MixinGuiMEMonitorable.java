@@ -1,7 +1,6 @@
 package co.neeve.nae2.mixin.patternmultitool.client;
 
 import appeng.client.gui.implementations.GuiMEMonitorable;
-import co.neeve.nae2.mixin.base.client.MixinAEBaseMEGui;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

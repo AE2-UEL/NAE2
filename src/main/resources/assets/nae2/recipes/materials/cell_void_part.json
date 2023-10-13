@@ -4,6 +4,23 @@
       "type": "forge:and",
       "values": [
         {
+          "type": "nae2:material_exists",
+          "material": "cell_void_part"
+        },
+        {
+          "type": "forge:or",
+          "values": [
+            {
+              "type": "minecraft:item_exists",
+              "item": "nae2:storage_cell_void"
+            },
+            {
+              "type": "minecraft:item_exists",
+              "item": "nae2:fluid_storage_cell_void"
+            }
+          ]
+        },
+        {
           "type": "appliedenergistics2:material_exists",
           "material": "material.annihilation_core"
         },
@@ -15,11 +32,10 @@
     }
   ],
   "result": {
-    "item": "nae2:material",
-    "data": 0,
-    "count": 1
+    "type": "material",
+    "name": "cell_void_part"
   },
-  "type": "appliedenergistics2:part_shaped",
+  "type": "nae2:shaped_recipe",
   "pattern": [
     "aba"
   ],

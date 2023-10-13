@@ -4,6 +4,10 @@
       "type": "forge:and",
       "values": [
         {
+          "type": "minecraft:item_exists",
+          "item": "nae2:pattern_multiplier"
+        },
+        {
           "type": "appliedenergistics2:material_exists",
           "material": "material.blank_pattern"
         },
@@ -29,8 +33,7 @@
       "part": "material.engineering_processor"
     }
   ],
-  "result":
-  {
+  "result": {
     "item": "nae2:pattern_multiplier",
     "count": 1
   }

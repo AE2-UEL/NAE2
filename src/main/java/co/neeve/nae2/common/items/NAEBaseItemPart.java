@@ -36,12 +36,18 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 		return Parts.getByID(itemStack.getItemDamage()).getTranslationKey();
 	}
 
+	public ItemStack getPartStack(Parts part) {
+		return new ItemStack(this, 1, part.ordinal());
+	}
+
 	@Override
 	protected void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
 		if (!this.isInCreativeTab(creativeTab)) return;
 
 		for (Parts part : Parts.values()) {
-			itemStacks.add(new ItemStack(this, 1, part.ordinal()));
+			if (!part.isEnabled()) continue;
+
+			itemStacks.add(getPartStack(part));
 		}
 	}
 
@@ -49,13 +55,18 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 	@Override
 	public IPart createPartFromItemStack(ItemStack is) {
 		try {
-			return Parts.values()[MathHelper.clamp(
-				is.getItemDamage(), 0, Parts.values().length - 1)]
-				.newInstance(is);
+			var part = Parts.values()[MathHelper.clamp(
+				is.getItemDamage(), 0, Parts.values().length - 1)];
+
+			if (part.isEnabled()) {
+				return part.newInstance(is);
+			}
 		} catch (IllegalAccessException | NoSuchMethodException | InstantiationException |
 		         InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+
+		return null;
 	}
 
 	@Override

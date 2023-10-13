@@ -38,7 +38,7 @@ public class VoidDisassembleHandler extends IForgeRegistryEntry.Impl<IRecipe> im
 
 	@Override
 	public @NotNull ItemStack getCraftingResult(@NotNull InventoryCrafting inv) {
-		return Materials.VOID_CELL_COMPONENT.getStack();
+		return Materials.CELL_VOID_PART.getStack();
 	}
 
 	@Override

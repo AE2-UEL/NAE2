@@ -1,5 +1,6 @@
 package co.neeve.nae2;
 
+import co.neeve.nae2.common.features.Features;
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.fml.common.Optional;
@@ -7,6 +8,7 @@ import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import zone.rong.mixinbooter.ILateMixinLoader;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,8 @@ import java.util.Map;
 @IFMLLoadingPlugin.Name("NAE2-Core")
 @Optional.Interface(iface = "zone.rong.mixinbooter.ILateMixinLoader", modid = "mixinbooter")
 public class NAE2MixinPlugin implements IFMLLoadingPlugin, ILateMixinLoader {
+
+	public static final String MIXIN_PATH_FORMAT = "mixins.nae2.%s.json";
 
 	@Override
 	public String[] getASMTransformerClass() {
@@ -43,6 +47,31 @@ public class NAE2MixinPlugin implements IFMLLoadingPlugin, ILateMixinLoader {
 	@Override
 	@Optional.Method(modid = "mixinbooter")
 	public List<String> getMixinConfigs() {
-		return ImmutableList.of("mixins.nae2.json");
+		NAE2.setupConfig();
+
+		var mixins = new ArrayList<String>();
+
+		for (var feature : Features.values()) {
+			if (!feature.isEnabled()) continue;
+
+			var featureMixins = feature.getMixins();
+			if (featureMixins != null) {
+				mixins.add(String.format(MIXIN_PATH_FORMAT, featureMixins));
+			}
+
+			var subFeatures = feature.getSubFeatures();
+			if (subFeatures != null) {
+				for (var subFeature : subFeatures) {
+					if (!subFeature.isEnabled()) continue;
+
+					var subFeatureMixins = subFeature.getMixins();
+					if (subFeatureMixins != null) {
+						mixins.add(String.format(MIXIN_PATH_FORMAT, subFeatureMixins));
+					}
+				}
+			}
+		}
+
+		return ImmutableList.copyOf(mixins);
 	}
 }

@@ -3,6 +3,7 @@ package co.neeve.nae2.client.models;
 import appeng.api.AEApi;
 import appeng.api.parts.IPartModel;
 import appeng.api.parts.IPartModels;
+import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.common.registries.Items;
 import co.neeve.nae2.common.registries.Materials;
@@ -24,6 +25,8 @@ public class ModelManager {
 		IPartModels partModels = AEApi.instance().registries().partModels();
 
 		for (var part : Parts.values()) {
+			if (!part.isEnabled()) continue;
+
 			ModelLoader.setCustomModelResourceLocation(Items.BASE_PART.getItem(), part.ordinal(),
 				part.getModelResourceLocation());
 
@@ -45,12 +48,16 @@ public class ModelManager {
 			}
 		}
 
-		for (var upgrade : Upgrades.values()) {
-			ModelLoader.setCustomModelResourceLocation(Items.BASE_UPGRADE.getItem(), upgrade.ordinal(),
-				upgrade.getModelResourceLocation());
+		if (Features.UPGRADES.isEnabled()) {
+			for (var upgrade : Upgrades.values()) {
+				if (!upgrade.isEnabled()) continue;
+				ModelLoader.setCustomModelResourceLocation(Items.BASE_UPGRADE.getItem(), upgrade.ordinal(),
+					upgrade.getModelResourceLocation());
+			}
 		}
 
 		for (var material : Materials.values()) {
+			if (!material.isEnabled()) continue;
 			ModelLoader.setCustomModelResourceLocation(Items.MATERIAL.getItem(), material.ordinal(),
 				material.getModelResourceLocation());
 		}

@@ -1,0 +1,32 @@
+{
+  "package": "co.neeve.nae2.mixin",
+  "required": true,
+  "refmap": "mixins.nae2.refmap.json",
+  "target": "@env(DEFAULT)",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "patternmultitool.shared.MixinAEBaseContainer",
+    "patternmultitool.shared.MixinContainerMEMonitorable",
+    "patternmultitool.shared.MixinContainerPatternEncoder",
+    "patternmultitool.shared.MixinContainerUpgradeable",
+    "patternmultitool.shared.pmthosts.MixinContainerExpandedPatternTerm",
+    "patternmultitool.shared.pmthosts.MixinContainerInterface",
+    "patternmultitool.shared.pmthosts.MixinContainerInterfaceTerminal",
+    "patternmultitool.shared.pmthosts.MixinContainerPatternTerm",
+    "patternmultitool.shared.pmthosts.MixinContainerWirelessPatternTerminal"
+  ],
+  "client": [
+    "patternmultitool.client.MixinAEBaseGui",
+    "patternmultitool.client.MixinAEBaseMEGui",
+    "patternmultitool.client.MixinAEItemStack",
+    "patternmultitool.client.MixinGuiMEMonitorable",
+    "patternmultitool.client.MixinGuiUpgradeable",
+    "patternmultitool.client.MixinJEIIngredientGrid",
+    "patternmultitool.client.MixinStackSizeRenderer",
+    "patternmultitool.client.pmthosts.MixinGuiInterface",
+    "patternmultitool.client.pmthosts.MixinGuiInterfaceTerminal",
+    "patternmultitool.client.pmthosts.MixinGuiPatternTerminal"
+  ],
+  "server": []
+}
