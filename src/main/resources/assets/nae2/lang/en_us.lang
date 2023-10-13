@@ -22,4 +22,7 @@ nae2.material.cell_void_part.name=ME Void Storage Component
 
 nae2.upgrade.hyper_acceleration.name=Hyper-Acceleration Card
 
+nae2.jei.missing.craft.1=[NAE2] All missing items are craftable.
+nae2.jei.missing.craft.2=Hold Ctrl to mass-order missing items.
+
 itemGroup.nae2=Neeve's AE2:EL Additions
