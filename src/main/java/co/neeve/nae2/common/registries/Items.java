@@ -33,6 +33,6 @@ public enum Items {
 	}
 
 	public ItemStack getStack() {
-		return item.getDefaultInstance();
+		return new ItemStack(item);
 	}
 }
