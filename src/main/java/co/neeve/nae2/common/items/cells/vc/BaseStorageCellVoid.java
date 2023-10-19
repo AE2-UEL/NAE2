@@ -31,9 +31,12 @@ import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseItem implements ICellWorkbenchItem {
+	private static final NumberFormat decimalFormat = NumberFormat.getInstance();
+
 	public BaseStorageCellVoid() {
 		this.setMaxStackSize(1);
 	}
@@ -93,7 +96,8 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 			var compound = stack.getTagCompound();
 			if (compound != null) {
 				lines.add("");
-				lines.add(I18n.format("nae2.storage_cell_void.count", this.getCondenserPower(stack),
+				lines.add(I18n.format("nae2.storage_cell_void.count",
+					decimalFormat.format(this.getCondenserPower(stack)),
 					GuiText.Condenser.getLocal()));
 			}
 		}
