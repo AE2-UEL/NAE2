@@ -108,7 +108,8 @@ public class MixinPacketJEIRecipe {
 
 	@Inject(method = "<init>(Lio/netty/buffer/ByteBuf;)V", at = @At(
 		value = "INVOKE",
-		target = "Lnet/minecraft/nbt/NBTTagCompound;getKeySet()Ljava/util/Set;"
+		target = "Lnet/minecraft/nbt/NBTTagCompound;getKeySet()Ljava/util/Set;",
+		remap = true
 	))
 	private void ctor(ByteBuf stream, CallbackInfo ci, @Local NBTTagCompound comp) {
 		if (comp == null) return;
@@ -119,7 +120,8 @@ public class MixinPacketJEIRecipe {
 
 	@Inject(method = "serverPacketData", at = @At(
 		value = "INVOKE",
-		target = "Lnet/minecraft/inventory/Container;onCraftMatrixChanged(Lnet/minecraft/inventory/IInventory;)V"
+		target = "Lnet/minecraft/inventory/Container;onCraftMatrixChanged(Lnet/minecraft/inventory/IInventory;)V",
+		remap = true
 	))
 	public void serverPacketData(INetworkInfo manager, AppEngPacket packet, EntityPlayer player, CallbackInfo ci,
 	                             @Local(name = "craftMatrix") IItemHandler craftMatrix,
