@@ -22,8 +22,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
-	dependencies = "required-after:appliedenergistics2@[rv6-stable-7-extended_life-v0.55.13,);" +
-		"required-after:mixinbooter@[8.3,)")
+	dependencies = "required-after:appliedenergistics2;required-after:mixinbooter@[8.3,)")
 public class NAE2 {
 	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 	public static NAE2 instance;
