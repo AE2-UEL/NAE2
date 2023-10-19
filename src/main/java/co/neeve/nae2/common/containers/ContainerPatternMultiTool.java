@@ -60,7 +60,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	@GuiSync(0)
 	public PatternMultiToolInventories viewingInventory = PatternMultiToolInventories.PMT;
 	@GuiSync(1)
-	public PatternMultiToolTabs viewingTab = PatternMultiToolTabs.MULTIPLIER;
+	public PatternMultiToolTabs viewingTab;
 	@SideOnly(Side.CLIENT)
 	private HashMap<AppEngSlot, ValidatonResult> highlightedSlots;
 	private NetworkToolViewer tbInventory;
@@ -72,6 +72,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		this.inventoryPlayer = ip;
 		this.iface = iface;
 		this.lockPlayerInventorySlot(ip.currentItem);
+		this.viewingTab = te.getTab();
 
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			highlightedSlots = new HashMap<>();
@@ -117,13 +118,17 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	@Override
 	public void onUpdate(String field, Object oldValue, Object newValue) {
 		if (field.equals("viewingInventory") || field.equals("viewingTab")) {
-			this.addSlots();
-
 			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 				if (Minecraft.getMinecraft().currentScreen instanceof GuiPatternMultiTool gpmt) {
+					if (field.equals("viewingTab")) {
+						assert getPatternMultiToolObject() != null;
+						getPatternMultiToolObject().setTab((PatternMultiToolTabs) newValue);
+					}
 					gpmt.setupTabSpecificButtons();
 				}
 			}
+
+			this.addSlots();
 		}
 	}
 
@@ -165,7 +170,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			}
 		}
 
-		if (this.viewingTab == PatternMultiToolTabs.SEARCH_REPLACE) {
+		if (this.getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
 			this.srSlots = new ArrayList<>();
 			var inv = this.patternMultiTool.getSearchReplaceInventory();
 			this.srSlots.add((SlotFake) this.addSlotToContainer(new SlotFakeTypeOnly(inv, 0, 8, 76 + 18 + 1)));
@@ -235,8 +240,6 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 				this.getPlayerInv().setInventorySlotContents(this.getPlayerInv().currentItem, toolInvItemStack);
 			}
 			this.setValidContainer(false);
-			super.detectAndSendChanges();
-			return;
 		}
 
 		super.detectAndSendChanges();
@@ -272,7 +275,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			}
 		}
 
-		if (this.viewingTab == PatternMultiToolTabs.SEARCH_REPLACE) {
+		if (this.getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
 			if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
 			this.highlightedSlots.clear();
 
@@ -425,11 +428,22 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	public void switchTab(PatternMultiToolTabs tab) {
+		var patternMultiToolObject = this.getPatternMultiToolObject();
+		assert patternMultiToolObject != null;
+		patternMultiToolObject.setTab(tab);
+		patternMultiToolObject.saveChanges();
+
+		// For sync purposes.
 		this.viewingTab = tab;
+
 		addSlots();
 		detectAndSendChanges();
 	}
 
+	public PatternMultiToolTabs getViewingTab() {
+		assert getPatternMultiToolObject() != null;
+		return getPatternMultiToolObject().getTab();
+	}
 
 	public enum ValidatonResult {
 		OK,

@@ -7,9 +7,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public enum PatternMultiToolTabs {
 	MULTIPLIER("multiply"), SEARCH_REPLACE("replace");
 
+	private static PatternMultiToolTabs[] cachedValues;
 	private final String message;
 
 	PatternMultiToolTabs(String message) {this.message = message;}
+
+	public static PatternMultiToolTabs fromInt(int i) {
+		if (cachedValues == null) cachedValues = values();
+		if (i < 0 || i > cachedValues.length) return cachedValues[0];
+		return cachedValues[i];
+	}
 
 	@SideOnly(Side.CLIENT)
 	public String localize() {

@@ -19,6 +19,8 @@ import static net.minecraftforge.fml.relauncher.Side.CLIENT;
 
 @SideOnly(CLIENT)
 public class PMTTabButton extends GuiButton implements ITooltip {
+	public static final ResourceLocation RESOURCE_LOCATION = new ResourceLocation("nae2", "textures/gui" +
+		"/pattern_multiplier.png");
 	private final GuiPatternMultiTool host;
 	private final PatternMultiToolTabs tab;
 	private final String message;
@@ -41,7 +43,7 @@ public class PMTTabButton extends GuiButton implements ITooltip {
 		var texWidth = 256f;
 		float uvU = u / texWidth;
 		float uvV = v / texHeight;
-		float rectHeight = 17.0F;
+		float rectHeight = 18.0F;
 
 		// Draw the rectangle.
 		Tessellator tessellator = Tessellator.getInstance();
@@ -57,11 +59,11 @@ public class PMTTabButton extends GuiButton implements ITooltip {
 	public void drawButton(@NotNull Minecraft minecraft, int x, int y, float partial) {
 		if (this.visible) {
 			var color = 1F;
-			if (((ContainerPatternMultiTool) this.host.inventorySlots).viewingTab != this.tab) {
+			if (((ContainerPatternMultiTool) this.host.inventorySlots).getViewingTab() != this.tab) {
 				color = 0.5F;
 			}
 			GlStateManager.color(color, color, color, 1.0F);
-			minecraft.renderEngine.bindTexture(new ResourceLocation("nae2", "textures/gui/pattern_multiplier.png"));
+			minecraft.renderEngine.bindTexture(RESOURCE_LOCATION);
 			this.hovered = x >= this.x && y >= this.y && x < this.x + this.width && y < this.y + this.height;
 			int uv_x = 179;
 			int uv_y = 35;

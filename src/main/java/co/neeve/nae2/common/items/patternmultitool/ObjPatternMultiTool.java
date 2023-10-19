@@ -10,6 +10,7 @@ import appeng.util.Platform;
 import appeng.util.inv.IAEAppEngInventory;
 import appeng.util.inv.InvOperation;
 import appeng.util.inv.filter.IAEItemFilter;
+import co.neeve.nae2.common.enums.PatternMultiToolTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandler;
@@ -20,6 +21,7 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 	private final AppEngInternalInventory srInv;
 	private final ItemStack is;
 	private final StackUpgradeInventory upgrades;
+	private PatternMultiToolTabs tab = PatternMultiToolTabs.MULTIPLIER;
 
 	public ObjPatternMultiTool(ItemStack is) {
 		this.is = is;
@@ -37,6 +39,7 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 			this.inv.readFromNBT(data, "inv");
 			this.upgrades.readFromNBT(data, "upgrades");
 			this.srInv.readFromNBT(data, "srInv");
+			this.tab = PatternMultiToolTabs.fromInt(data.getInteger("tab"));
 		}
 	}
 
@@ -46,6 +49,7 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 		this.inv.writeToNBT(data, "inv");
 		this.upgrades.writeToNBT(data, "upgrades");
 		this.srInv.writeToNBT(data, "srInv");
+		data.setInteger("tab", tab.ordinal());
 	}
 
 	public void onChangeInventory(IItemHandler inv, int slot, InvOperation mc, ItemStack removedStack,
@@ -70,6 +74,14 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 
 	public int getInstalledCapacityUpgrades() {
 		return upgrades.getInstalledUpgrades(Upgrades.CAPACITY);
+	}
+
+	public PatternMultiToolTabs getTab() {
+		return tab;
+	}
+
+	public void setTab(PatternMultiToolTabs tab) {
+		this.tab = tab;
 	}
 
 	private static class ObjPatternMultiToolInventoryFilter implements IAEItemFilter {

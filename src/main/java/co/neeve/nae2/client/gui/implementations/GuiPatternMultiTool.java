@@ -98,6 +98,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 
 			this.buttonList.add(btn);
 		}
+
 		var last = this.buttonList.get(buttonList.size() - 1);
 		tabSwitcherExclusion = new Rectangle(first.x, first.y, last.width + last.x - first.x,
 			last.height + last.y - first.y);
@@ -120,21 +121,22 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		// Calculate start position for buttons
 		int start = 7 + this.guiLeft;
 
-		if (this.containerPatternMultiTool.viewingTab == PatternMultiToolTabs.MULTIPLIER) {
+		int y = this.guiTop + 76 + 16;
+		if (this.containerPatternMultiTool.getViewingTab() == PatternMultiToolTabs.MULTIPLIER) {
 			// Add buttons to the GUI
-			this.buttonList.add(new PatternMultiToolButton(start, this.guiTop + 76 + 18,
+			this.buttonList.add(new PatternMultiToolButton(start, y,
 				PatternMultiToolActions.MUL2));
-			this.buttonList.add(new PatternMultiToolButton(start + 23, this.guiTop + 76 + 18,
+			this.buttonList.add(new PatternMultiToolButton(start + 23, y,
 				PatternMultiToolActions.MUL3));
-			this.buttonList.add(new PatternMultiToolButton(start + 46, this.guiTop + 76 + 18,
+			this.buttonList.add(new PatternMultiToolButton(start + 46, y,
 				PatternMultiToolActions.ADD));
 
 			GuiButton unencode;
-			this.buttonList.add(unencode = new PatternMultiToolButton(start + 176 - 60 - 15, this.guiTop + 76 + 18,
+			this.buttonList.add(unencode = new PatternMultiToolButton(start + 176 - 60 - 15, y,
 				PatternMultiToolActions.CLEAR));
 			unencode.width = 60;
-		} else if (this.containerPatternMultiTool.viewingTab == PatternMultiToolTabs.SEARCH_REPLACE) {
-			PatternMultiToolButton btn = new PatternMultiToolButton(start + 176 - 60 - 15, this.guiTop + 76 + 18,
+		} else if (this.containerPatternMultiTool.getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
+			PatternMultiToolButton btn = new PatternMultiToolButton(start + 176 - 60 - 15, y,
 				PatternMultiToolActions.REPLACE);
 			btn.width = 60;
 			this.buttonList.add(btn);
@@ -206,7 +208,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 			}
 		}
 
-		if (this.containerPatternMultiTool.viewingTab == PatternMultiToolTabs.SEARCH_REPLACE) {
+		if (this.containerPatternMultiTool.getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
 			var slots = this.containerPatternMultiTool.getSearchReplaceSlots();
 			if (slots != null) {
 				for (var slot : slots) {

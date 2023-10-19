@@ -20,7 +20,7 @@ public class PatternMultiToolButton extends GuiButton implements ITooltip {
 		super(0, x, y, "");
 		this.action = action;
 		this.width = 18;
-		this.height = 18;
+		this.height = 20;
 
 		this.defX = x;
 		this.defY = y;
