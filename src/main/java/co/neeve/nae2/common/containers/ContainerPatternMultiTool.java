@@ -26,6 +26,8 @@ import co.neeve.nae2.common.interfaces.IContainerPatternMultiTool;
 import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import co.neeve.nae2.common.slots.SlotPatternMultiTool;
 import co.neeve.nae2.common.slots.SlotPatternMultiToolUpgrade;
+import com.glodblock.github.common.item.ItemFluidDrop;
+import com.glodblock.github.common.item.ItemFluidEncodedPattern;
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -40,6 +42,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -300,6 +303,9 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 					continue;
 				}
 
+				var ae2fc = Platform.isModLoaded("ae2fc") && is.getItem() instanceof ItemFluidEncodedPattern;
+				final String countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
+
 				var isCrafting = nbt.getBoolean("crafting");
 				ValidatonResult result = null;
 
@@ -309,6 +315,10 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 				var lists = new ArrayList<NBTTagList>();
 				lists.add(tagIn);
 				if (!isCrafting) lists.add(tagOut);
+
+				var fluidStackIn = FluidUtil.getFluidContained(itemA);
+				var fluidStackOut = FluidUtil.getFluidContained(itemB);
+				var fluidReplacement = ae2fc && fluidStackIn != null && fluidStackOut != null;
 
 				for (var list : lists) {
 					var idx = 0;
@@ -320,11 +330,18 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 							// If crafting, store validation for later.
 							if (isCrafting) {
-								var count = compound.getTag("Count").copy();
+								var count = compound.getTag(countTag).copy();
 								var data = itemBData.copy();
-								data.setTag("Count", count);
+								data.setTag(countTag, count);
 								list.set(idx, data);
 							} else continue;
+						} else if (fluidReplacement && stack.getItem() instanceof ItemFluidDrop) {
+							var fluidStack = ItemFluidDrop.getFluidStack(stack);
+
+							// This should never be a crafting pattern.
+							if (fluidStackIn.isFluidEqual(fluidStack)) {
+								result = ValidatonResult.OK;
+							}
 						}
 						idx++;
 					}
