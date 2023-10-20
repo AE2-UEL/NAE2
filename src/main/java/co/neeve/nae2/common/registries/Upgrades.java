@@ -9,12 +9,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
 public enum Upgrades {
 	HYPER_ACCELERATION("hyper_acceleration", UpgradeFeatures.HYPER_ACCELERATION);
 
+	private static Upgrades[] cachedValues;
 	private final String translationKey;
 	private final Map<ItemStack, Integer> supportedMax = new HashMap<>();
 	private UpgradeFeatures feature;
@@ -32,8 +34,12 @@ public enum Upgrades {
 		this.feature = upgradeFeature;
 	}
 
+	@Nullable
 	public static Upgrades getByID(int id) {
-		return values()[id];
+		if (cachedValues == null) cachedValues = values();
+
+		if (id < 0 || id >= cachedValues.length) return null;
+		return cachedValues[id];
 	}
 
 	@SideOnly(Side.CLIENT)

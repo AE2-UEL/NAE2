@@ -42,9 +42,12 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 		instance = this;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public @NotNull String getTranslationKey(ItemStack itemStack) {
-		return Upgrades.getByID(itemStack.getItemDamage()).getTranslationKey();
+		var upgrade = Upgrades.getByID(itemStack.getItemDamage());
+		if (upgrade == null) return I18n.translateToLocal("item.appliedenergistics2.material.invalid_type.name");
+		return upgrade.getTranslationKey();
 	}
 
 	@Override
@@ -53,15 +56,14 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 
 		for (Upgrades upgrade : Upgrades.values()) {
 			if (!upgrade.isEnabled()) continue;
-			
+
 			itemStacks.add(new ItemStack(this, 1, upgrade.ordinal()));
 		}
 	}
-
-	@SuppressWarnings("deprecation")
+	
 	@Override
-	public @NotNull String getItemStackDisplayName(ItemStack stack) {
-		return I18n.translateToLocal(Upgrades.getByID(stack.getItemDamage()).getTranslationKey());
+	public @NotNull String getItemStackDisplayName(@NotNull ItemStack stack) {
+		return getTranslationKey(stack);
 	}
 
 	@SideOnly(Side.CLIENT)
