@@ -10,14 +10,18 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -32,6 +36,16 @@ import java.util.stream.Collectors;
 @SuppressWarnings("rawtypes")
 @Mixin(value = DualityInterface.class, remap = false)
 public class MixinBlocking {
+	@Unique
+	@Nullable
+	private static Method nae2$getMethodSafe(Class<?> clazz, String name, Class<?>... parameterTypes) {
+		try {
+			return clazz.getMethod(name, parameterTypes);
+		} catch (NoSuchMethodException ignored) {
+			return null;
+		}
+	}
+
 	@WrapOperation(
 		method = "isBusy",
 		at = @At(
@@ -111,5 +125,20 @@ public class MixinBlocking {
 		} else {
 			return operation.call(iterator);
 		}
+	}
+
+	@WrapOperation(method = { "isBusy", "pushPattern" }, at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)" +
+			"Lnet/minecraft/block/state/IBlockState;",
+		remap = true
+	))
+	private IBlockState wrapBlockingFixUp(World instance, BlockPos blockPos, Operation<IBlockState> operation,
+	                                      @Local(name = "te") TileEntity te) {
+		// We're in the wrong place. Bets on this blowing up sometime later?
+		if (nae2$getMethodSafe(te.getClass(), "hasBoundPosition") != null)
+			return operation.call(instance, blockPos);
+
+		return instance.getBlockState(te.getPos());
 	}
 }
