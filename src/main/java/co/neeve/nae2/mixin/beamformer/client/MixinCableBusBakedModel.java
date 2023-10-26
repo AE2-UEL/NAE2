@@ -5,7 +5,6 @@ import appeng.api.parts.IPartModel;
 import appeng.client.render.cablebus.CableBusBakedModel;
 import appeng.client.render.cablebus.CableBusRenderState;
 import appeng.client.render.cablebus.QuadRotator;
-import appeng.parts.PartModel;
 import co.neeve.nae2.common.parts.implementations.PartBeamFormer;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -40,8 +39,8 @@ public class MixinCableBusBakedModel {
 		target = "Ljava/util/EnumMap;get(Ljava/lang/Object;)Ljava/lang/Object;",
 		ordinal = 0
 	))
-	private Object injectBeamFormerSkip(EnumMap<EnumFacing, PartModel> instance, Object facing,
-	                                    Operation<PartModel> operation) {
+	private Object injectBeamFormerSkip(EnumMap<EnumFacing, IPartModel> instance, Object facing,
+	                                    Operation<IPartModel> operation) {
 		var model = operation.call(instance, facing);
 		if (model == PartBeamFormer.MODEL_ON || model == PartBeamFormer.MODEL_OFF) return null;
 		return model;
