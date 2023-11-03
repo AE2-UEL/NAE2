@@ -16,7 +16,7 @@ import appeng.helpers.IContainerCraftingPacket;
 import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
 import appeng.util.item.ItemStackHashStrategy;
-import co.neeve.nae2.common.helpers.VirtualPattern;
+import co.neeve.nae2.common.helpers.VirtualPatternDetails;
 import co.neeve.nae2.common.interfaces.IExtendedCraftingGridCache;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.netty.buffer.ByteBuf;
@@ -185,7 +185,7 @@ public class MixinPacketJEIRecipe {
 			.collect(Collectors.toList());
 
 		// Create a Virtual Pattern, despite AE2 telling us not to.
-		var pattern = new VirtualPattern(optimal,
+		var pattern = new VirtualPatternDetails(optimal,
 			output.stream().map(AEItemStack::fromItemStack).collect(Collectors.toList()));
 
 		// Try firing the crafting job.

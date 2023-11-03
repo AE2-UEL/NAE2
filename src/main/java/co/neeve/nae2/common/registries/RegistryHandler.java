@@ -66,6 +66,12 @@ public class RegistryHandler {
 					));
 			}
 		}
+
+		for (InternalItems itemDef : InternalItems.values()) {
+			if (!itemDef.isEnabled()) continue;
+
+			event.getRegistry().register(itemDef.getItem());
+		}
 	}
 
 	@SubscribeEvent

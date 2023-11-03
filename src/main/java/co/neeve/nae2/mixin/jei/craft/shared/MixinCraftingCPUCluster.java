@@ -5,7 +5,7 @@ import appeng.api.networking.energy.IEnergyGrid;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.me.cache.CraftingGridCache;
 import appeng.me.cluster.implementations.CraftingCPUCluster;
-import co.neeve.nae2.common.helpers.VirtualPattern;
+import co.neeve.nae2.common.helpers.VirtualPatternDetails;
 import com.llamalad7.mixinextras.sugar.Local;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +34,7 @@ public abstract class MixinCraftingCPUCluster {
 	), cancellable = true)
 	public void executeCrafting(IEnergyGrid eg, CraftingGridCache cc, CallbackInfo ci,
 	                            @Local ICraftingPatternDetails details) {
-		if (details instanceof VirtualPattern) {
+		if (details instanceof VirtualPatternDetails) {
 			if (this.remainingItemCount == finalOutput.getStackSize()) {
 				this.cancel();
 				ci.cancel();
