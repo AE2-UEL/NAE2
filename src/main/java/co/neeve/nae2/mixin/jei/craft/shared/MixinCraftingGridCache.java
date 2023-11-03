@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.Unique;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-@Mixin(CraftingGridCache.class)
+@Mixin(value = CraftingGridCache.class, remap = false)
 public abstract class MixinCraftingGridCache implements IExtendedCraftingGridCache {
 	@Shadow
 	@Final

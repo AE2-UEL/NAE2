@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.awt.*;
 import java.util.List;
 
-@Mixin(GuiMEMonitorable.class)
+@Mixin(value = GuiMEMonitorable.class, remap = false)
 public class MixinGuiMEMonitorable extends MixinAEBaseMEGui {
 	public MixinGuiMEMonitorable(Container inventorySlotsIn) {
 		super(inventorySlotsIn);

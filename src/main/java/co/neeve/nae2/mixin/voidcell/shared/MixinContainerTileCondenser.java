@@ -26,7 +26,8 @@ public class MixinContainerTileCondenser extends AEBaseContainer {
 	@Inject(method = "<init>", at = @At(
 		value = "INVOKE",
 		target = "Lappeng/container/implementations/ContainerCondenser;bindPlayerInventory" +
-			"(Lnet/minecraft/entity/player/InventoryPlayer;II)V"
+			"(Lnet/minecraft/entity/player/InventoryPlayer;II)V",
+		remap = false
 	))
 	private void ctor(InventoryPlayer ip, TileCondenser condenser, CallbackInfo ci, @Local IItemHandler inv) {
 		SlotRestrictedInput slotRestrictedInput =

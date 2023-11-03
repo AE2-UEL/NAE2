@@ -29,7 +29,7 @@ public class MixinAEBaseContainer extends Container {
 	@Unique
 	protected ArrayList<AppEngSlot> patternMultiToolSlots = null;
 
-	@Shadow
+	@Shadow(remap = false)
 	public void lockPlayerInventorySlot(int idx) {}
 
 	@Shadow
@@ -37,7 +37,7 @@ public class MixinAEBaseContainer extends Container {
 		return false;
 	}
 
-	@Shadow
+	@Shadow(remap = false)
 	public InventoryPlayer getInventoryPlayer() {
 		return null;
 	}

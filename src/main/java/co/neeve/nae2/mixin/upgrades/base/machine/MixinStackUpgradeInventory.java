@@ -7,13 +7,15 @@ import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(StackUpgradeInventory.class)
+@Mixin(value = StackUpgradeInventory.class, remap = false)
 public class MixinStackUpgradeInventory extends MixinUpgradeInventory {
 	@Shadow
 	@Final
 	private ItemStack stack;
 
+	@Unique
 	@Override
 	public int getMaxInstalled(Upgrades upgrades) {
 		int max = 0;

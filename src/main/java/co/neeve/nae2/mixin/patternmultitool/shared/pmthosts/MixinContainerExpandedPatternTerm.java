@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("AddedMixinMembersNamePattern")
-@Mixin(ContainerExpandedProcessingPatternTerm.class)
+@Mixin(value = ContainerExpandedProcessingPatternTerm.class, remap = false)
 public class MixinContainerExpandedPatternTerm extends MixinContainerPatternEncoder implements IPatternMultiToolToolboxHost {
 	@SuppressWarnings("InjectIntoConstructor")
 	@Inject(method =

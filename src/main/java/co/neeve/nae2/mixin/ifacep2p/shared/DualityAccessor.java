@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(DualityInterface.class)
+@Mixin(value = DualityInterface.class, remap = false)
 public interface DualityAccessor {
 	@Accessor
 	AENetworkProxy getGridProxy();

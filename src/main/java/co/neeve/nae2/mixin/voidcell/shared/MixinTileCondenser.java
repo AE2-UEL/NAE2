@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(targets = "appeng/tile/misc/TileCondenser", remap = false)
+@Mixin(value = TileCondenser.class, remap = false)
 public abstract class MixinTileCondenser extends AEBaseInvTile implements IExtendedTileCondenser {
 	@Unique
 	private final AppEngInternalInventory nae2$voidCell = new AppEngInternalInventory(this, 1);

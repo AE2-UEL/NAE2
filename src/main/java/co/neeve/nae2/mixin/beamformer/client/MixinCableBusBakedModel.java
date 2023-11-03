@@ -30,7 +30,7 @@ import static co.neeve.nae2.common.parts.implementations.PartBeamFormer.PRISM_LO
 
 @Mixin(value = CableBusBakedModel.class)
 public class MixinCableBusBakedModel {
-	@Shadow
+	@Shadow(remap = false)
 	@Final
 	private Map<ResourceLocation, IBakedModel> partModels;
 
@@ -50,7 +50,8 @@ public class MixinCableBusBakedModel {
 		value = "INVOKE",
 		target = "Lappeng/client/render/cablebus/FacadeBuilder;buildFacadeQuads" +
 			"(Lnet/minecraft/util/BlockRenderLayer;" +
-			"Lappeng/client/render/cablebus/CableBusRenderState;JLjava/util/List;Ljava/util/function/Function;)V"
+			"Lappeng/client/render/cablebus/CableBusRenderState;JLjava/util/List;Ljava/util/function/Function;)V",
+		remap = false
 	))
 	private void injectBeamFormerPrisms(IBlockState state, EnumFacing side, long rand,
 	                                    CallbackInfoReturnable<List<BakedQuad>> cir,

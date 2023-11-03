@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(SlotRestrictedInput.class)
+@Mixin(value = SlotRestrictedInput.class, remap = false)
 public class MixinSlotRestrictedInput {
 	@Shadow
 	@Final

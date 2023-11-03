@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @SuppressWarnings("AddedMixinMembersNamePattern")
-@Mixin(value = ContainerInterfaceTerminal.class)
+@Mixin(value = ContainerInterfaceTerminal.class, remap = false)
 public class MixinContainerInterfaceTerminal extends MixinAEBaseContainer implements IPatternMultiToolToolboxHost {
 	@SuppressWarnings("InjectIntoConstructor")
 	@Inject(at = @At(value = "INVOKE", target = "Lappeng/container/implementations/ContainerInterfaceTerminal;" +

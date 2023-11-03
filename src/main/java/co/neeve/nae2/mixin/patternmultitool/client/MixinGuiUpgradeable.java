@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 @SuppressWarnings("EmptyMethod")
-@Mixin(GuiUpgradeable.class)
+@Mixin(value = GuiUpgradeable.class, remap = false)
 public class MixinGuiUpgradeable extends MixinAEBaseGui {
 	public MixinGuiUpgradeable(Container inventorySlotsIn) {
 		super(inventorySlotsIn);

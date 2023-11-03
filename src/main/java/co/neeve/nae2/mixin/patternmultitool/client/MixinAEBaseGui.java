@@ -31,20 +31,25 @@ import java.util.List;
 import static java.util.Collections.EMPTY_LIST;
 
 @SuppressWarnings({ "SameReturnValue", "AddedMixinMembersNamePattern" })
-@Mixin(value = AEBaseGui.class)
+@Mixin(value = AEBaseGui.class, remap = false)
 public class MixinAEBaseGui extends GuiContainer {
 	@Unique
 	protected List<PatternMultiToolButton> patternMultiToolButtons = null;
+
 	@Final
-	@Shadow
+	@Shadow(remap = false)
 	private StackSizeRenderer stackSizeRenderer;
 
 	public MixinAEBaseGui(Container inventorySlotsIn) {
 		super(inventorySlotsIn);
 	}
 
-	@WrapOperation(method = "drawSlot", at = @At(value = "INVOKE", target = "Lappeng/util/item/AEItemStack;" +
-		"fromItemStack(Lnet/minecraft/item/ItemStack;)Lappeng/util/item/AEItemStack;"))
+	@WrapOperation(method = "drawSlot", at = @At(
+		value = "INVOKE",
+		target = "Lappeng/util/item/AEItemStack;fromItemStack(Lnet/minecraft/item/ItemStack;)" +
+			"Lappeng/util/item/AEItemStack;",
+		remap = false
+	))
 	private static AEItemStack injectItemStack(ItemStack itemStack, Operation<AEItemStack> original, Slot slot) {
 		AEItemStack stack = original.call(itemStack);
 		ItemStack slotIs = slot.getStack();
@@ -88,11 +93,11 @@ public class MixinAEBaseGui extends GuiContainer {
 		}
 	}
 
-	@Shadow
+	@Shadow(remap = false)
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 	}
 
-	@Shadow
+	@Shadow(remap = false)
 	public List<Rectangle> getJEIExclusionArea() {
 		return null;
 	}
