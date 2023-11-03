@@ -6,6 +6,7 @@ import appeng.api.networking.crafting.ICraftingJob;
 import appeng.container.AEBaseContainer;
 import appeng.container.ContainerOpenContext;
 import appeng.container.implementations.ContainerCraftConfirm;
+import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.interfaces.IInventorySlotAware;
 import appeng.core.AELog;
 import appeng.core.sync.AppEngPacket;
@@ -131,6 +132,9 @@ public class MixinPacketJEIRecipe {
 		// Not asked. No do.
 		if (!nae2$craft) return;
 
+		// No encoders.
+		if (player.openContainer instanceof ContainerPatternEncoder) return;
+
 		// Not a crafting recipe. No do.
 		if (output.size() != 1) return;
 
@@ -138,14 +142,6 @@ public class MixinPacketJEIRecipe {
 
 		// Invalid output stack. No do.
 		if (outputAIS == null) return;
-
-		var target = cct.getActionSource();
-		var optionalActionHost = target.machine();
-
-		// Not a valid action host. No do.
-		//noinspection SimplifyOptionalCallChains
-		if (!optionalActionHost.isPresent()) return;
-		var actionHost = optionalActionHost.get();
 
 		// Not a valid context. No do.
 		final ContainerOpenContext context = ((AEBaseContainer) cct).getOpenContext();
@@ -199,7 +195,7 @@ public class MixinPacketJEIRecipe {
 			if (te != null) {
 				Platform.openGUI(player, te, context.getSide(), GuiBridge.GUI_CRAFTING_CONFIRM);
 			} else {
-				if (actionHost instanceof IInventorySlotAware i) {
+				if (player.openContainer instanceof IInventorySlotAware i) {
 					Platform.openGUI(player, i.getInventorySlot(), GuiBridge.GUI_CRAFTING_CONFIRM,
 						i.isBaubleSlot());
 				}
