@@ -27,4 +27,18 @@ nae2.upgrade.hyper_acceleration.name=Hyper-Acceleration Card
 nae2.jei.missing.craft.1=[NAE2] All missing items are craftable.
 nae2.jei.missing.craft.2=Hold Ctrl to mass-order missing items.
 
+nae2.jei.cellview.items=items
+nae2.jei.cellview.buckets=buckets
+nae2.jei.cellview.units=buckets
+# count / max unit_name
+nae2.jei.cellview.stored=Stored: %s / %s %s
+nae2.jei.cellview.hover.stored=Stored: %s %s
+# count unit_name
+nae2.jei.cellview=Cell View
+nae2.jei.cellview.loss=Type loss: %s %s
+nae2.jei.cellview.used=Used bytes: %s
+nae2.jei.cellview.hover.1=%s types used up.
+nae2.jei.cellview.hover.2=Each used type decreases the capacity.
+nae2.jei.cellview.hover.3=%s bytes/type * %s = %s bytes lost.
+
 itemGroup.nae2=Neeve's AE2:EL Additions

@@ -1,5 +1,6 @@
 package co.neeve.nae2;
 
+import appeng.util.Platform;
 import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
 import co.neeve.nae2.client.models.ModelManager;
 import co.neeve.nae2.common.features.Features;
@@ -76,7 +77,11 @@ public class NAE2 {
 				var entry = featureCategory.computeIfAbsent("enabled", x -> new Property("enabled", "true",
 					Property.Type.BOOLEAN));
 
-				feature.setEnabled(entry.getBoolean(true));
+				if (feature == Features.JEI_HOOKS) {
+					feature.setEnabled(Platform.isModLoaded("jei") && entry.getBoolean(true));
+				} else {
+					feature.setEnabled(entry.getBoolean(true));
+				}
 
 				var subFeatures = feature.getSubFeatures();
 				if (subFeatures != null) {
@@ -85,7 +90,7 @@ public class NAE2 {
 						var subFeatureEntry = featureCategory.computeIfAbsent(subFeatureLowerCase,
 							x -> new Property(subFeatureLowerCase, "true", Property.Type.BOOLEAN));
 
-						subFeature.setEnabled(subFeatureEntry.getBoolean(true));
+						subFeature.setEnabled(feature.isEnabled() && subFeatureEntry.getBoolean(true));
 						subFeatureEntry.setComment(subFeature.getDescription());
 					}
 				}
