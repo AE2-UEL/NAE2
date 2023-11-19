@@ -1,6 +1,7 @@
 package co.neeve.nae2.common.containers;
 
 import appeng.api.config.Upgrades;
+import appeng.api.implementations.ICraftingPatternItem;
 import appeng.api.implementations.guiobjects.IGuiItem;
 import appeng.container.AEBaseContainer;
 import appeng.container.ContainerNull;
@@ -48,10 +49,10 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class ContainerPatternMultiTool extends AEBaseContainer implements IAEAppEngInventory,
 	IContainerPatternMultiTool {
@@ -69,20 +70,19 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	private NetworkToolViewer tbInventory;
 	private List<SlotFake> srSlots;
 
-	public ContainerPatternMultiTool(InventoryPlayer ip, ObjPatternMultiTool te, IInterfaceHost iface) {
+	public ContainerPatternMultiTool(InventoryPlayer ip, ObjPatternMultiTool te) {
 		super(ip, te);
 		this.patternMultiTool = te;
 		this.inventoryPlayer = ip;
-		this.iface = iface;
 		this.lockPlayerInventorySlot(ip.currentItem);
+		this.iface = te.getInterface();
+		if (this.iface != null) {
+			this.viewingInventory = PatternMultiToolInventories.INTERFACE;
+		}
 		this.viewingTab = te.getTab();
 
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 			highlightedSlots = new HashMap<>();
-		}
-
-		if (iface != null) {
-			this.viewingInventory = PatternMultiToolInventories.INTERFACE;
 		}
 
 		// Add slots for the container
@@ -106,16 +106,14 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	@Override
-	public IItemHandler getPatternMultiToolInventory() {
+	@Nonnull
+	public IItemHandler getPatternInventory() {
+		IItemHandler result = null;
 		switch (this.viewingInventory) {
-			case PMT -> {
-				return this.patternMultiTool.getPatternInventory();
-			}
-			case INTERFACE -> {
-				return this.iface.getInventoryByName("patterns");
-			}
+			case PMT -> result = this.patternMultiTool.getPatternInventory();
+			case INTERFACE -> result = this.iface.getInventoryByName("patterns");
 		}
-		return null;
+		return result;
 	}
 
 	@Override
@@ -147,7 +145,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 		for (int y = 0; y < 4; ++y) {
 			for (int x = 0; x < 9; ++x) {
-				SlotPatternMultiTool slot = new SlotPatternMultiTool(this.getPatternMultiToolInventory(), this,
+				SlotPatternMultiTool slot = new SlotPatternMultiTool(this.getPatternInventory(), this,
 					y * 9 + x, 8 + x * 18, 19 + y * 18, y, this.getInventoryPlayer());
 				slot.setStackLimit(this.viewingInventory == PatternMultiToolInventories.INTERFACE ? 1 : 64);
 
@@ -195,16 +193,14 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		this.bindPlayerInventory(this.inventoryPlayer, 0, 107 + 18);
 	}
 
-	public UpgradeInventory getPatternMultiToolUpgradeInventory() {
+	@Nonnull
+	public UpgradeInventory getUpgradeInventory() {
+		UpgradeInventory result = null;
 		switch (this.viewingInventory) {
-			case PMT -> {
-				return this.patternMultiTool.getUpgradeInventory();
-			}
-			case INTERFACE -> {
-				return (UpgradeInventory) this.iface.getInventoryByName("upgrades");
-			}
+			case PMT -> result = this.patternMultiTool.getUpgradeInventory();
+			case INTERFACE -> result = (UpgradeInventory) this.iface.getInventoryByName("upgrades");
 		}
-		return null;
+		return result;
 	}
 
 	public boolean isBoundToInterface() {
@@ -212,10 +208,10 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	public void setupUpgrades() {
-		UpgradeInventory ui = this.getPatternMultiToolUpgradeInventory();
+		UpgradeInventory ui = this.getUpgradeInventory();
 
 		// Throw because this should never happen.
-		for (int upgradeSlot = 0; upgradeSlot < Objects.requireNonNull(ui).getSlots(); upgradeSlot++) {
+		for (int upgradeSlot = 0; upgradeSlot < ui.getSlots(); upgradeSlot++) {
 			SlotRestrictedInput slot = new SlotPatternMultiToolUpgrade(SlotRestrictedInput.PlacableItemType.UPGRADES,
 				ui, this, upgradeSlot, 187, 8 + upgradeSlot * 18, this.getInventoryPlayer());
 			slot.setNotDraggable();
@@ -251,17 +247,16 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	// Handle slot changes
 	public void onSlotChange(Slot s) {
 		if (this.viewingInventory == PatternMultiToolInventories.INTERFACE) {
-			IItemHandler patterns = this.getPatternMultiToolInventory();
+			IItemHandler patterns = this.getPatternInventory();
 
 			List<ItemStack> dropList = new ArrayList<>();
 
 			int maxSlots =
 				((UpgradeInventory) iface.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.PATTERN_EXPANSION) * 9;
 
-			// Throw because this should never happen.
-			for (int invSlot = 0; invSlot < Objects.requireNonNull(patterns).getSlots(); ++invSlot) {
+			for (int invSlot = 0; invSlot < patterns.getSlots(); ++invSlot) {
 				ItemStack is = patterns.getStackInSlot(invSlot);
-				if (!(is.getItem() instanceof ItemEncodedPattern)) {
+				if (!(is.getItem() instanceof ICraftingPatternItem)) {
 					dropList.add(patterns.extractItem(invSlot, Integer.MAX_VALUE, false));
 				} else if (invSlot > 8 + maxSlots) {
 					if (!is.isEmpty()) {
@@ -284,8 +279,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 			var host = this;
 			var srInv = host.getSearchReplaceInventory();
-			var inv = host.getPatternMultiToolInventory();
-			if (srInv == null || inv == null) return;
+			if (srInv == null) return;
 
 			var itemA = srInv.getStackInSlot(0);
 			var itemB = srInv.getStackInSlot(1);
@@ -393,31 +387,28 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	@Override
-	public boolean isPatternMultiToolSlotEnabled(int i) {
+	public boolean isPatternRowEnabled(int i) {
 		return i <= this.getInstalledCapacityUpgrades();
 	}
 
 	public int getInstalledCapacityUpgrades() {
 		Upgrades which = null;
-		UpgradeInventory ui = this.getPatternMultiToolUpgradeInventory();
+		UpgradeInventory ui = this.getUpgradeInventory();
 
 		switch (this.viewingInventory) {
 			case PMT -> which = Upgrades.CAPACITY;
 			case INTERFACE -> which = Upgrades.PATTERN_EXPANSION;
 		}
-		if (which == null) {
-			throw new RuntimeException("Invalid upgrade container state.");
-		}
 
 		// Throw because this should never happen.
-		return Objects.requireNonNull(ui).getInstalledUpgrades(which);
+		return ui.getInstalledUpgrades(which);
 	}
 
 	@Override
 	public boolean canTakeStack() {
 		// Throw because this should never happen.
 		List<ItemStack> inventory =
-			Lists.newArrayList((AppEngInternalInventory) Objects.requireNonNull(this.getPatternMultiToolInventory()));
+			Lists.newArrayList((AppEngInternalInventory) this.getPatternInventory());
 		int slices = inventory.size() / 9;
 		int lockedUpgrades = slices; // Stub
 		int installedUpgrades = this.getInstalledCapacityUpgrades();

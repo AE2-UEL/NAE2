@@ -14,6 +14,8 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
+import java.util.Arrays;
+
 public class SlotPatternMultiTool extends SlotRestrictedInput {
 	private final IPatternMultiToolHost host;
 	private final int groupNum;
@@ -69,13 +71,16 @@ public class SlotPatternMultiTool extends SlotRestrictedInput {
 
 		ItemStack is = super.getStack();
 
-		if (is.getItem() instanceof ItemEncodedPattern) {
-			if (!is.isEmpty() && is.getItem() instanceof ItemEncodedPattern iep) {
-				ItemStack out = iep.getOutput(is);
+		if (!is.isEmpty() && is.getItem() instanceof ICraftingPatternItem cpi) {
+			if (is.getItem() instanceof ItemEncodedPattern iep) {
+				return iep.getOutput(is);
+			}
+			
+			var details = cpi.getPatternForItem(is, null);
+			var stack = Arrays.stream(details.getOutputs()).findFirst().orElse(null);
 
-				if (!out.isEmpty()) {
-					return out;
-				}
+			if (stack != null) {
+				return stack.createItemStack();
 			}
 		}
 
@@ -84,6 +89,6 @@ public class SlotPatternMultiTool extends SlotRestrictedInput {
 
 	@Override
 	public boolean isSlotEnabled() {
-		return this.host != null && this.host.isPatternMultiToolSlotEnabled(this.groupNum);
+		return this.host != null && this.host.isPatternRowEnabled(this.groupNum);
 	}
 }

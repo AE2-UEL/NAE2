@@ -42,4 +42,7 @@ nae2.jei.cellview.hover.2=Each used type decreases the capacity.
 nae2.jei.cellview.hover.3=%s bytes/type * %s = %s bytes lost.
 nae2.jei.cellview.keybind=Press %s to view contents
 
+tile.nae2.reconstruction_chamber.name=Reconstruction Chamber
+tile.nae2.reconstruction_chamber.desc=Makes Atomic Recontructors from Actually Additions treat items inside as if they were on the ground for conversion purposes. No more item drops!\n\nAuto-pushes products into nearby inventories and ME Interfaces.
+
 itemGroup.nae2=Neeve's AE2:EL Additions

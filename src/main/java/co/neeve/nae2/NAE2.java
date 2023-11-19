@@ -1,13 +1,11 @@
 package co.neeve.nae2;
 
-import appeng.util.Platform;
 import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
 import co.neeve.nae2.client.models.ModelManager;
 import co.neeve.nae2.common.features.Features;
-import co.neeve.nae2.common.items.patternmultitool.GuiHandlerPatternMultiTool;
-import co.neeve.nae2.common.items.patternmultitool.net.HandlerPatternMultiTool;
-import co.neeve.nae2.common.items.patternmultitool.net.PatternMultiToolPacket;
+import co.neeve.nae2.common.net.NetHandler;
 import co.neeve.nae2.common.registries.RegistryHandler;
+import co.neeve.nae2.common.sync.GuiHandler;
 import co.neeve.nae2.server.WorldListener;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
@@ -25,15 +23,24 @@ import java.io.File;
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
 	dependencies = "required-after:appliedenergistics2;required-after:mixinbooter@[8.3,)")
 public class NAE2 {
-	public static final SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 	public static NAE2 instance;
 	private static ConfigManager configManager;
+	private final NetHandler network = new NetHandler();
 	private final RegistryHandler registryHandler = new RegistryHandler();
+	private GuiHandler guiHandler;
 
 	public static void setupConfig() {
 		if (configManager == null) {
 			configManager = new ConfigManager();
 		}
+	}
+
+	public static SimpleNetworkWrapper net() {
+		return instance.network.getChannel();
+	}
+
+	public static GuiHandler gui() {
+		return NAE2.instance.guiHandler;
 	}
 
 	@EventHandler
@@ -42,13 +49,11 @@ public class NAE2 {
 
 		NAE2.instance = this;
 		MinecraftForge.EVENT_BUS.register(new WorldListener());
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, this.guiHandler = new GuiHandler());
 
 		// TODO: move.
 		boolean isClient = event.getSide() == Side.CLIENT;
 		if (Features.PATTERN_MULTI_TOOL.isEnabled()) {
-			NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandlerPatternMultiTool());
-			NAE2.network.registerMessage(HandlerPatternMultiTool.class, PatternMultiToolPacket.class, 0, Side.SERVER);
-
 			if (isClient) {
 				MinecraftForge.EVENT_BUS.register(new PatternMultiToolButtonHandler());
 			}
@@ -77,12 +82,8 @@ public class NAE2 {
 				var entry = featureCategory.computeIfAbsent("enabled", x -> new Property("enabled", "true",
 					Property.Type.BOOLEAN));
 
-				if (feature == Features.JEI_HOOKS) {
-					feature.setEnabled(Platform.isModLoaded("jei") && entry.getBoolean(true));
-				} else {
-					feature.setEnabled(entry.getBoolean(true));
-				}
-
+				feature.setEnabled(entry.getBoolean(true));
+				
 				var subFeatures = feature.getSubFeatures();
 				if (subFeatures != null) {
 					for (var subFeature : subFeatures) {

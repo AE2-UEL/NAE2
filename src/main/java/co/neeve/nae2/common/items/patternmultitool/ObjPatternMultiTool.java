@@ -1,8 +1,9 @@
 package co.neeve.nae2.common.items.patternmultitool;
 
 import appeng.api.config.Upgrades;
+import appeng.api.implementations.ICraftingPatternItem;
 import appeng.api.implementations.guiobjects.IGuiItemObject;
-import appeng.items.misc.ItemEncodedPattern;
+import appeng.helpers.IInterfaceHost;
 import appeng.parts.automation.StackUpgradeInventory;
 import appeng.parts.automation.UpgradeInventory;
 import appeng.tile.inventory.AppEngInternalInventory;
@@ -15,6 +16,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
+
 public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 	public static final int UPGRADE_COUNT = 3;
 	private final AppEngInternalInventory inv;
@@ -22,6 +25,7 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 	private final ItemStack is;
 	private final StackUpgradeInventory upgrades;
 	private PatternMultiToolTabs tab = PatternMultiToolTabs.MULTIPLIER;
+	private IInterfaceHost interfaceHost;
 
 	public ObjPatternMultiTool(ItemStack is) {
 		this.is = is;
@@ -84,6 +88,14 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 		this.tab = tab;
 	}
 
+	public @Nullable IInterfaceHost getInterface() {
+		return this.interfaceHost;
+	}
+
+	public void setInterface(IInterfaceHost interfaceHost) {
+		this.interfaceHost = interfaceHost;
+	}
+
 	private static class ObjPatternMultiToolInventoryFilter implements IAEItemFilter {
 		private ObjPatternMultiToolInventoryFilter() {
 		}
@@ -93,7 +105,7 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 		}
 
 		public boolean allowInsert(IItemHandler inv, int slot, ItemStack stack) {
-			return stack.getItem() instanceof ItemEncodedPattern;
+			return stack.getItem() instanceof ICraftingPatternItem;
 		}
 	}
 }

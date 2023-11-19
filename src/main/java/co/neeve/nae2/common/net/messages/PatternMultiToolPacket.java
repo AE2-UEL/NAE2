@@ -1,4 +1,4 @@
-package co.neeve.nae2.common.items.patternmultitool.net;
+package co.neeve.nae2.common.net.messages;
 
 import appeng.api.AEApi;
 import appeng.container.AEBaseContainer;
@@ -13,8 +13,10 @@ import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import co.neeve.nae2.common.enums.PatternMultiToolTabs;
 import co.neeve.nae2.common.interfaces.IContainerPatternMultiTool;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
+import co.neeve.nae2.common.net.INAEMessage;
 import com.glodblock.github.common.item.ItemFluidDrop;
 import com.glodblock.github.common.item.ItemFluidEncodedPattern;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -23,33 +25,55 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.ArrayList;
 
-public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiToolPacket, IMessage> {
+public class PatternMultiToolPacket implements INAEMessage {
+	private int value;
+	private int actionType;
 
-	// Handles incoming messages from PatternMultiToolPacket
-	public IMessage onMessage(PatternMultiToolPacket message, MessageContext ctx) {
-		EntityPlayerMP player = ctx.getServerHandler().player;
-		player.getServerWorld().addScheduledTask(() -> processMessage(message, player));
-		return null;
+	public PatternMultiToolPacket() {
 	}
 
-	// Processes a received message
-	private void processMessage(PatternMultiToolPacket message, EntityPlayerMP player) {
+	public PatternMultiToolPacket(PatternMultiToolActionTypes actionType, int value) {
+		this.actionType = actionType.ordinal();
+		this.value = value;
+	}
+
+	@Override
+	public void toBytes(ByteBuf buf) {
+		buf.writeInt(actionType);
+		buf.writeInt(value);
+	}
+
+	@Override
+	public void fromBytes(ByteBuf buf) {
+		actionType = buf.readInt();
+		value = buf.readInt();
+	}
+
+	public int getValue() {
+		return this.value;
+	}
+
+	public PatternMultiToolActionTypes getActionType() {
+		return PatternMultiToolActionTypes.values()[this.actionType];
+	}
+
+	@Override
+	public void process(MessageContext ctx) {
 		if (Platform.isClient()) return;
+		var player = ctx.getServerHandler().player;
 
 		if (player.openContainer instanceof AEBaseContainer bc && bc instanceof IPatternMultiToolHost container) {
-			if (message.getActionType() == PatternMultiToolActionTypes.TAB_SWITCH && container instanceof ContainerPatternMultiTool containerPatternMultiTool) {
-				containerPatternMultiTool.switchTab(PatternMultiToolTabs.values()[message.getValue()]);
-			} else if (message.getActionType() == PatternMultiToolActionTypes.BUTTON_PRESS) {
-				AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternMultiToolInventory();
+			if (this.getActionType() == PatternMultiToolActionTypes.TAB_SWITCH && container instanceof ContainerPatternMultiTool containerPatternMultiTool) {
+				containerPatternMultiTool.switchTab(PatternMultiToolTabs.values()[this.getValue()]);
+			} else if (this.getActionType() == PatternMultiToolActionTypes.BUTTON_PRESS) {
+				AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternInventory();
 				if (inv == null) return;
 
-				PatternMultiToolActions value = PatternMultiToolActions.values()[message.getValue()];
+				PatternMultiToolActions value = PatternMultiToolActions.values()[this.getValue()];
 
 				if (value == PatternMultiToolActions.INV_SWITCH && container instanceof IContainerPatternMultiTool cmp) {
 					cmp.toggleInventory();
@@ -112,7 +136,7 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 	// Searches and replaces items. Duh :)
 	private void searchAndReplace(IContainerPatternMultiTool host, EntityPlayerMP player) {
 		var srInv = host.getSearchReplaceInventory();
-		var inv = host.getPatternMultiToolInventory();
+		var inv = host.getPatternInventory();
 		if (srInv == null || inv == null) return;
 
 		var itemA = srInv.getStackInSlot(0);
@@ -159,7 +183,7 @@ public class HandlerPatternMultiTool implements IMessageHandler<PatternMultiTool
 							var ifd = ItemFluidDrop.newStack(fluidStackOut);
 							NBTTagCompound ifdCompound;
 							if (ifd == null || (ifdCompound = ifd.getTagCompound()) == null) continue;
-							
+
 							var data = compound.copy();
 							data.setTag("tag", ifdCompound);
 							list.set(idx, data);

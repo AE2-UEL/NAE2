@@ -1,6 +1,8 @@
 package co.neeve.nae2.client.gui.implementations;
 
 import appeng.api.AEApi;
+import appeng.api.parts.IPart;
+import appeng.api.parts.PartItemStack;
 import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.widgets.GuiCustomSlot;
 import appeng.container.interfaces.IJEIGhostIngredients;
@@ -12,7 +14,6 @@ import appeng.core.sync.network.NetworkHandler;
 import appeng.core.sync.packets.PacketInventoryAction;
 import appeng.fluids.client.gui.widgets.GuiFluidSlot;
 import appeng.fluids.util.AEFluidStack;
-import appeng.helpers.IInterfaceHost;
 import appeng.helpers.InventoryAction;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.NAE2;
@@ -27,8 +28,8 @@ import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import co.neeve.nae2.common.enums.PatternMultiToolInventories;
 import co.neeve.nae2.common.enums.PatternMultiToolTabs;
 import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
-import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
-import co.neeve.nae2.common.items.patternmultitool.net.PatternMultiToolPacket;
+import co.neeve.nae2.common.net.messages.PatternMultiToolPacket;
+import co.neeve.nae2.common.registries.Items;
 import mezz.jei.api.gui.IGhostIngredientHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
@@ -51,19 +52,19 @@ import java.util.*;
 public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolHostGui, IJEIGhostIngredients {
 	private static final ItemStack INTERFACE_ICON =
 		AEApi.instance().definitions().blocks().iface().maybeStack(1).orElse(ItemStack.EMPTY);
-	private static final ItemStack PMT_ICON = new ItemStack(new ToolPatternMultiTool(), 1);
+	private static final ItemStack PMT_ICON = Items.PATTERN_MULTI_TOOL.getStack();
 	// GUI texture
 	private static final ResourceLocation loc = new ResourceLocation(Tags.MODID, "textures/gui/pattern_multiplier" +
 		".png");
-	private final ContainerPatternMultiTool containerPatternMultiTool;
 	private final Map<IGhostIngredientHandler.Target<?>, Object> mapTargetSlot = new HashMap<>();
+	private final ContainerPatternMultiTool containerPMT;
 	private PMTSwitcherButton switcherButton;
 	private Rectangle tabSwitcherExclusion = null;
 
 	// Constructor
-	public GuiPatternMultiTool(InventoryPlayer inventoryPlayer, ObjPatternMultiTool te, IInterfaceHost iface) {
-		super(new ContainerPatternMultiTool(inventoryPlayer, te, iface));
-		this.containerPatternMultiTool = (ContainerPatternMultiTool) this.inventorySlots;
+	public GuiPatternMultiTool(InventoryPlayer inventoryPlayer, ObjPatternMultiTool te) {
+		super(new ContainerPatternMultiTool(inventoryPlayer, te));
+		this.containerPMT = (ContainerPatternMultiTool) this.inventorySlots;
 		this.ySize = 189 + 18;
 		this.xSize = 211;
 	}
@@ -74,10 +75,10 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		super.actionPerformed(btn);
 
 		if (btn == this.switcherButton) {
-			NAE2.network.sendToServer(new PatternMultiToolPacket(PatternMultiToolActionTypes.BUTTON_PRESS,
+			NAE2.net().sendToServer(new PatternMultiToolPacket(PatternMultiToolActionTypes.BUTTON_PRESS,
 				PatternMultiToolActions.INV_SWITCH.ordinal()));
 		} else if (btn instanceof PMTTabButton tabButton) {
-			NAE2.network.sendToServer(new PatternMultiToolPacket(PatternMultiToolActionTypes.TAB_SWITCH,
+			NAE2.net().sendToServer(new PatternMultiToolPacket(PatternMultiToolActionTypes.TAB_SWITCH,
 				tabButton.getTab().ordinal()));
 		}
 	}
@@ -106,11 +107,12 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		setupTabSpecificButtons();
 
 		// Draw Interface/PMT switcher
-		if (containerPatternMultiTool.isBoundToInterface()) {
+		if (this.getContainer().isBoundToInterface()) {
 			switcherButton = new PMTSwitcherButton(this.guiLeft + 152 - 1, this.guiTop + 3 - 18 + 11, PMT_ICON,
 				GuiText.Priority.getLocal(), this.itemRender);
 			switcherButton.setHideEdge(1);
 			switcherButton.id = 7;
+			updateSwitcher();
 			this.buttonList.add(switcherButton);
 		}
 	}
@@ -122,7 +124,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		int start = 7 + this.guiLeft;
 
 		int y = this.guiTop + 76 + 16;
-		if (this.containerPatternMultiTool.getViewingTab() == PatternMultiToolTabs.MULTIPLIER) {
+		if (this.getContainer().getViewingTab() == PatternMultiToolTabs.MULTIPLIER) {
 			// Add buttons to the GUI
 			this.buttonList.add(new PatternMultiToolButton(start, y,
 				PatternMultiToolActions.MUL2));
@@ -135,7 +137,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 			this.buttonList.add(unencode = new PatternMultiToolButton(start + 176 - 60 - 15, y,
 				PatternMultiToolActions.CLEAR));
 			unencode.width = 60;
-		} else if (this.containerPatternMultiTool.getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
+		} else if (this.getContainer().getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
 			PatternMultiToolButton btn = new PatternMultiToolButton(start + 176 - 60 - 15, y,
 				PatternMultiToolActions.REPLACE);
 			btn.width = 60;
@@ -155,18 +157,30 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	public void updateScreen() {
 		super.updateScreen();
 
+		updateSwitcher();
+	}
+
+	private void updateSwitcher() {
 		if (switcherButton != null) {
 			boolean b = this.getContainer().viewingInventory == PatternMultiToolInventories.INTERFACE;
-			switcherButton.setItem(b ? INTERFACE_ICON :
-				Objects.requireNonNull(Objects.requireNonNull(getPMTObject())).getItemStack());
-			switcherButton.setMessage(b ? "Viewing ME Interface" : "Viewing Pattern Multi-Tool");
+			var icon = getIcon(b);
+			switcherButton.setItem(icon);
+			switcherButton.setMessage(b ? "Viewing " + icon.getDisplayName() : "Viewing Pattern Multi-Tool");
 		}
 	}
 
-	// Draws the screen
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
+	private ItemStack getIcon(boolean b) {
+		if (b) {
+			var obj = this.getContainer().getPatternMultiToolObject();
+			if (obj != null) {
+				var iface = obj.getInterface();
+				if (iface instanceof IPart part) {
+					return part.getItemStack(PartItemStack.NETWORK);
+				}
+			}
+			return INTERFACE_ICON;
+		}
+		return PMT_ICON;
 	}
 
 	// Draws the foreground
@@ -176,7 +190,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		this.fontRenderer.drawString(GuiText.inventory.getLocal(), 8, this.ySize - 96 + 3, 4210752);
 
 		for (Map.Entry<AppEngSlot, ContainerPatternMultiTool.ValidatonResult> entry :
-			this.containerPatternMultiTool.getHighlightedSlots().entrySet()) {
+			this.getContainer().getHighlightedSlots().entrySet()) {
 			AppEngSlot slot = entry.getKey();
 			ContainerPatternMultiTool.ValidatonResult result = entry.getValue();
 			var x = slot.xPos;
@@ -192,7 +206,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, 177, this.ySize);
 
 		// Draw pattern rows.
-		int installedCapacityUpgrades = containerPatternMultiTool.getInstalledCapacityUpgrades();
+		int installedCapacityUpgrades = this.getContainer().getInstalledCapacityUpgrades();
 		for (int u = 0; u < installedCapacityUpgrades; u++) {
 			this.drawTexturedModalRect(offsetX + 8, offsetY + 37 + u * 18, 8, 19, 18 * 9 - 1, 18 - 1);
 		}
@@ -200,7 +214,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		// Draw the upgrade inventory depending on the size.
 		// Throw because this should never happen.
 		int upgradeInventorySize =
-			Objects.requireNonNull(containerPatternMultiTool.getPatternMultiToolUpgradeInventory()).getSlots();
+			Objects.requireNonNull(this.getContainer().getUpgradeInventory()).getSlots();
 		if (upgradeInventorySize > 0) {
 			this.drawTexturedModalRect(offsetX + 180, offsetY, 180, 0, 32, 32);
 			for (int u = 1; u < upgradeInventorySize; u++) {
@@ -208,8 +222,8 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 			}
 		}
 
-		if (this.containerPatternMultiTool.getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
-			var slots = this.containerPatternMultiTool.getSearchReplaceSlots();
+		if (this.getContainer().getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
+			var slots = this.getContainer().getSearchReplaceSlots();
 			if (slots != null) {
 				for (var slot : slots) {
 					this.drawTexturedModalRect(offsetX + slot.xPos - 1, offsetY + slot.yPos - 1, 8 - 1, 19 - 1, 18,
@@ -227,11 +241,11 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	}
 
 	protected boolean hasToolbox() {
-		return ((ContainerPatternMultiTool) this.inventorySlots).hasToolbox();
+		return this.getContainer().hasToolbox();
 	}
 
 	protected ContainerPatternMultiTool getContainer() {
-		return (ContainerPatternMultiTool) this.inventorySlots;
+		return this.containerPMT;
 	}
 
 	@Override
@@ -330,7 +344,5 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	public Map<IGhostIngredientHandler.Target<?>, Object> getFakeSlotTargetMap() {
 		return mapTargetSlot;
 	}
-
-
 }
 

@@ -5,7 +5,7 @@ import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import co.neeve.nae2.common.enums.PatternMultiToolActionTypes;
 import co.neeve.nae2.common.enums.PatternMultiToolActions;
-import co.neeve.nae2.common.items.patternmultitool.net.PatternMultiToolPacket;
+import co.neeve.nae2.common.net.messages.PatternMultiToolPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -16,7 +16,7 @@ public class PatternMultiToolButtonHandler {
 	@SubscribeEvent
 	public void handlePatternMultiToolPress(GuiScreenEvent.ActionPerformedEvent.Post event) {
 		if (event.getGui() instanceof IPatternMultiToolHostGui && event.getButton() instanceof PatternMultiToolButton tb) {
-			SimpleNetworkWrapper network = NAE2.network;
+			SimpleNetworkWrapper network = NAE2.net();
 
 			if (tb.getAction() == PatternMultiToolActions.CLEAR) {
 				Minecraft mc = event.getGui().mc;

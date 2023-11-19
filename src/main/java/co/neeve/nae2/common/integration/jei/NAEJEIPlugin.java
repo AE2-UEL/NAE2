@@ -2,6 +2,7 @@ package co.neeve.nae2.common.integration.jei;
 
 import appeng.api.implementations.items.IStorageCell;
 import co.neeve.nae2.common.features.subfeatures.JEIFeatures;
+import co.neeve.nae2.common.registries.Blocks;
 import co.neeve.nae2.common.registries.InternalItems;
 import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.IModPlugin;
@@ -73,6 +74,11 @@ public class NAEJEIPlugin implements IModPlugin, IRecipeRegistryPlugin {
 
 		if (JEIFeatures.CELL_VIEW.isEnabled()) {
 			registry.addRecipeRegistryPlugin(this);
+		}
+
+		for (var blockDef : Blocks.values()) {
+			if (!blockDef.isEnabled()) continue;
+			blockDef.jeiRegister(registry);
 		}
 	}
 }

@@ -29,7 +29,7 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 		var pattern = original.call(instance);
 		if (pattern.isEmpty() && this instanceof IPatternMultiToolHost pmh) {
 			// Try search for blanks in our inventory.
-			final IItemHandler pmhInv = pmh.getPatternMultiToolInventory();
+			final IItemHandler pmhInv = pmh.getPatternInventory();
 			final ObjPatternMultiTool pmhObj = pmh.getPatternMultiToolObject();
 			if (pmhInv == null || pmhObj == null) return pattern;
 
@@ -58,7 +58,7 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 		"Lnet/minecraft/entity/player" + "/InventoryPlayer;addItemStackToInventory(Lnet/minecraft/item/ItemStack;)Z"))
 	public boolean injectPMTOutput(InventoryPlayer ip, ItemStack itemStackIn) {
 		if (this instanceof IPatternMultiToolHost pmh) {
-			final IItemHandler pmhInv = pmh.getPatternMultiToolInventory();
+			final IItemHandler pmhInv = pmh.getPatternInventory();
 			if (pmhInv != null) {
 				itemStackIn = ItemHandlerHelper.insertIntoHandler(pmhInv, itemStackIn);
 				if (itemStackIn.isEmpty()) {

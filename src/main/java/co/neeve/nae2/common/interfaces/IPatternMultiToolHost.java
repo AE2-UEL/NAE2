@@ -9,7 +9,7 @@ public interface IPatternMultiToolHost {
 	@Nullable
 	ObjPatternMultiTool getPatternMultiToolObject();
 
-	default @Nullable IItemHandler getPatternMultiToolInventory() {
+	default @Nullable IItemHandler getPatternInventory() {
 		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
 		if (pmtObject == null) return null;
 		return pmtObject.getPatternInventory();
@@ -22,7 +22,7 @@ public interface IPatternMultiToolHost {
 	}
 
 
-	default boolean isPatternMultiToolSlotEnabled(int i) {
+	default boolean isPatternRowEnabled(int i) {
 		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
 		if (pmtObject == null) return false;
 		return i <= this.getPatternMultiToolObject().getInstalledCapacityUpgrades();

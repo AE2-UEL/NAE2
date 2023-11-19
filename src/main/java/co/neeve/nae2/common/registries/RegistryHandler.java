@@ -12,16 +12,19 @@ import co.neeve.nae2.common.features.subfeatures.UpgradeFeatures;
 import co.neeve.nae2.common.items.cells.vc.VoidCellHandler;
 import co.neeve.nae2.common.items.cells.vc.VoidCraftingHandler;
 import co.neeve.nae2.common.items.cells.vc.VoidDisassembleHandler;
+import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Objects;
@@ -72,6 +75,12 @@ public class RegistryHandler {
 
 			event.getRegistry().register(itemDef.getItem());
 		}
+
+		for (Blocks blockDef : Blocks.values()) {
+			if (!blockDef.isEnabled()) continue;
+
+			event.getRegistry().register(blockDef.getItemBlock());
+		}
 	}
 
 	@SubscribeEvent
@@ -97,6 +106,27 @@ public class RegistryHandler {
 				registry.register(new VoidCraftingHandler(stack, Materials.CELL_VOID_PART.getStack(),
 					Items.STORAGE_CELL_VOID.getStack()).setRegistryName("storage_cell_void"));
 			});
+		}
+	}
+
+	@SubscribeEvent
+	public void registerBlocks(final RegistryEvent.Register<Block> event) {
+		for (Blocks blockDef : Blocks.values()) {
+			if (!blockDef.isEnabled()) return;
+
+			event.getRegistry().register(blockDef.getBlock());
+		}
+	}
+
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void registerModels(final ModelRegistryEvent event) {
+		for (Blocks blockDef : Blocks.values()) {
+			if (!blockDef.isEnabled()) return;
+			
+			ModelLoader.setCustomModelResourceLocation(blockDef.getItemBlock(), 0,
+				new ModelResourceLocation(blockDef.getResourceLocation(), "inventory"));
 		}
 	}
 }
