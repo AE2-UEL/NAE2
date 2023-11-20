@@ -38,9 +38,10 @@ import static de.ellpeck.actuallyadditions.api.ActuallyAdditionsAPI.RECONSTRUCTO
 public class TileReconstructionChamber extends AEBaseInvTile implements ITickable {
 	private final AppEngInternalInventory inputInvInternal;
 	private final WrapperFilteredItemHandler outputInv;
-	private final WrapperChainedItemHandler wrappedInv;
+	private final WrapperChainedItemHandler publicInv;
 	private final EnumMap<EnumFacing, Object> neighbors = new EnumMap<>(EnumFacing.class);
 	private final AppEngInternalInventory outputInvInternal;
+	private final WrapperChainedItemHandler internalInv;
 	@SideOnly(Side.CLIENT)
 	private LinkedList<Hologram> holograms;
 	private int ticks;
@@ -51,7 +52,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 		if (Platform.isClient()) {
 			holograms = new LinkedList<>();
 		}
-		
+
 		this.outputInvInternal = new AppEngInternalInventory(this, 1, 512) {
 			@Override
 			protected int getStackLimit(int slot, @NotNull ItemStack stack) {
@@ -66,7 +67,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 			}
 		};
 
-		WrapperFilteredItemHandler inputInv = new WrapperFilteredItemHandler(this.inputInvInternal,
+		var inputInv = new WrapperFilteredItemHandler(this.inputInvInternal,
 			new IAEItemFilter() {
 				@Override
 				public boolean allowExtract(IItemHandler iItemHandler, int i, int i1) {
@@ -90,7 +91,8 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 				return false;
 			}
 		});
-		this.wrappedInv = new WrapperChainedItemHandler(inputInv, outputInv);
+		this.publicInv = new WrapperChainedItemHandler(inputInv, outputInv);
+		this.internalInv = new WrapperChainedItemHandler(inputInvInternal, outputInvInternal);
 
 		this.inputInvInternal.setFilter(new IAEItemFilter() {
 			@Override
@@ -127,6 +129,11 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	}
 
 	@Override
+	public boolean canBeRotated() {
+		return false;
+	}
+
+	@Override
 	protected boolean readFromStream(ByteBuf data) throws IOException {
 		var result = super.readFromStream(data);
 		if (data.readBoolean()) {
@@ -150,7 +157,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	@NotNull
 	@Override
 	public IItemHandler getInternalInventory() {
-		return wrappedInv;
+		return publicInv;
 	}
 
 	@Override
@@ -255,9 +262,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	}
 
 	private ItemStack pushTo(ItemStack output, EnumFacing d) {
-		if (output.isEmpty()) {
-			return output;
-		} else {
+		if (!output.isEmpty()) {
 			Object capability = this.neighbors.get(d);
 			if (capability instanceof InventoryAdaptor adaptor) {
 				int size = output.getCount();
@@ -268,8 +273,8 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 				}
 			}
 
-			return output;
 		}
+		return output;
 	}
 
 	public void updateNeighbors() {
@@ -345,7 +350,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	public void spawnHologram() {
 		if (this.holoStack.isEmpty()) return;
 
-		this.holograms.addFirst(new Hologram(this.holoStack));
+		this.holograms.addFirst(new Hologram(this.holoStack, this.world.getTotalWorldTime()));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -359,26 +364,31 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 		updateNeighbors();
 	}
 
+	public WrapperChainedItemHandler getPrivateInv() {
+		return internalInv;
+	}
+
 	@SideOnly(Side.CLIENT)
 	public static class Hologram {
 
 		private final ItemStack holoStack;
-		private double life = getMaxLife();
+		private final long life;
 
-		public Hologram(ItemStack holoStack) {
+		public Hologram(ItemStack holoStack, long time) {
 			this.holoStack = holoStack;
+			this.life = time;
 		}
 
 		public static int getMaxLife() {
-			return 40;
+			return 30;
 		}
 
-		public double getLife() {
+		public double getStart() {
 			return life;
 		}
 
-		public void setLife(double life) {
-			this.life = life;
+		public double getProgress(double time) {
+			return Math.min(1, Math.max(0, (time - getStart()) / getMaxLife()));
 		}
 
 		public ItemStack getHoloStack() {

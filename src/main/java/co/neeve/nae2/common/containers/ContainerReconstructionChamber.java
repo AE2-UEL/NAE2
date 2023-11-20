@@ -11,7 +11,7 @@ public class ContainerReconstructionChamber extends AEBaseContainer {
 
 	public ContainerReconstructionChamber(InventoryPlayer ip, TileReconstructionChamber trc) {
 		super(ip, trc);
-		var ih = trc.getInternalInventory();
+		var ih = trc.getPrivateInv();
 
 		this.addSlotToContainer(new AppEngSlot(ih, 0, 52, 37));
 		this.addSlotToContainer(new AppEngSlot(ih, 1, 108, 37) {

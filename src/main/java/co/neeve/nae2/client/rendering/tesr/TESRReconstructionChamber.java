@@ -47,21 +47,20 @@ public class TESRReconstructionChamber extends TileEntitySpecialRenderer<TileRec
 			renderIS(te, x, y, z, partialTicks, is, scale, 0xFFFFFFFF);
 		}
 
-		var maxLife = (float) TileReconstructionChamber.Hologram.getMaxLife();
+		var currentTime = te.getWorld().getTotalWorldTime();
 
 		var iter = te.getHolograms().iterator();
 		while (iter.hasNext()) {
 			var holo = iter.next();
 			is = holo.getHoloStack();
-			var life = holo.getLife() - partialTicks;
-			holo.setLife(life);
-			if (life <= 0) {
+			var progress = holo.getProgress(currentTime + partialTicks);
+			if (progress >= 1) {
 				iter.remove();
 			} else {
-				var f = easeOutCirc(life / maxLife);
+				var f = easeOutCirc(progress);
 
-				renderIS(te, x, y, z, partialTicks, is, (float) (1 - f) * 0.25f + 0.5f,
-					0x00FFFFFF | (int) Math.floor(f * 255) << 24);
+				renderIS(te, x, y, z, partialTicks, is, (float) f * 0.25f + 0.5f,
+					0x00FFFFFF | (int) Math.floor((1f - f) * 255) << 24);
 			}
 		}
 	}
