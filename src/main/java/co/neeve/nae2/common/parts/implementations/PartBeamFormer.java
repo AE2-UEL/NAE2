@@ -22,17 +22,24 @@ import appeng.parts.ICableBusContainer;
 import appeng.parts.PartModel;
 import appeng.util.Platform;
 import co.neeve.nae2.client.rendering.BeamRenderer;
+import co.neeve.nae2.common.features.subfeatures.BeamFeatures;
 import co.neeve.nae2.common.interfaces.IBeamFormerHost;
 import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.common.parts.NAEBasePartState;
 import co.neeve.nae2.server.IBlockStateListener;
 import co.neeve.nae2.server.WorldListener;
 import com.google.common.collect.ImmutableList;
+import gregtech.client.shader.postprocessing.BloomEffect;
+import gregtech.client.utils.BloomEffectUtil;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -47,6 +54,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -69,13 +78,58 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	public static final PartModel MODEL_ON = new PartModel(STATUS_ON_LOC, MODEL_BASE_LOC, PRISM_LOC);
 	public static final PartModel MODEL_OFF = new PartModel(STATUS_OFF_LOC, MODEL_BASE_LOC, PRISM_LOC);
 
+	@SideOnly(Side.CLIENT)
+	private static Object GREGTECH_BLOOM_HANDLER;
+
+	static {
+		if (Platform.isClientInstall()) {
+			GREGTECH_BLOOM_HANDLER = null;
+			if (BeamFeatures.GREGTECH_SHADERS.isEnabled()) {
+				try {
+					GREGTECH_BLOOM_HANDLER = new BloomEffectUtil.IBloomRenderFast() {
+						float lastBrightnessX;
+						float lastBrightnessY;
+
+						@Override
+						@SideOnly(Side.CLIENT)
+						public int customBloomStyle() {
+							return 1;
+						}
+
+						@Override
+						@SideOnly(Side.CLIENT)
+						public void preDraw(BufferBuilder buffer) {
+							BloomEffect.strength = 0.8f;
+							BloomEffect.baseBrightness = 0.0f;
+							BloomEffect.highBrightnessThreshold = 1.25f;
+							BloomEffect.lowBrightnessThreshold = 0.5f;
+							BloomEffect.step = 1;
+
+							lastBrightnessX = OpenGlHelper.lastBrightnessX;
+							lastBrightnessY = OpenGlHelper.lastBrightnessY;
+
+							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+							GlStateManager.disableTexture2D();
+						}
+
+						@Override
+						@SideOnly(Side.CLIENT)
+						public void postDraw(BufferBuilder buffer) {
+							GlStateManager.enableTexture2D();
+							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastBrightnessX,
+								lastBrightnessY);
+						}
+					};
+				} catch (NoClassDefFoundError ignored) {}
+			}
+		}
+	}
+
 	private int beamLength = 0;
 	private PartBeamFormer otherBeamFormer = null;
 	private IGridConnection connection = null;
 	private Long2ObjectLinkedOpenHashMap<BlockPos> listenerLinkedList = null;
-	private BlockPos breakPos = null;
 	private boolean hideBeam;
-
 	@SideOnly(Side.CLIENT)
 	private boolean paired;
 
@@ -92,6 +146,62 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@SuppressWarnings("deprecation")
 	private static boolean isTranslucent(IBlockState newState) {
 		return !newState.getMaterial().isOpaque() || newState.getBlock().getLightOpacity(newState) != 255;
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static void drawCube(BufferBuilder bufferBuilder, double x, double y, double z, double scaleX,
+	                            double scaleY, double scaleZ, float r, float g, float b) {
+		// Calculate the offset for each axis
+		double halfScaleX = scaleX / 2;
+		double halfScaleY = scaleY / 2;
+		double halfScaleZ = scaleZ / 2;
+
+		// Bottom vertices of the cube
+		double x1 = x - halfScaleX;
+		double y1 = y - halfScaleY;
+		double z1 = z - halfScaleZ;
+
+		// Top vertices of the cube
+		double x2 = x + halfScaleX;
+		double y2 = y + halfScaleY;
+		double z2 = z + halfScaleZ;
+
+		// Down face
+		float alpha = 0.9f;
+		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y1, z2).color(r, g, b, alpha).endVertex();
+
+		// Up face
+		bufferBuilder.pos(x1, y2, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y2, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y2, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y2, z1).color(r, g, b, alpha).endVertex();
+
+		// North face
+		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y2, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y2, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
+
+		// South face
+		bufferBuilder.pos(x1, y1, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y2, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y2, z2).color(r, g, b, alpha).endVertex();
+
+		// West face
+		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y1, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y2, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x1, y2, z1).color(r, g, b, alpha).endVertex();
+
+		// East face
+		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y2, z1).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y2, z2).color(r, g, b, alpha).endVertex();
+		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
 	}
 
 	public @NotNull IPartModel getStaticModels() {
@@ -124,7 +234,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@Override
 	public void removeFromWorld() {
 		this.unregisterListener();
-		this.disconnect();
+		this.disconnect(null);
 		this.getProxy().invalidate();
 	}
 
@@ -176,6 +286,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 		// Re-register and rehash block positions for world listening.
 		this.unregisterListener();
+		this.otherBeamFormer.unregisterListener();
 		listenerLinkedList = new Long2ObjectLinkedOpenHashMap<>();
 		for (var loc : locs)
 			listenerLinkedList.put(loc.toLong(), loc);
@@ -184,9 +295,6 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 		this.beamLength = listenerLinkedList.size();
 		this.otherBeamFormer.beamLength = 0;
-
-		this.breakPos = null;
-		this.otherBeamFormer.breakPos = null;
 
 		// eh
 		this.updateEnergyConsumption();
@@ -201,7 +309,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		this.otherBeamFormer.getHost().markForSave();
 	}
 
-	public boolean disconnect() {
+	public boolean disconnect(@Nullable BlockPos breakPos) {
 		if (this.connection == null) {
 			updateEnergyConsumption();
 			return false;
@@ -210,9 +318,9 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		var newBeamA = 0;
 		var newBeamB = 0;
 
-		if (this.breakPos != null) {
+		if (breakPos != null) {
 			var iterator = this.listenerLinkedList.long2ObjectEntrySet().fastIterator();
-			var hash = this.breakPos.toLong();
+			var hash = breakPos.toLong();
 			while (iterator.hasNext()) {
 				if (iterator.next().getLongKey() == hash) break;
 				newBeamA++;
@@ -250,11 +358,21 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	public void notifyBlockUpdate(World worldIn, BlockPos pos, IBlockState oldState, IBlockState newState, int flags) {
 		try {
 			var isValid = isTranslucent(newState);
+
+			if (isValid) {
+				var te = this.getTile().getWorld().getTileEntity(pos);
+				if (te instanceof IPartHost partHost) {
+					if (partHost.getPart(this.getSide()) instanceof PartBeamFormer ||
+						partHost.getPart(getSide().getOpposite()) instanceof PartBeamFormer) {
+						isValid = false;
+					}
+				}
+			}
+
 			if (connection != null && !isValid) {
-				breakPos = pos;
+				disconnect(pos);
 				this.getProxy().getTick().alertDevice(this.getGridNode());
-			} else if (connection == null && isValid) {
-				breakPos = null;
+			} else if (isValid && connection == null) {
 				this.getProxy().getTick().alertDevice(this.getGridNode());
 			}
 		} catch (GridAccessException ignored) {}
@@ -309,7 +427,6 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		if (!this.getProxy().isReady()) return TickRateModulation.SAME;
 
 		var isConnectionValid = this.connection != null;
-		if (isConnectionValid && breakPos == null) return TickRateModulation.SLEEP; // Trust block updates.
 
 		var myNode = this.getGridNode();
 		if (myNode == null) {
@@ -338,7 +455,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 					}
 
 					// We're not ok.
-					var disconnected = disconnect();
+					var disconnected = disconnect(loc);
 
 					if (potentialFormer.getProxy().isReady() && potentialFormer.otherBeamFormer == null) {
 						try {
@@ -356,12 +473,16 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 					// Don't go past formers.
 					return disconnected ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
 				}
+
+				if (ph.getPart(side) instanceof PartBeamFormer) {
+					return disconnect(loc) ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
+				}
 			}
 
 			var block = world.getBlockState(loc);
 			// No can do. Something is blocking us.
 			if (!isTranslucent(block)) {
-				return disconnect() ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
+				return disconnect(loc) ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
 			}
 
 			blockSet.add(loc);
@@ -375,17 +496,23 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@SideOnly(Side.CLIENT)
 	public void renderDynamic(double x, double y, double z, float partialTicks, int destroyStage) {
 		if (!hideBeam && this.beamLength != 0 && this.isActive() && this.isPowered()) {
+			// Get the direction vector
+			var facing = this.getSide().getFacing();
+			final int dx = facing.getXOffset();
+			final int dy = facing.getYOffset();
+			final int dz = facing.getZOffset();
+
+			if (GREGTECH_BLOOM_HANDLER != null) {
+				BloomEffectUtil.requestCustomBloom((BloomEffectUtil.IBloomRenderFast) GREGTECH_BLOOM_HANDLER,
+					bufferBuilder -> drawBeamGT(x, y, z, dx, dy, dz, bufferBuilder));
+				return;
+			}
+
 			var color = this.getHost().getColor();
 			var scale = 255f;
 			float[] rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
 				((color.mediumVariant >> 8) & 0xff) / scale,
 				(color.mediumVariant & 0xff) / scale };
-
-			// Get the direction vector
-			var facing = this.getSide().getFacing();
-			int dx = facing.getXOffset();
-			int dy = facing.getYOffset();
-			int dz = facing.getZOffset();
 
 			// Calculate the pitch, yaw, and roll based on the direction vector
 			float pitch = (float) Math.atan2(Math.sqrt(dx * dx + dz * dz), dy) * (180F / (float) Math.PI);
@@ -406,6 +533,34 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 			GlStateManager.popMatrix();
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	private void drawBeamGT(double x, double y, double z, int dx, int dy, int dz, BufferBuilder bufferBuilder) {
+		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+		var bl = (beamLength + 1) / 2d;
+		double minScale = 0.15d;
+		var color = this.getHost().getColor();
+		var scale = 255f;
+		float[] rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
+			((color.mediumVariant >> 8) & 0xff) / scale,
+			(color.mediumVariant & 0xff) / scale };
+
+		drawCube(bufferBuilder,
+			x + 0.5d + dx * bl,
+			y + 0.5d + dy * bl,
+			z + 0.5d + dz * bl,
+			Math.max(minScale, Math.abs(dx * beamLength + dx * 0.25d)),
+			Math.max(minScale, Math.abs(dy * beamLength + dy * 0.25d)),
+			Math.max(minScale, Math.abs(dz * beamLength + dz * 0.25d)),
+			rgb[0],
+			rgb[1],
+			rgb[2]
+		);
+
+		GlStateManager.color(1f, 1f, 1f, 1f);
+		Tessellator.getInstance().draw();
 	}
 
 	@Override

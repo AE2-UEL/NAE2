@@ -10,7 +10,7 @@ import java.util.EnumSet;
 public enum Features implements IFeature {
 	PATTERN_MULTI_TOOL(EnumSet.allOf(PatternMultiToolFeatures.class)),
 	VOID_CELLS(EnumSet.allOf(VoidCellFeatures.class)),
-	BEAM_FORMERS("beam_former"),
+	BEAM_FORMERS(EnumSet.allOf(BeamFeatures.class), "beam_former"),
 	JEI_HOOKS(EnumSet.allOf(JEIFeatures.class)) {
 		@Override
 		public boolean isEnabled() {
