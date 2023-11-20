@@ -5,7 +5,6 @@ import appeng.api.parts.IPart;
 import appeng.api.parts.IPartItem;
 import appeng.items.AEBaseItem;
 import co.neeve.nae2.common.registries.Parts;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -15,6 +14,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,12 +69,13 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public @NotNull String getItemStackDisplayName(ItemStack stack) {
 		Parts pt = Parts.getByID(stack.getItemDamage());
-		String name;
+		final String name;
 		if (pt.getTranslationKey().equals("p2p_tunnel")) {
-			name = I18n.format("item.appliedenergistics2.multi_part." + pt.getTranslationKey() + ".name");
+			name = I18n.translateToLocal("item.appliedenergistics2.multi_part." + pt.getTranslationKey() + ".name");
 		} else {
 			name = super.getItemStackDisplayName(stack);
 		}

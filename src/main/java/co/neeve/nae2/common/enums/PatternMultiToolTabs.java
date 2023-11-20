@@ -19,7 +19,7 @@ public enum PatternMultiToolTabs {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public String localize() {
+	public String getLocal() {
 		return I18n.format("nae2.pattern_multiplier.tab." + this.message);
 	}
 }

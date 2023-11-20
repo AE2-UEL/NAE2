@@ -42,12 +42,16 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	private final EnumMap<EnumFacing, Object> neighbors = new EnumMap<>(EnumFacing.class);
 	private final AppEngInternalInventory outputInvInternal;
 	@SideOnly(Side.CLIENT)
-	private final LinkedList<Hologram> holograms = new LinkedList<>();
+	private LinkedList<Hologram> holograms;
 	private int ticks;
 	private ItemStack displayStack = ItemStack.EMPTY;
 	private ItemStack holoStack = ItemStack.EMPTY;
 
 	public TileReconstructionChamber() {
+		if (Platform.isClient()) {
+			holograms = new LinkedList<>();
+		}
+		
 		this.outputInvInternal = new AppEngInternalInventory(this, 1, 512) {
 			@Override
 			protected int getStackLimit(int slot, @NotNull ItemStack stack) {

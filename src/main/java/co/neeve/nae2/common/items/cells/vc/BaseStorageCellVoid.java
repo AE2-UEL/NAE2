@@ -27,6 +27,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,6 +69,7 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 
 	public abstract IStorageChannel<T> getStorageChannel();
 
+	@SideOnly(Side.CLIENT)
 	@Override
 	protected void addCheckedInformation(ItemStack stack, World world, List<String> lines,
 	                                     ITooltipFlag advancedTooltips) {

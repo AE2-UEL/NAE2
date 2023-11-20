@@ -60,10 +60,11 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 			itemStacks.add(new ItemStack(this, 1, upgrade.ordinal()));
 		}
 	}
-	
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public @NotNull String getItemStackDisplayName(@NotNull ItemStack stack) {
-		return getTranslationKey(stack);
+		return I18n.translateToLocal(getTranslationKey(stack));
 	}
 
 	@SideOnly(Side.CLIENT)

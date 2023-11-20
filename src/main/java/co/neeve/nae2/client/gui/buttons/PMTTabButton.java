@@ -31,11 +31,11 @@ public class PMTTabButton extends GuiButton implements ITooltip {
 		this.tab = tab;
 		this.y = y;
 
-		var sw = Minecraft.getMinecraft().fontRenderer.getStringWidth(tab.localize());
+		var sw = Minecraft.getMinecraft().fontRenderer.getStringWidth(tab.getLocal());
 		this.width = 5 + sw + 5;
 		this.x = x - width;
 		this.height = 17;
-		this.message = tab.localize();
+		this.message = tab.getLocal();
 	}
 
 	private static void drawStretchedTexture(int x, int y, int u, int v, int width) {

@@ -33,7 +33,6 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -267,7 +266,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 			if (Platform.isServer()) {
 				hideBeam = !hideBeam;
 
-				player.sendMessage(new TextComponentTranslation(hideBeam ? I18n.format("nae2.part.beam_former.hide") :
+				player.sendMessage(new TextComponentTranslation(hideBeam ? "nae2.part.beam_former.hide" :
 					"nae2.part.beam_former.show"));
 				this.getHost().markForUpdate();
 				this.getHost().markForSave();
