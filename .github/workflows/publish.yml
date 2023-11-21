@@ -7,8 +7,6 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+' # any semver tag, e.g. 1.2.3
 
 env:
-  # link to the changelog with a format code for the version
-  CHANGELOG_LOCATION: "Changelog is available [here](https://github.com/${{github.repository}}/releases/tag/${{github.ref_name}})"
   # type of release
   RELEASE_TYPE: "beta"
 
@@ -59,7 +57,6 @@ jobs:
         env:
           CURSEFORGE_API_KEY: "${{secrets.CURSEFORGE_API_KEY}}"
           CURSEFORGE_PROJECT_ID: "${{secrets.CURSEFORGE_PROJECT_ID}}"
-          CHANGELOG_LOCATION: "${{env.CHANGELOG_LOCATION}}"
           RELEASE_TYPE: "${{env.RELEASE_TYPE}}"
         with:
           arguments: 'curseforge --daemon'
