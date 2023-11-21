@@ -1,0 +1,48 @@
+#PARSE_ESCAPES
+
+item.nae2.pattern_multiplier.name=多功能样板工具
+item.nae2.storage_cell_void.name=ME虚空聚合元件
+item.nae2.fluid_storage_cell_void.name=ME流体虚空聚合元件
+
+nae2.pattern_multiplier.unencode=清除
+nae2.pattern_multiplier.unencode.desc=清除所有编码样板的配置。该操作无法回退！
+nae2.pattern_multiplier.replace=替换
+nae2.pattern_multiplier.replace.desc=在所有编码样板的配置中匹配第一个槽位的物品并将其替换为第二个槽位的物品。§4该操作无法回退！§7\n\n§c红色§7表示物品已成功匹配，但替换后的样板无效。将跳过该槽位的操作。\n\n§a绿色§7表示物品已成功匹配，替换操作将正常进行。
+
+nae2.pattern_multiplier.tab.multiply=倍增
+nae2.pattern_multiplier.tab.replace=替换
+
+nae2.part.beam_former.name=ME光束成型器
+nae2.part.beam_former.hide=已隐藏光束。
+nae2.part.beam_former.show=已显示光束。
+
+nae2.storage_cell_void.warning.1=销毁§c一切§r！
+nae2.storage_cell_void.warning.2=如不清楚预计的后果，请先在%s中进行配置。
+nae2.storage_cell_void.count=已存储%s %s能量。
+
+nae2.material.cell_void_part.name=ME虚空聚合组件
+
+nae2.upgrade.hyper_acceleration.name=超速卡
+
+nae2.jei.missing.craft.1=[NAE2] 所有确实物品均可合成。
+nae2.jei.missing.craft.2=按住 Ctrl 来批量请求合成。
+
+nae2.jei.cellview.items=物品
+nae2.jei.cellview.buckets=桶
+nae2.jei.cellview.units=桶
+# count / max unit_name
+nae2.jei.cellview.stored=已存储：%s / %s %s
+nae2.jei.cellview.hover.stored=已存储：%s %s
+# count unit_name
+nae2.jei.cellview=元件详情
+nae2.jei.cellview.loss=类型损耗：%s %s
+nae2.jei.cellview.used=占用字节：%s
+nae2.jei.cellview.hover.1=已占用 %s 种类型。
+nae2.jei.cellview.hover.2=每种占用类型均会损耗容量。
+nae2.jei.cellview.hover.3=%s 字节/类型 * %s = %s 字节损耗。
+nae2.jei.cellview.keybind=按下 %s 来浏览内容
+
+tile.nae2.reconstruction_chamber.name=原子再构室
+tile.nae2.reconstruction_chamber.desc=实用拓展模组的原子再构机可对其中的物品进行转换。不再需要处理掉落物了！\n\n成品将自动输出至相邻的物品存储空间或ME接口中。
+
+itemGroup.nae2=Neeve的AE2:EL附加工具
