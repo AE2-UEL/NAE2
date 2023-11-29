@@ -24,7 +24,7 @@ nae2.material.cell_void_part.name=ME虚空聚合组件
 
 nae2.upgrade.hyper_acceleration.name=超速卡
 
-nae2.jei.missing.craft.1=[NAE2] 所有确实物品均可合成。
+nae2.jei.missing.craft.1=[NAE2] 所有缺失物品均可合成。
 nae2.jei.missing.craft.2=按住 Ctrl 来批量请求合成。
 
 nae2.jei.cellview.items=物品
