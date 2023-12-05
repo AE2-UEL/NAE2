@@ -48,17 +48,17 @@ public abstract class MixinTileCondenser extends AEBaseInvTile implements IExten
 
 	@Override
 	public IItemHandler getVoidCellInv() {
-		return nae2$voidCell;
+		return this.nae2$voidCell;
 	}
 
 	@Inject(method = "writeToNBT", at = @At("RETURN"))
 	public void writeToNBT(NBTTagCompound data, CallbackInfoReturnable<NBTTagCompound> cir) {
-		nae2$voidCell.writeToNBT(data, "voidCellInv");
+		this.nae2$voidCell.writeToNBT(data, "voidCellInv");
 	}
 
 	@Inject(method = "readFromNBT", at = @At("RETURN"))
 	public void readFromNBT(NBTTagCompound data, CallbackInfo ci) {
-		nae2$voidCell.readFromNBT(data, "voidCellInv");
+		this.nae2$voidCell.readFromNBT(data, "voidCellInv");
 	}
 
 	/**
@@ -70,8 +70,8 @@ public abstract class MixinTileCondenser extends AEBaseInvTile implements IExten
 	}, cancellable = true)
 	private void onChangeInventory(IItemHandler inv, int slot, InvOperation mc, ItemStack removed, ItemStack added,
 	                               CallbackInfo ci) {
-		if (inv == nae2$voidCell && removed.isEmpty() && added.getItem() instanceof BaseStorageCellVoid) {
-			addPower(0);
+		if (inv == this.nae2$voidCell && removed.isEmpty() && added.getItem() instanceof BaseStorageCellVoid) {
+			this.addPower(0);
 			ci.cancel();
 		}
 	}
@@ -93,7 +93,7 @@ public abstract class MixinTileCondenser extends AEBaseInvTile implements IExten
 	private void onChangeInventory(CallbackInfo ci) {
 		var is = this.getVoidCellInv().getStackInSlot(0);
 		if (!is.isEmpty()) {
-			refillFromVoidCell(is);
+			this.refillFromVoidCell(is);
 		}
 	}
 
@@ -117,7 +117,7 @@ public abstract class MixinTileCondenser extends AEBaseInvTile implements IExten
 		if (is.getItem() instanceof BaseStorageCellVoid<?> cell) {
 			var cellPower = cell.getCondenserPower(is);
 			if (cellPower != 0) {
-				var toAdd = getStorage() - getStoredPower();
+				var toAdd = this.getStorage() - this.getStoredPower();
 				if (toAdd > 0) {
 					var toBeAdded = Math.min(cellPower, toAdd);
 					cell.setCondenserPower(is, cell.getCondenserPower(is) - toBeAdded);

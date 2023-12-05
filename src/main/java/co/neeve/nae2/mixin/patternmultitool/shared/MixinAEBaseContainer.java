@@ -12,7 +12,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -61,11 +60,11 @@ public class MixinAEBaseContainer extends Container {
 	@Unique
 	public void initializePatternMultiTool() {
 		if (this instanceof IPatternMultiToolToolboxHost host) {
-			final InventoryPlayer inventoryPlayer = this.getInventoryPlayer();
-			final ItemStack patternMultiTool = PlayerHelper.getPatternMultiTool(inventoryPlayer.player);
+			final var inventoryPlayer = this.getInventoryPlayer();
+			final var patternMultiTool = PlayerHelper.getPatternMultiTool(inventoryPlayer.player);
 			if (patternMultiTool == null) return;
 
-			int slotId = PlayerHelper.getSlotFor(inventoryPlayer, patternMultiTool);
+			var slotId = PlayerHelper.getSlotFor(inventoryPlayer, patternMultiTool);
 			if (slotId != -1)
 				this.lockPlayerInventorySlot(slotId);
 
@@ -73,12 +72,12 @@ public class MixinAEBaseContainer extends Container {
 			this.patternMultiToolSlots = new ArrayList<>();
 
 			var lines = this.patternMultiToolObject.getInstalledCapacityUpgrades();
-			for (int u = 0; u < 4; u++) {
-				for (int v = 0; v < 9; v++) {
+			for (var u = 0; u < 4; u++) {
+				for (var v = 0; v < 9; v++) {
 					AppEngSlot slot;
-					int slotIndex = v + u * 9;
-					int x = host.getPatternMultiToolToolboxOffsetX() + u * 18;
-					int y = host.getPatternMultiToolToolboxOffsetY() + v * 18;
+					var slotIndex = v + u * 9;
+					var x = host.getPatternMultiToolToolboxOffsetX() + u * 18;
+					var y = host.getPatternMultiToolToolboxOffsetY() + v * 18;
 					if (u <= lines)
 						slot = (new SlotPatternMultiTool(this.patternMultiToolObject.getPatternInventory(), host,
 							slotIndex, x, y, u, inventoryPlayer));

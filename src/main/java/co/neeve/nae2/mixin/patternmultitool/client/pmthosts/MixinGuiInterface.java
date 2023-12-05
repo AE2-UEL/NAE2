@@ -40,6 +40,6 @@ public class MixinGuiInterface extends MixinGuiUpgradeable implements IPatternMu
 
 	@Inject(method = "addButtons", at = @At("RETURN"), remap = false)
 	public void injectButtons(CallbackInfo ci) {
-		initializePatternMultiTool();
+		this.initializePatternMultiTool();
 	}
 }

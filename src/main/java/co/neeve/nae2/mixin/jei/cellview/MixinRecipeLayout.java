@@ -30,7 +30,7 @@ public class MixinRecipeLayout {
 	))
 	public void drawOverlay(Minecraft minecraft, int mouseX, int mouseY, CallbackInfo ci) {
 		if (this.recipeCategory instanceof IRecipeCategoryWithOverlay withOverlay) {
-			withOverlay.drawOverlay(minecraft, posX, posY, mouseX, mouseY);
+			withOverlay.drawOverlay(minecraft, this.posX, this.posY, mouseX, mouseY);
 		}
 	}
 }

@@ -17,9 +17,7 @@ import com.github.bsideup.jabel.Desugar;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import mezz.jei.Internal;
-import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IDrawableStatic;
@@ -58,16 +56,14 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 	private final Int2ObjectOpenHashMap<ExtendedStackInfo<? extends IAEStack<?>>> extendedStacks =
 		new Int2ObjectOpenHashMap<>();
 	private final IDrawableStatic background;
-	private final ObjectOpenHashSet<ExtendedStackInfo<? extends IAEStack<?>>> fallbackStacks =
-		new ObjectOpenHashSet<>();
 	private final ObjectArrayList<Point> slotBackgroundXYs = new ObjectArrayList<>();
 	private IDrawable icon = null;
 	private CellInfo<? extends IAEStack<?>> cellInfo;
 
 	public JEICellCategory(IJeiHelpers helpers) {
-		IGuiHelper guiHelper = helpers.getGuiHelper();
-		background = guiHelper.createBlankDrawable(WIDTH, TOTAL_HEIGHT);
-		slotSprite = guiHelper.drawableBuilder(new ResourceLocation(Tags.MODID, "textures/gui/slot.png"), 0, 0,
+		var guiHelper = helpers.getGuiHelper();
+		this.background = guiHelper.createBlankDrawable(WIDTH, TOTAL_HEIGHT);
+		this.slotSprite = guiHelper.drawableBuilder(new ResourceLocation(Tags.MODID, "textures/gui/slot.png"), 0, 0,
 				18, 18)
 			.setTextureSize(18, 18)
 			.build();
@@ -126,7 +122,7 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 
 	@Override
 	public @NotNull IDrawable getBackground() {
-		return background;
+		return this.background;
 	}
 
 	@Nullable
@@ -143,17 +139,17 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 		this.slotBackgroundXYs.clear();
 		var stack = recipeWrapper.stack();
 		this.cellInfo = getCellInfo(stack);
-		if (cellInfo == null) return;
+		if (this.cellInfo == null) return;
 
 		// Collect all item stacks and sort, largest first.
-		ArrayList<IAEStack<?>> storedStacks = new ArrayList<>();
-		getAvailableItems(cellInfo).forEach(storedStacks::add);
+		var storedStacks = new ArrayList<IAEStack<?>>();
+		getAvailableItems(this.cellInfo).forEach(storedStacks::add);
 		storedStacks.sort((a, b) -> Math.toIntExact(b.getStackSize() - a.getStackSize()));
 
-		var totalTypes = (int) cellInfo.cellInv.getTotalItemTypes();
+		var totalTypes = (int) this.cellInfo.cellInv.getTotalItemTypes();
 		var gridWidth = Math.min(9, totalTypes);
-		int gridStartY = TOTAL_HEIGHT - GRID_HEIGHT;
-		int gridStartX = WIDTH / 2 - gridWidth * 18 / 2;
+		var gridStartY = TOTAL_HEIGHT - GRID_HEIGHT;
+		var gridStartX = WIDTH / 2 - gridWidth * 18 / 2;
 
 		var stacks = recipeLayout.getItemStacks();
 
@@ -167,10 +163,10 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 
 				var renderer = Internal.getIngredientRegistry().getIngredientRenderer(stack);
 				stacks.init(i, true, renderer, posX, posY, CELL_SIZE, CELL_SIZE,
-					(slotSprite.getWidth() - SLOT_SIZE) / 2,
-					(slotSprite.getHeight() - SLOT_SIZE) / 2);
+					(this.slotSprite.getWidth() - SLOT_SIZE) / 2,
+					(this.slotSprite.getHeight() - SLOT_SIZE) / 2);
 				stacks.set(i, aeStack.asItemStackRepresentation());
-				stacks.addTooltipCallback(getCallBack(cellInfo));
+				stacks.addTooltipCallback(this.getCallBack(this.cellInfo));
 
 				this.extendedStacks.put(i, new ExtendedStackInfo<>(aeStack, posX, posY));
 			}
@@ -190,12 +186,12 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 			var fontHeight = Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
 			var format = NumberFormat.getInstance();
 
-			var storedItemCount = cellInfo.cellInv.getStoredItemCount();
-			int transferFactor = cellInfo.channel().transferFactor();
-			var capacity = (cellInfo.cellInv.getRemainingItemCount() + storedItemCount) / transferFactor;
-			var byteLoss = cellInfo.cellInv.getBytesPerType() * cellInfo.cellInv.getStoredItemTypes();
-			var capacityLoss = byteLoss * cellInfo.channel.getUnitsPerByte() / transferFactor;
-			var unitName = I18n.format("nae2.jei.cellview." + getStorageChannelUnits(cellInfo.channel()));
+			var storedItemCount = this.cellInfo.cellInv.getStoredItemCount();
+			var transferFactor = this.cellInfo.channel().transferFactor();
+			var capacity = (this.cellInfo.cellInv.getRemainingItemCount() + storedItemCount) / transferFactor;
+			var byteLoss = this.cellInfo.cellInv.getBytesPerType() * this.cellInfo.cellInv.getStoredItemTypes();
+			var capacityLoss = byteLoss * this.cellInfo.channel.getUnitsPerByte() / transferFactor;
+			var unitName = I18n.format("nae2.jei.cellview." + getStorageChannelUnits(this.cellInfo.channel()));
 
 			Minecraft.getMinecraft().fontRenderer.drawString(
 				I18n.format("nae2.jei.cellview.stored",
@@ -217,9 +213,9 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 
 	@Override
 	public @NotNull List<String> getTooltipStrings(int mouseX, int mouseY) {
-		if (cellInfo != null && mouseX > 0 && mouseY > 0 && mouseX < WIDTH && mouseY < TOTAL_HEIGHT - GRID_HEIGHT - 2) {
-			long storedItemTypes = cellInfo.cellInv.getStoredItemTypes();
-			int bytesPerType = cellInfo.cellInv.getBytesPerType();
+		if (this.cellInfo != null && mouseX > 0 && mouseY > 0 && mouseX < WIDTH && mouseY < TOTAL_HEIGHT - GRID_HEIGHT - 2) {
+			var storedItemTypes = this.cellInfo.cellInv.getStoredItemTypes();
+			var bytesPerType = this.cellInfo.cellInv.getBytesPerType();
 			if (bytesPerType > 0 && storedItemTypes > 0) {
 				var format = NumberFormat.getInstance();
 				var byteLoss = bytesPerType * storedItemTypes;
@@ -241,9 +237,9 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 	@NotNull
 	private <T> ITooltipCallback<T> getCallBack(CellInfo<? extends IAEStack<?>> cellInfo) {
 		return (int slotIndex, boolean input, T ingredient, List<String> tooltip) -> {
-			if (extendedStacks.containsKey(slotIndex)) {
+			if (this.extendedStacks.containsKey(slotIndex)) {
 				var format = NumberFormat.getInstance();
-				var stackSize = extendedStacks.get(slotIndex).stack().getStackSize();
+				var stackSize = this.extendedStacks.get(slotIndex).stack().getStackSize();
 				var unitName = I18n.format("nae2.jei.cellview." + getStorageChannelUnits(cellInfo.channel()));
 
 				tooltip.add(I18n.format("nae2.jei.cellview.hover.stored",
@@ -260,13 +256,13 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 			var stack = info.stack();
 
 			if (stack instanceof IAEFluidStack aefs) {
-				fluidStackSizeRenderer.renderStackSize(minecraft.fontRenderer, aefs, offsetX + info.posX(),
+				this.fluidStackSizeRenderer.renderStackSize(minecraft.fontRenderer, aefs, offsetX + info.posX(),
 					offsetY + info.posY());
 			} else {
 				var aeStack = AEItemStack.fromItemStack(stack.asItemStackRepresentation());
 				if (aeStack == null) return;
 				aeStack.setStackSize(stack.getStackSize());
-				stackSizeRenderer.renderStackSize(minecraft.fontRenderer,
+				this.stackSizeRenderer.renderStackSize(minecraft.fontRenderer,
 					aeStack, offsetX + info.posX(), offsetY + info.posY());
 			}
 		});

@@ -60,16 +60,16 @@ public class MixinCableBusBakedModel {
 	                                    @Local(name = "quads") List<BakedQuad> quads) {
 		// yeah, we'll have to do that again.
 		if (layer == BlockRenderLayer.TRANSLUCENT || layer == BlockRenderLayer.CUTOUT) {
-			for (EnumFacing facing : EnumFacing.values()) {
-				IPartModel partModel = renderState.getAttachments().get(facing);
+			for (var facing : EnumFacing.values()) {
+				var partModel = renderState.getAttachments().get(facing);
 
 				// Take over to render the prism correctly. If it's beaming, then we won't even get here.
 				// Carbon copy of AE2, mostly.
 				if (partModel == PartBeamFormer.MODEL_ON || partModel == PartBeamFormer.MODEL_OFF) {
-					for (ResourceLocation model : partModel.getModels()) {
+					for (var model : partModel.getModels()) {
 						if (model != PRISM_LOC && layer == BlockRenderLayer.TRANSLUCENT) continue;
 						if (model == PRISM_LOC && layer != BlockRenderLayer.TRANSLUCENT) continue;
-						IBakedModel bakedModel = this.partModels.get(model);
+						var bakedModel = this.partModels.get(model);
 
 						List<BakedQuad> partQuads;
 						if (bakedModel instanceof IPartBakedModel) {
@@ -80,7 +80,7 @@ public class MixinCableBusBakedModel {
 							partQuads = bakedModel.getQuads(state, null, rand);
 						}
 
-						QuadRotator rotator = new QuadRotator();
+						var rotator = new QuadRotator();
 						partQuads = rotator.rotateQuads(partQuads, facing, EnumFacing.UP);
 						quads.addAll(partQuads);
 					}

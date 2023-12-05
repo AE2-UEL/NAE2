@@ -3,7 +3,6 @@ package co.neeve.nae2.mixin.upgrades.base;
 import appeng.parts.automation.UpgradeInventory;
 import co.neeve.nae2.common.interfaces.IExtendedUpgradeInventory;
 import co.neeve.nae2.common.items.NAEBaseItemUpgrade;
-import co.neeve.nae2.common.registries.Upgrades;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Final;
@@ -27,8 +26,8 @@ public class MixinUpgradeInvFilter {
 	), cancellable = true)
 	private void injectAllowInsert(IItemHandler inv, int slot, ItemStack itemstack,
 	                               CallbackInfoReturnable<Boolean> cir) {
-		if (this$0 instanceof IExtendedUpgradeInventory outer && itemstack.getItem() instanceof NAEBaseItemUpgrade niu) {
-			Upgrades u = niu.getType(itemstack);
+		if (this.this$0 instanceof IExtendedUpgradeInventory outer && itemstack.getItem() instanceof NAEBaseItemUpgrade niu) {
+			var u = niu.getType(itemstack);
 			if (u != null) {
 				cir.setReturnValue(outer.getInstalledUpgrades(u) < outer.getMaxInstalled(u));
 			}

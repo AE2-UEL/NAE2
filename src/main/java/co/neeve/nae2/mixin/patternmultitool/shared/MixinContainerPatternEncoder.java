@@ -1,17 +1,14 @@
 package co.neeve.nae2.mixin.patternmultitool.shared;
 
 import appeng.api.AEApi;
-import appeng.api.definitions.IDefinitions;
 import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.slot.SlotRestrictedInput;
 import co.neeve.nae2.common.helpers.ItemHandlerHelper;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
-import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -29,16 +26,16 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 		var pattern = original.call(instance);
 		if (pattern.isEmpty() && this instanceof IPatternMultiToolHost pmh) {
 			// Try search for blanks in our inventory.
-			final IItemHandler pmhInv = pmh.getPatternInventory();
-			final ObjPatternMultiTool pmhObj = pmh.getPatternMultiToolObject();
+			final var pmhInv = pmh.getPatternInventory();
+			final var pmhObj = pmh.getPatternMultiToolObject();
 			if (pmhInv == null || pmhObj == null) return pattern;
 
-			final IDefinitions definitions = AEApi.instance().definitions();
+			final var definitions = AEApi.instance().definitions();
 
-			for (int i = 0; i < pmhInv.getSlots(); i++) {
-				ItemStack is = pmhInv.getStackInSlot(i);
+			for (var i = 0; i < pmhInv.getSlots(); i++) {
+				var is = pmhInv.getStackInSlot(i);
 				if (!is.isEmpty() && definitions.materials().blankPattern().isSameAs(is)) {
-					ItemStack newPattern = is.copy();
+					var newPattern = is.copy();
 					newPattern.setCount(1);
 					is.shrink(1);
 
@@ -58,7 +55,7 @@ public class MixinContainerPatternEncoder extends MixinContainerMEMonitorable {
 		"Lnet/minecraft/entity/player" + "/InventoryPlayer;addItemStackToInventory(Lnet/minecraft/item/ItemStack;)Z"))
 	public boolean injectPMTOutput(InventoryPlayer ip, ItemStack itemStackIn) {
 		if (this instanceof IPatternMultiToolHost pmh) {
-			final IItemHandler pmhInv = pmh.getPatternInventory();
+			final var pmhInv = pmh.getPatternInventory();
 			if (pmhInv != null) {
 				itemStackIn = ItemHandlerHelper.insertIntoHandler(pmhInv, itemStackIn);
 				if (itemStackIn.isEmpty()) {

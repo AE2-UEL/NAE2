@@ -3,7 +3,7 @@ package co.neeve.nae2.common.helpers;
 import appeng.api.networking.crafting.ICraftingPatternDetails;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.util.item.AEItemStack;
-import co.neeve.nae2.common.registries.InternalItems;
+import co.neeve.nae2.NAE2;
 import com.google.common.collect.Iterables;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -51,7 +51,7 @@ public class VirtualPatternDetails implements ICraftingPatternDetails {
 
 	@Override
 	public ItemStack getPattern() {
-		var is = new ItemStack(InternalItems.VIRTUAL_PATTERN.getItem(), 1);
+		var is = Objects.requireNonNull(NAE2.definitions().items().virtualPattern().maybeStack(1).orElse(null));
 		var compound = new NBTTagCompound();
 		var tagInputs = new NBTTagList();
 		for (var input : this.inputs) {
@@ -85,22 +85,22 @@ public class VirtualPatternDetails implements ICraftingPatternDetails {
 
 	@Override
 	public IAEItemStack[] getInputs() {
-		return inputs;
+		return this.inputs;
 	}
 
 	@Override
 	public IAEItemStack[] getCondensedInputs() {
-		return inputs;
+		return this.inputs;
 	}
 
 	@Override
 	public IAEItemStack[] getCondensedOutputs() {
-		return outputs;
+		return this.outputs;
 	}
 
 	@Override
 	public IAEItemStack[] getOutputs() {
-		return outputs;
+		return this.outputs;
 	}
 
 	@Override

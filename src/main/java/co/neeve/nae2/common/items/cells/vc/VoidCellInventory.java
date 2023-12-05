@@ -24,18 +24,18 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 
 	@SuppressWarnings("unchecked")
 	protected VoidCellInventory(ItemStack o) {
-		itemStack = o;
+		this.itemStack = o;
 
 		this.item = (BaseStorageCellVoid<T>) o.getItem();
-		this.channel = item.getStorageChannel();
+		this.channel = this.item.getStorageChannel();
 		this.itemListCache = this.getChannel().createList();
 
-		CellConfig cc = this.isFluid() ? new FluidCellConfig(o) : new CellConfig(o);
-		for (final ItemStack is : cc) {
+		var cc = this.isFluid() ? new FluidCellConfig(o) : new CellConfig(o);
+		for (final var is : cc) {
 			if (!is.isEmpty()) {
-				if (isFluid() && is.getItem() instanceof FluidDummyItem fdi) {
+				if (this.isFluid() && is.getItem() instanceof FluidDummyItem fdi) {
 					this.itemListCache.add((T) AEFluidStack.fromFluidStack(fdi.getFluidStack(is)));
-				} else if (!isFluid()) {
+				} else if (!this.isFluid()) {
 					this.itemListCache.add((T) AEItemStack.fromItemStack(is));
 				}
 			}
@@ -51,7 +51,7 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 		if (!this.itemListCache.isEmpty() && this.itemListCache.findPrecise(input) == null) return input;
 
 		if (mode == Actionable.MODULATE) {
-			item.addCondenserPowerFromInput(itemStack, input.getStackSize());
+			this.item.addCondenserPowerFromInput(this.itemStack, input.getStackSize());
 		}
 		return null;
 	}
@@ -66,11 +66,11 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 
 	@Override
 	public IStorageChannel<T> getChannel() {
-		return channel;
+		return this.channel;
 	}
 
 	private boolean isFluid() {
-		return itemStack.getItem() instanceof FluidStorageCellVoid;
+		return this.itemStack.getItem() instanceof FluidStorageCellVoid;
 	}
 
 	public AccessRestriction getAccess() {

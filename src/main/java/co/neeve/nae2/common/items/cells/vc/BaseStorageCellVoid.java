@@ -15,12 +15,11 @@ import appeng.items.AEBaseItem;
 import appeng.items.contents.CellConfig;
 import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
+import co.neeve.nae2.NAE2;
 import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
-import co.neeve.nae2.common.registries.Materials;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
@@ -77,11 +76,11 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 
 		var empty = true;
 
-		IMEInventoryHandler<?> inventory = getCellInventory(stack);
+		IMEInventoryHandler<?> inventory = this.getCellInventory(stack);
 		if (inventory != null) {
-			CellConfig cc = new CellConfig(stack);
+			var cc = new CellConfig(stack);
 
-			for (ItemStack is : cc) {
+			for (var is : cc) {
 				if (!is.isEmpty()) {
 					empty = false;
 					lines.add(is.getDisplayName());
@@ -118,7 +117,7 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 	public void setCondenserPower(ItemStack stack, double power) {
 		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
 
-		NBTTagCompound compound = stack.getTagCompound();
+		var compound = stack.getTagCompound();
 		if (compound == null) stack.setTagCompound(compound = new NBTTagCompound());
 		compound.setDouble("power", power);
 	}
@@ -127,7 +126,7 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
 
 		this.setCondenserPower(stack,
-			getCondenserPower(stack) + power / (double) getStorageChannel().transferFactor());
+			this.getCondenserPower(stack) + power / (double) this.getStorageChannel().transferFactor());
 	}
 
 	@Override
@@ -143,12 +142,13 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 				return;
 			}
 
-			InventoryPlayer playerInventory = player.inventory;
+			var playerInventory = player.inventory;
 			if (playerInventory.getCurrentItem() == stack) {
 				if (this.getCondenserPower(stack) < 1) {
 					var ia = InventoryAdaptor.getAdaptor(player);
 					playerInventory.setInventorySlotContents(playerInventory.currentItem, ItemStack.EMPTY);
-					ItemStack extraB = ia.addItems(Materials.CELL_VOID_PART.getStack());
+					var extraB =
+						ia.addItems(NAE2.definitions().materials().cellPartVoid().maybeStack(1).orElse(ItemStack.EMPTY));
 					if (!extraB.isEmpty()) {
 						player.dropItem(extraB, false);
 					}
@@ -166,7 +166,7 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 
 	protected void dropEmptyStorageCellCase(InventoryAdaptor ia, EntityPlayer player) {
 		AEApi.instance().definitions().materials().emptyStorageCell().maybeStack(1).ifPresent((is) -> {
-			ItemStack extraA = ia.addItems(is);
+			var extraA = ia.addItems(is);
 			if (!extraA.isEmpty()) {
 				player.dropItem(extraA, false);
 			}

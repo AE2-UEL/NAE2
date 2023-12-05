@@ -13,11 +13,11 @@ public enum BeamFeatures implements ISubFeature {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 	public void setEnabled(boolean enabled) {

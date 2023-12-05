@@ -8,16 +8,13 @@ import appeng.api.networking.ticking.TickRateModulation;
 import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.parts.IPartHost;
 import appeng.api.parts.IPartModel;
-import appeng.api.storage.IMEMonitor;
-import appeng.api.storage.IStorageMonitorable;
-import appeng.api.storage.IStorageMonitorableAccessor;
 import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEItemStack;
 import appeng.capabilities.Capabilities;
 import appeng.core.settings.TickRates;
 import appeng.fluids.helper.IFluidInterfaceHost;
 import appeng.helpers.IInterfaceHost;
 import appeng.helpers.ItemStackHelper;
+import appeng.items.parts.PartModels;
 import appeng.me.GridAccessException;
 import appeng.me.cache.helpers.TunnelCollection;
 import appeng.me.helpers.MachineSource;
@@ -28,14 +25,12 @@ import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
 import appeng.util.inv.WrapperChainedItemHandler;
 import appeng.util.item.AEItemStack;
-import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.mixin.ifacep2p.shared.DualityAccessor;
 import com.glodblock.github.inventory.FluidConvertingInventoryAdaptor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
@@ -50,11 +45,14 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IItemHandler, IGridTickable,
-	IPartModelProvider, IFluidHandler {
+	IFluidHandler {
 	private static final P2PModels MODELS = new P2PModels("part/p2p/p2p_tunnel_interface");
 	private static final FluidTankProperties[] INACTIVE_TANK =
 		new FluidTankProperties[]{ new FluidTankProperties(null, 0, false, false) };
@@ -74,6 +72,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		this.mySource = new MachineSource(this);
 	}
 
+	@PartModels
 	public static List<IPartModel> getModels() {
 		return MODELS.getModels();
 	}
@@ -90,9 +89,9 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	public void writeToNBT(NBTTagCompound data) {
 		super.writeToNBT(data);
 
-		NBTTagList waitingToSend = new NBTTagList();
-		for (ItemStack is : this.waitingToSend) {
-			NBTTagCompound itemNBT = ItemStackHelper.stackToNBT(is);
+		var waitingToSend = new NBTTagList();
+		for (var is : this.waitingToSend) {
+			var itemNBT = ItemStackHelper.stackToNBT(is);
 			waitingToSend.appendTag(itemNBT);
 		}
 
@@ -102,11 +101,11 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	public void readFromNBT(NBTTagCompound data) {
 		super.readFromNBT(data);
 
-		NBTTagList waitingList = data.getTagList("waitingToSend", 10);
+		var waitingList = data.getTagList("waitingToSend", 10);
 		NBTTagCompound up;
-		for (int x = 0; x < waitingList.tagCount(); ++x) {
+		for (var x = 0; x < waitingList.tagCount(); ++x) {
 			up = waitingList.getCompoundTagAt(x);
-			ItemStack is = ItemStackHelper.stackFromNBT(up);
+			var is = ItemStackHelper.stackFromNBT(up);
 			this.addToSendList(is);
 		}
 	}
@@ -134,7 +133,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 
 	public @NotNull TickRateModulation tickingRequest(@NotNull IGridNode node, int ticksSinceLastCall) {
 		// ME Interface push/pull, boring stuff. Carbon copy of item P2P.
-		boolean wasReq = this.requested;
+		var wasReq = this.requested;
 		if (this.requested && this.cachedInv != null) {
 			this.cachedInv.cycleOrder();
 		}
@@ -169,7 +168,8 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			var target = w.getTileEntity(tile.getPos().offset(s));
 			if (target != null) {
 				// this is so bad
-				if (target instanceof IInterfaceHost || target instanceof TileCableBus && ((TileCableBus) target).getPart(s.getOpposite()) instanceof PartInterface) {
+				if (target instanceof IInterfaceHost || target instanceof TileCableBus && ((TileCableBus) target).getPart(
+					s.getOpposite()) instanceof PartInterface) {
 					try {
 						IInterfaceHost targetTE;
 						if (target instanceof IInterfaceHost) {
@@ -181,20 +181,20 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 						var dualityAccessor = (DualityAccessor) targetTE.getInterfaceDuality();
 
 						if (!dualityAccessor.invokeSameGrid(this.getGridNode().getGrid())) {
-							IStorageMonitorableAccessor mon =
+							var mon =
 								target.getCapability(Capabilities.STORAGE_MONITORABLE_ACCESSOR, s.getOpposite());
 							if (mon != null) {
-								IStorageMonitorable sm = mon.getInventory(this.mySource);
+								var sm = mon.getInventory(this.mySource);
 								if (sm != null && Platform.canAccess(dualityAccessor.getGridProxy(),
 									this.mySource)) {
-									IMEMonitor<IAEItemStack> inv =
+									var inv =
 										sm.getInventory(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
 									if (inv != null) {
-										Iterator<ItemStack> i = this.waitingToSend.iterator();
+										var i = this.waitingToSend.iterator();
 
 										while (i.hasNext()) {
-											ItemStack whatToSend = i.next();
-											IAEItemStack result =
+											var whatToSend = i.next();
+											var result =
 												inv.injectItems(AEItemStack.fromItemStack(whatToSend),
 													Actionable.MODULATE, this.mySource);
 											if (result != null) {
@@ -225,12 +225,12 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 						ad = InventoryAdaptor.getAdaptor(target, s.getOpposite());
 					}
 
-					Iterator<ItemStack> i = this.waitingToSend.iterator();
+					var i = this.waitingToSend.iterator();
 
 					while (i.hasNext()) {
-						ItemStack whatToSend = i.next();
+						var whatToSend = i.next();
 						if (ad != null) {
-							ItemStack result = ad.addItems(whatToSend);
+							var result = ad.addItems(whatToSend);
 							if (!result.isEmpty()) {
 								if (whatToSend.getCount() != result.getCount()) {
 									worked = true;
@@ -286,7 +286,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	public TileEntity getFacingTileEntity() {
 		var tile = this.getTile();
 
-		return tile.getWorld().getTileEntity(tile.getPos().offset(getSide().getFacing()));
+		return tile.getWorld().getTileEntity(tile.getPos().offset(this.getSide().getFacing()));
 	}
 
 	public boolean hasCapability(Capability<?> capabilityClass) {
@@ -320,11 +320,11 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		} else {
 			List<IItemHandler> outs = new ArrayList<>();
 
-			TunnelCollection<PartP2PInterface> itemTunnels = this.getInputs();
+			var itemTunnels = this.getInputs();
 			if (itemTunnels == null) return EmptyHandler.INSTANCE;
 
-			for (PartP2PInterface tunnel : itemTunnels) {
-				IItemHandler inv = tunnel.getOutputInv();
+			for (var tunnel : itemTunnels) {
+				var inv = tunnel.getOutputInv();
 				if (inv != null && inv != this) {
 					if (Platform.getRandomInt() % 2 == 0) {
 						outs.add(inv);
@@ -335,7 +335,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			}
 
 			return this.cachedInv =
-				new WrapperChainedItemHandler(outs.toArray(new IItemHandler[outs.size()]));
+				new WrapperChainedItemHandler(outs.toArray(new IItemHandler[0]));
 		}
 	}
 
@@ -348,9 +348,10 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		if (!this.partVisited) {
 			this.partVisited = true;
 			if (this.getProxy().isActive()) {
-				EnumFacing facing = this.getSide().getFacing();
-				TileEntity te = this.getTile().getWorld().getTileEntity(this.getTile().getPos().offset(facing));
-				if ((te instanceof IInterfaceHost || te instanceof TileCableBus && ((TileCableBus) te).getPart(facing.getOpposite()) instanceof PartInterface) && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+				var facing = this.getSide().getFacing();
+				var te = this.getTile().getWorld().getTileEntity(this.getTile().getPos().offset(facing));
+				if ((te instanceof IInterfaceHost || te instanceof TileCableBus && ((TileCableBus) te).getPart(facing.getOpposite()) instanceof PartInterface) && te.hasCapability(
+					CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
 					facing.getOpposite())) ret = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
 					facing.getOpposite());
 			}
@@ -366,7 +367,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			return stack;
 		} else {
 			++this.depth;
-			ItemStack ret = this.getDestination().insertItem(slot, stack, simulate);
+			var ret = this.getDestination().insertItem(slot, stack, simulate);
 			--this.depth;
 			return ret;
 		}
@@ -398,7 +399,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		if (!this.isOutput()) {
 			this.cachedInv = null;
 			this.cachedOutputs = null;
-			int olderSize = this.oldSize;
+			var olderSize = this.oldSize;
 			this.oldSize = this.getDestination().getSlots();
 			if (olderSize != this.oldSize) {
 				this.getHost().notifyNeighbors();
@@ -406,7 +407,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		} else {
 			var inputs = this.getInputs();
 			if (inputs == null) return;
-			for (PartP2PInterface partP2PInterface : this.getInputs()) {
+			for (var partP2PInterface : this.getInputs()) {
 				if (partP2PInterface != null) {
 					partP2PInterface.getHost().notifyNeighbors();
 				}
@@ -422,7 +423,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			var inputs = this.getInputs();
 			if (inputs == null) return;
 
-			for (PartP2PInterface partP2PInterface : inputs) {
+			for (var partP2PInterface : inputs) {
 				if (partP2PInterface != null) {
 					partP2PInterface.onTunnelNetworkChange();
 				}
@@ -437,9 +438,9 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		} else if (this.cachedTank != null) {
 			return this.cachedTank;
 		} else {
-			TileEntity te = this.getFacingTileEntity();
+			var te = this.getFacingTileEntity();
 
-			EnumFacing opposite = this.getSide().getFacing().getOpposite();
+			var opposite = this.getSide().getFacing().getOpposite();
 			if (!(te instanceof IFluidInterfaceHost || te instanceof IPartHost ph && ph.getPart(opposite) instanceof IFluidInterfaceHost))
 				return null;
 
@@ -471,8 +472,8 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 
 	@Override
 	public int fill(FluidStack resource, boolean doFill) {
-		if (depth == 1) return 0;
-		depth++;
+		if (this.depth == 1) return 0;
+		this.depth++;
 
 		var used = 0;
 		var inputs = this.getInputs();
@@ -488,7 +489,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			}
 		}
 
-		depth--;
+		this.depth--;
 		return used;
 	}
 
@@ -499,7 +500,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		this.depth++;
 
 		if (fluid != null && fluid.amount > 0) {
-			FluidStack resource = fluid.copy();
+			var resource = fluid.copy();
 			FluidStack totalDrained = null;
 
 			var inputs = this.getInputs();
@@ -508,7 +509,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 					var fh = input.getFacingTileEntityFluidHandler();
 					if (fh == null) continue;
 
-					FluidStack drain = fh.drain(resource, doDrain);
+					var drain = fh.drain(resource, doDrain);
 					if (drain != null) {
 						if (totalDrained == null) {
 							totalDrained = drain;
@@ -543,7 +544,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			return null;
 		} else {
 			FluidStack totalDrained = null;
-			int toDrain = maxDrain;
+			var toDrain = maxDrain;
 
 			var inputs = this.getInputs();
 			if (inputs != null) {
@@ -557,9 +558,9 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 							toDrain -= totalDrained.amount;
 						}
 					} else {
-						FluidStack copy = totalDrained.copy();
+						var copy = totalDrained.copy();
 						copy.amount = toDrain;
-						FluidStack drain = fh.drain(copy, doDrain);
+						var drain = fh.drain(copy, doDrain);
 						if (drain != null) {
 							totalDrained.amount += drain.amount;
 							toDrain -= drain.amount;

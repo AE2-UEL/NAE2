@@ -1,11 +1,8 @@
 package co.neeve.nae2.common.recipes.factories.recipes;
 
-import co.neeve.nae2.common.registries.Materials;
-import co.neeve.nae2.common.registries.Parts;
+import co.neeve.nae2.NAE2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.item.ItemStack;
@@ -25,10 +22,10 @@ import java.util.Set;
 public class ShapedRecipeFactory implements IRecipeFactory {
 	@Override
 	public ShapedOreRecipe parse(JsonContext context, JsonObject json) {
-		String group = JsonUtils.getString(json, "group", "");
+		var group = JsonUtils.getString(json, "group", "");
 
 		Map<Character, Ingredient> ingMap = Maps.newHashMap();
-		for (Map.Entry<String, JsonElement> entry : JsonUtils.getJsonObject(json, "key").entrySet()) {
+		for (var entry : JsonUtils.getJsonObject(json, "key").entrySet()) {
 			if (entry.getKey().length() != 1)
 				throw new JsonSyntaxException("Invalid key entry: '" + entry.getKey() + "' is an invalid symbol " +
 					"(must" +
@@ -42,20 +39,20 @@ public class ShapedRecipeFactory implements IRecipeFactory {
 
 		ingMap.put(' ', Ingredient.EMPTY);
 
-		JsonArray patternJ = JsonUtils.getJsonArray(json, "pattern");
+		var patternJ = JsonUtils.getJsonArray(json, "pattern");
 
 		if (patternJ.size() == 0)
 			throw new JsonSyntaxException("Invalid pattern: empty pattern not allowed");
 
-		String[] pattern = new String[patternJ.size()];
-		for (int x = 0; x < pattern.length; ++x) {
-			String line = JsonUtils.getString(patternJ.get(x), "pattern[" + x + "]");
+		var pattern = new String[patternJ.size()];
+		for (var x = 0; x < pattern.length; ++x) {
+			var line = JsonUtils.getString(patternJ.get(x), "pattern[" + x + "]");
 			if (x > 0 && pattern[0].length() != line.length())
 				throw new JsonSyntaxException("Invalid pattern: each row must  be the same width");
 			pattern[x] = line;
 		}
 
-		CraftingHelper.ShapedPrimer primer = new CraftingHelper.ShapedPrimer();
+		var primer = new CraftingHelper.ShapedPrimer();
 		primer.width = pattern[0].length();
 		primer.height = pattern.length;
 		primer.mirrored = JsonUtils.getBoolean(json, "mirrored", true);
@@ -64,10 +61,10 @@ public class ShapedRecipeFactory implements IRecipeFactory {
 		Set<Character> keys = Sets.newHashSet(ingMap.keySet());
 		keys.remove(' ');
 
-		int x = 0;
-		for (String line : pattern) {
-			for (char chr : line.toCharArray()) {
-				Ingredient ing = ingMap.get(chr);
+		var x = 0;
+		for (var line : pattern) {
+			for (var chr : line.toCharArray()) {
+				var ing = ingMap.get(chr);
 				if (ing == null)
 					throw new JsonSyntaxException("Pattern references symbol '" + chr + "' but it's not defined in " +
 						"the" +
@@ -87,19 +84,21 @@ public class ShapedRecipeFactory implements IRecipeFactory {
 
 		ItemStack resultStack;
 		if (Objects.equals(type, "part")) {
-			var partDef = Parts.getByName(name);
+			var partDef = NAE2.definitions().parts().getById(name).orElse(null);
 
 			if (partDef == null || !partDef.isEnabled())
 				throw new IllegalStateException("Part \"" + name + "\" doesn't exist or is disabled");
 
-			resultStack = partDef.getStack();
+			resultStack = partDef.maybeStack(1).orElseThrow(() ->
+				new IllegalStateException("Material \"" + name + "\" doesn't exist or is disabled"));
 		} else if (Objects.equals(type, "material")) {
-			var materialDef = Materials.getByName(name);
+			var materialDef = NAE2.definitions().materials().getById(name).orElse(null);
 
 			if (materialDef == null || !materialDef.isEnabled())
 				throw new IllegalStateException("Material \"" + name + "\" doesn't exist or is disabled");
 
-			resultStack = materialDef.getStack();
+			resultStack = materialDef.maybeStack(1).orElseThrow(() ->
+				new IllegalStateException("Material \"" + name + "\" doesn't exist or is disabled"));
 		} else {
 			throw new IllegalStateException("Unexpected output type \"" + type + "\"");
 		}

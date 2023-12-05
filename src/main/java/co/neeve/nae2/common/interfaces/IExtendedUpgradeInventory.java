@@ -1,9 +1,9 @@
 package co.neeve.nae2.common.interfaces;
 
-import co.neeve.nae2.common.registries.Upgrades;
+import co.neeve.nae2.common.registration.definitions.Upgrades;
 
 public interface IExtendedUpgradeInventory {
-	int getInstalledUpgrades(Upgrades u);
+	int getInstalledUpgrades(Upgrades.UpgradeType u);
 
-	int getMaxInstalled(Upgrades u);
+	int getMaxInstalled(Upgrades.UpgradeType u);
 }

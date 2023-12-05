@@ -43,9 +43,9 @@ public class MixinGuiPatternTerminal extends MixinGuiMEMonitorable implements IP
 
 	@Inject(method = "initGui", at = @At("RETURN"))
 	public void injectButtons(CallbackInfo ci) {
-		initializePatternMultiTool();
+		this.initializePatternMultiTool();
 		if (this.patternMultiToolButtons != null)
-			PatternMultiToolGUIHelper.repositionButtons(patternMultiToolButtons, 0,
+			PatternMultiToolGUIHelper.repositionButtons(this.patternMultiToolButtons, 0,
 				this.getPMTOffsetY() - 50);
 	}
 

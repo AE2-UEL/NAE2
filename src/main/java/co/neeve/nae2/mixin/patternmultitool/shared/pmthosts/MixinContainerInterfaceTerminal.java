@@ -1,7 +1,6 @@
 package co.neeve.nae2.mixin.patternmultitool.shared.pmthosts;
 
 import appeng.container.implementations.ContainerInterfaceTerminal;
-import appeng.container.slot.AppEngSlot;
 import appeng.helpers.InventoryAction;
 import appeng.parts.reporting.PartInterfaceTerminal;
 import appeng.util.helpers.ItemHandlerUtil;
@@ -10,14 +9,11 @@ import co.neeve.nae2.mixin.patternmultitool.shared.MixinAEBaseContainer;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.List;
 
 @SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(value = ContainerInterfaceTerminal.class, remap = false)
@@ -36,12 +32,12 @@ public class MixinContainerInterfaceTerminal extends MixinAEBaseContainer implem
 	public void injectPMTInventory(EntityPlayerMP player, InventoryAction action, int slot, long id, CallbackInfo ci,
 	                               @Local(ordinal = 0) IItemHandler theSlot) {
 		if (this.patternMultiToolObject != null) {
-			IItemHandler pmtPatterns = this.patternMultiToolObject.getPatternInventory();
-			List<AppEngSlot> pmtSlots = this.getPatternMultiToolSlots();
+			var pmtPatterns = this.patternMultiToolObject.getPatternInventory();
+			var pmtSlots = this.getPatternMultiToolSlots();
 			if (pmtSlots == null) return;
-			ItemStack partialIs = theSlot.getStackInSlot(0);
+			var partialIs = theSlot.getStackInSlot(0);
 
-			for (int i = 0; i < pmtPatterns.getSlots(); i++) {
+			for (var i = 0; i < pmtPatterns.getSlots(); i++) {
 				if (!pmtSlots.get(i).isItemValid(partialIs)) continue;
 
 				partialIs = pmtPatterns.insertItem(i, partialIs, false);

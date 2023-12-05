@@ -41,7 +41,7 @@ public class MixinJEIMissingItem {
 			.map(iGuiIngredient -> iGuiIngredient.isInput() && !iGuiIngredient.getAllIngredients().isEmpty() ? 1 : 0)
 			.reduce(0, Integer::sum);
 
-		if (foundAnyCraftable && craftableSlots.size() + foundSlots.size() == inCount) {
+		if (foundAnyCraftable && this.craftableSlots.size() + this.foundSlots.size() == inCount) {
 			tooltipLines.add("");
 			tooltipLines.add(I18n.translateToLocal("nae2.jei.missing.craft.1"));
 			tooltipLines.add(I18n.translateToLocal("nae2.jei.missing.craft.2"));

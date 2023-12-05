@@ -94,24 +94,24 @@ public abstract class MixinPushPattern {
 	                                 @Local World world,
 	                                 @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnel) {
 		// There's a pending inputTunnel to be iterated. Iterate it instead.
-		if (nae2$tunnelsToVisit != null) {
+		if (this.nae2$tunnelsToVisit != null) {
 			// Are we still the same?
-			var te = world.getTileEntity(nae2$inputTunnel.getHost().getTile().getPos());
-			if (!(te instanceof IPartHost ph && ph.getPart(nae2$originalFacing.getOpposite()) == nae2$inputTunnel)) {
-				nae2$tunnelsToVisit = null;
-				visitedFaces.remove(nae2$originalFacing);
+			var te = world.getTileEntity(this.nae2$inputTunnel.getHost().getTile().getPos());
+			if (!(te instanceof IPartHost ph && ph.getPart(this.nae2$originalFacing.getOpposite()) == this.nae2$inputTunnel)) {
+				this.nae2$tunnelsToVisit = null;
+				this.visitedFaces.remove(this.nae2$originalFacing);
 				return null;
 			}
 
 			// Pop one inputTunnel and feed it instead, supplying the output inputTunnel's facing value.
 			// If the list is empty, dereference it to restore AE2 behavior.
-			PartP2PInterface tunnel = nae2$tunnelsToVisit.removeFirst();
-			var input = nae2$inputTunnel;
-			if (nae2$tunnelsToVisit.isEmpty()) {
-				visitedFaces.remove(nae2$originalFacing);
-				nae2$tunnelsToVisit = null;
-				nae2$inputTunnel = null;
-				nae2$originalFacing = null;
+			var tunnel = this.nae2$tunnelsToVisit.removeFirst();
+			var input = this.nae2$inputTunnel;
+			if (this.nae2$tunnelsToVisit.isEmpty()) {
+				this.visitedFaces.remove(this.nae2$originalFacing);
+				this.nae2$tunnelsToVisit = null;
+				this.nae2$inputTunnel = null;
+				this.nae2$originalFacing = null;
 			}
 
 			// Do we still belong?
@@ -140,9 +140,9 @@ public abstract class MixinPushPattern {
 
 				// Sure it is, and we have TEs. Let the other part of this method know we're iterating them next.
 				if (!outputTunnels.isEmpty()) {
-					nae2$tunnelsToVisit = outputTunnels;
-					nae2$originalFacing = facing;
-					nae2$inputTunnel = inputTunnel;
+					this.nae2$tunnelsToVisit = outputTunnels;
+					this.nae2$originalFacing = facing;
+					this.nae2$inputTunnel = inputTunnel;
 				}
 			}
 
@@ -150,9 +150,9 @@ public abstract class MixinPushPattern {
 		}
 
 		currentOutputTunnel.set(null);
-		nae2$tunnelsToVisit = null;
-		nae2$inputTunnel = null;
-		nae2$originalFacing = null;
+		this.nae2$tunnelsToVisit = null;
+		this.nae2$inputTunnel = null;
+		this.nae2$originalFacing = null;
 		return te;
 	}
 
@@ -162,7 +162,7 @@ public abstract class MixinPushPattern {
 	))
 	private boolean wrapPushRemove(EnumSet<EnumFacing> instance, Object obj, Operation<Boolean> operation,
 	                               @Local Iterator iterator) {
-		if (nae2$tunnelsToVisit == null) {
+		if (this.nae2$tunnelsToVisit == null) {
 			return operation.call(instance, obj);
 		}
 
@@ -176,7 +176,7 @@ public abstract class MixinPushPattern {
 	))
 	private boolean wrapPushHasNext(boolean original) {
 		// Continue iterating even if there's no next value, if we're supplying tunnel ents.
-		return original || nae2$tunnelsToVisit != null;
+		return original || this.nae2$tunnelsToVisit != null;
 	}
 
 	@WrapOperation(method = "pushPattern", at = @At(
@@ -186,7 +186,7 @@ public abstract class MixinPushPattern {
 	private Object wrapPushNext(Iterator iterator, Operation<Object> operation) {
 		// Check if we're iterating tunnels. If we are, the value returned doesn't matter, since we supply our own
 		// in the next method. Return something bogus to keep JVM happy.
-		if (nae2$tunnelsToVisit != null) {
+		if (this.nae2$tunnelsToVisit != null) {
 			return EnumFacing.UP;
 		} else {
 			return operation.call(iterator);

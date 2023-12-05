@@ -23,14 +23,14 @@ public class ReconstructorFXPacket implements INAEMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(pos.getX());
-		buf.writeInt(pos.getY());
-		buf.writeInt(pos.getZ());
+		buf.writeInt(this.pos.getX());
+		buf.writeInt(this.pos.getY());
+		buf.writeInt(this.pos.getZ());
 	}
 
 	@Override
 	public void process(MessageContext ctx) {
-		var te = Minecraft.getMinecraft().world.getTileEntity(pos);
+		var te = Minecraft.getMinecraft().world.getTileEntity(this.pos);
 		if (te instanceof TileReconstructionChamber trc) {
 			trc.spawnHologram();
 		}

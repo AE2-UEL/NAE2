@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 @Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
 public class ToolPatternMultiTool extends AEBaseItem implements INAEGuiItem<ObjPatternMultiTool>, IBauble {
 	public ToolPatternMultiTool() {
-		setMaxStackSize(1);
+		this.setMaxStackSize(1);
 	}
 
 	public static ObjPatternMultiTool getGuiObject(ItemStack patternMultiTool) {
@@ -55,7 +55,7 @@ public class ToolPatternMultiTool extends AEBaseItem implements INAEGuiItem<ObjP
 	                                                      float hitY,
 	                                                      float hitZ) {
 		if (te instanceof IPartHost) {
-			final RayTraceResult mop = new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos);
+			final var mop = new RayTraceResult(new Vec3d(hitX, hitY, hitZ), side, pos);
 			var selectedPart = ((IPartHost) te).selectPart(mop.hitVec);
 
 			if (selectedPart.part instanceof IInterfaceHost interfaceHost) {
@@ -69,7 +69,7 @@ public class ToolPatternMultiTool extends AEBaseItem implements INAEGuiItem<ObjP
 	public @NotNull ActionResult<ItemStack> onItemRightClick(final @NotNull World w, final @NotNull EntityPlayer p,
 	                                                         final @NotNull EnumHand hand) {
 		if (Platform.isServer()) {
-			final RayTraceResult mop = AppEng.proxy.getRTR();
+			final var mop = AppEng.proxy.getRTR();
 
 			if (mop == null || mop.typeOfHit == RayTraceResult.Type.MISS) {
 				NAE2.gui().openGUI(p, null, AEPartLocation.INTERNAL, GuiBridge.PATTERN_MULTI_TOOL);
@@ -89,7 +89,7 @@ public class ToolPatternMultiTool extends AEBaseItem implements INAEGuiItem<ObjP
 			return EnumActionResult.PASS;
 		}
 
-		TileEntity te = world.getTileEntity(pos);
+		var te = world.getTileEntity(pos);
 		if (te == null) {
 			NAE2.gui().openGUI(player, null, AEPartLocation.INTERNAL, GuiBridge.PATTERN_MULTI_TOOL);
 

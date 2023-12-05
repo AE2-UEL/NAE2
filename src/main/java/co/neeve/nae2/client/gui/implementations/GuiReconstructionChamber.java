@@ -2,6 +2,7 @@ package co.neeve.nae2.client.gui.implementations;
 
 import appeng.client.gui.AEBaseGui;
 import appeng.core.localization.GuiText;
+import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.containers.ContainerReconstructionChamber;
 import co.neeve.nae2.common.tiles.TileReconstructionChamber;
 import net.minecraft.client.resources.I18n;
@@ -24,7 +25,7 @@ public class GuiReconstructionChamber extends AEBaseGui {
 
 	@Override
 	public void drawBG(final int offsetX, final int offsetY, final int mouseX, final int mouseY) {
-		ResourceLocation loc = new ResourceLocation("nae2", "textures/gui/reconstruction_chamber.png");
+		var loc = new ResourceLocation(Tags.MODID, "textures/gui/reconstruction_chamber.png");
 		this.mc.getTextureManager().bindTexture(loc);
 		this.drawTexturedModalRect(offsetX, offsetY, 0, 0, this.xSize, this.ySize);
 	}

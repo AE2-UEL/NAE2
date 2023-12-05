@@ -1,0 +1,40 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "minecraft:item_exists",
+          "item": "nae2:pattern_multiplier"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.blank_pattern"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.engineering_processor"
+        }
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "type": "appliedenergistics2:part",
+      "part": "material.blank_pattern"
+    },
+    {
+      "type": "forge:ore_dict",
+      "ore": "itemIlluminatedPanel"
+    },
+    {
+      "type": "appliedenergistics2:part",
+      "part": "material.engineering_processor"
+    }
+  ],
+  "result": {
+    "item": "nae2:pattern_multiplier",
+    "count": 1
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "minecraft:item_exists",
+          "item": "nae2:storage_cell_256k"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.empty_storage_cell"
+        },
+        {
+          "type": "nae2:material_exists",
+          "name": "cell_part_256k"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:storage_cell_256k"
+  },
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "appliedenergistics2:part",
+      "part": "material.empty_storage_cell"
+    },
+    {
+      "type": "nae2:material",
+      "name": "cell_part_256k"
+    }
+  ]
+}

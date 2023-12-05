@@ -31,7 +31,7 @@ public abstract class MixinCraftingGridCache implements IExtendedCraftingGridCac
 	                                                        IAEItemStack slotItem, ICraftingPatternDetails extras,
 	                                                        ICraftingCallback cb) {
 		if (world != null && grid != null && actionSrc != null && slotItem != null) {
-			CraftingJob job = new CraftingJob(world, grid, actionSrc, slotItem, cb);
+			var job = new CraftingJob(world, grid, actionSrc, slotItem, cb);
 			((IExtendedCraftingTreeNode) job.getTree()).setVirtualPatternDetails(extras);
 			return CRAFTING_POOL.submit(job, job);
 		} else {

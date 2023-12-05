@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public record SingleStackRecipe(ItemStack stack) implements IRecipeWrapper {
 	@Override
 	public void getIngredients(@NotNull IIngredients ingredients) {
-		ingredients.setInput(VanillaTypes.ITEM, stack);
-		ingredients.setOutput(VanillaTypes.ITEM, stack);
+		ingredients.setInput(VanillaTypes.ITEM, this.stack);
+		ingredients.setOutput(VanillaTypes.ITEM, this.stack);
 	}
 }

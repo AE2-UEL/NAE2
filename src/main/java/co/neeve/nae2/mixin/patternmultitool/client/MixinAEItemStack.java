@@ -13,11 +13,11 @@ public class MixinAEItemStack implements IExtendedAEItemStack {
 
 	@Override
 	public int getExtendedCount() {
-		return extendedCount;
+		return this.extendedCount;
 	}
 
 	@Override
 	public void setExtendedCount(int count) {
-		extendedCount = count;
+		this.extendedCount = count;
 	}
 }

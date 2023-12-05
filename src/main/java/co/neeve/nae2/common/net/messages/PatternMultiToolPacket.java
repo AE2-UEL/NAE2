@@ -21,7 +21,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fluids.FluidUtil;
@@ -43,14 +42,14 @@ public class PatternMultiToolPacket implements INAEMessage {
 
 	@Override
 	public void toBytes(ByteBuf buf) {
-		buf.writeInt(actionType);
-		buf.writeInt(value);
+		buf.writeInt(this.actionType);
+		buf.writeInt(this.value);
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf) {
-		actionType = buf.readInt();
-		value = buf.readInt();
+		this.actionType = buf.readInt();
+		this.value = buf.readInt();
 	}
 
 	public int getValue() {
@@ -70,10 +69,10 @@ public class PatternMultiToolPacket implements INAEMessage {
 			if (this.getActionType() == PatternMultiToolActionTypes.TAB_SWITCH && container instanceof ContainerPatternMultiTool containerPatternMultiTool) {
 				containerPatternMultiTool.switchTab(PatternMultiToolTabs.values()[this.getValue()]);
 			} else if (this.getActionType() == PatternMultiToolActionTypes.BUTTON_PRESS) {
-				AppEngInternalInventory inv = (AppEngInternalInventory) container.getPatternInventory();
+				var inv = (AppEngInternalInventory) container.getPatternInventory();
 				if (inv == null) return;
 
-				PatternMultiToolActions value = PatternMultiToolActions.values()[this.getValue()];
+				var value = PatternMultiToolActions.values()[this.getValue()];
 
 				if (value == PatternMultiToolActions.INV_SWITCH && container instanceof IContainerPatternMultiTool cmp) {
 					cmp.toggleInventory();
@@ -82,15 +81,15 @@ public class PatternMultiToolPacket implements INAEMessage {
 				}
 
 				if (value == PatternMultiToolActions.REPLACE && container instanceof IContainerPatternMultiTool cmp) {
-					searchAndReplace(cmp, player);
+					this.searchAndReplace(cmp, player);
 					bc.detectAndSendChanges();
 					return;
 				}
 
-				for (ItemStack is : inv) {
+				for (var is : inv) {
 					if (is.getItem() instanceof ItemEncodedPattern) {
 						try {
-							handleButtonPress(is, bc, value);
+							this.handleButtonPress(is, bc, value);
 						} catch (IndexOutOfBoundsException e) {
 							// uwu
 						}
@@ -105,18 +104,18 @@ public class PatternMultiToolPacket implements INAEMessage {
 	// Handles the logic for when a button is pressed
 	private void handleButtonPress(ItemStack is, AEBaseContainer container, PatternMultiToolActions buttonId) {
 		switch (buttonId) {
-			case MUL2 -> updatePatternCount(is, 2, Operation.MULTIPLY);
-			case MUL3 -> updatePatternCount(is, 3, Operation.MULTIPLY);
-			case ADD -> updatePatternCount(is, 1, Operation.ADD);
-			case DIV2 -> updatePatternCount(is, 2, Operation.DIVIDE);
-			case DIV3 -> updatePatternCount(is, 3, Operation.DIVIDE);
-			case SUB -> updatePatternCount(is, 1, Operation.SUBTRACT);
-			case CLEAR -> emptyPattern(is, container);
+			case MUL2 -> this.updatePatternCount(is, 2, Operation.MULTIPLY);
+			case MUL3 -> this.updatePatternCount(is, 3, Operation.MULTIPLY);
+			case ADD -> this.updatePatternCount(is, 1, Operation.ADD);
+			case DIV2 -> this.updatePatternCount(is, 2, Operation.DIVIDE);
+			case DIV3 -> this.updatePatternCount(is, 3, Operation.DIVIDE);
+			case SUB -> this.updatePatternCount(is, 1, Operation.SUBTRACT);
+			case CLEAR -> this.emptyPattern(is, container);
 		}
 	}
 
 	private void emptyPattern(ItemStack is, AEBaseContainer container) {
-		ItemStack newStack =
+		var newStack =
 			AEApi.instance().definitions().materials().blankPattern().maybeStack(is.getCount()).orElse(ItemStack.EMPTY);
 
 		container.putStackInSlot(container.getInventory().indexOf(is), newStack);
@@ -124,8 +123,8 @@ public class PatternMultiToolPacket implements INAEMessage {
 
 	// Checks if each tag in the list can be divided evenly by the factor
 	private boolean canDivideTagList(NBTTagList tagList, int factor, String countTag) {
-		for (NBTBase tag : tagList) {
-			NBTTagCompound ntc = (NBTTagCompound) tag;
+		for (var tag : tagList) {
+			var ntc = (NBTTagCompound) tag;
 			if (ntc.getInteger(countTag) % factor != 0) {
 				return true;
 			}
@@ -149,17 +148,17 @@ public class PatternMultiToolPacket implements INAEMessage {
 		for (var i = 0; i < inv.getSlots(); i++) {
 			var is = inv.getStackInSlot(i);
 			if (!(is.getItem() instanceof ItemEncodedPattern)) continue;
-			NBTTagCompound nbt = is.getTagCompound();
+			var nbt = is.getTagCompound();
 			if (nbt == null) {
 				// Skip this item if it has no NBT data
 				continue;
 			}
 
 			var ae2fc = Platform.isModLoaded("ae2fc") && is.getItem() instanceof ItemFluidEncodedPattern;
-			final String countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
+			final var countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
 
-			final NBTTagList tagIn = (NBTTagList) nbt.getTag("in").copy();
-			final NBTTagList tagOut = (NBTTagList) nbt.getTag("out").copy();
+			final var tagIn = (NBTTagList) nbt.getTag("in").copy();
+			final var tagOut = (NBTTagList) nbt.getTag("out").copy();
 
 			var fluidStackIn = FluidUtil.getFluidContained(itemA);
 			var fluidStackOut = FluidUtil.getFluidContained(itemB);
@@ -168,8 +167,8 @@ public class PatternMultiToolPacket implements INAEMessage {
 			var lists = new NBTTagList[]{ tagIn, tagOut };
 			for (var list : lists) {
 				var idx = 0;
-				for (NBTBase tag : list.copy()) {
-					NBTTagCompound compound = (NBTTagCompound) tag;
+				for (var tag : list.copy()) {
+					var compound = (NBTTagCompound) tag;
 					var stack = ItemStackHelper.stackFromNBT(compound);
 					if (itemA.isItemEqual(stack)) {
 						var count = compound.getTag(countTag).copy();
@@ -230,20 +229,20 @@ public class PatternMultiToolPacket implements INAEMessage {
 	private void updatePatternCount(ItemStack is, int factor, Operation operation) {
 		var ae2fc = Platform.isModLoaded("ae2fc") && is.getItem() instanceof ItemFluidEncodedPattern;
 
-		NBTTagCompound nbt = is.getTagCompound();
+		var nbt = is.getTagCompound();
 		if (nbt == null) {
 			// Skip this item if it has no NBT data
 			return;
 		}
 
-		final NBTTagList tagIn = (NBTTagList) nbt.getTag("in");
-		final NBTTagList tagOut = (NBTTagList) nbt.getTag("out");
+		final var tagIn = (NBTTagList) nbt.getTag("in");
+		final var tagOut = (NBTTagList) nbt.getTag("out");
 
-		final String countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
+		final var countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
 
 		// If operation is DIVIDE, check if all counts are divisible by the factor
 		if (operation == Operation.DIVIDE &&
-			(canDivideTagList(tagIn, factor, countTag) || canDivideTagList(tagOut, factor, countTag))) {
+			(this.canDivideTagList(tagIn, factor, countTag) || this.canDivideTagList(tagOut, factor, countTag))) {
 			// If any count is not divisible by the factor, don't modify the pattern
 			return;
 		}
@@ -252,10 +251,12 @@ public class PatternMultiToolPacket implements INAEMessage {
 
 		// I don't know why AE2FC keeps a different set of tags.
 		if (ae2fc) {
-			final NBTTagList ae2fcTagIn = (NBTTagList) nbt.getTag("Inputs");
-			final NBTTagList ae2fcTagOut = (NBTTagList) nbt.getTag("Outputs");
+			final var ae2fcTagIn = (NBTTagList) nbt.getTag("Inputs");
+			final var ae2fcTagOut = (NBTTagList) nbt.getTag("Outputs");
 			if (operation == Operation.DIVIDE &&
-				(canDivideTagList(ae2fcTagIn, factor, countTag) || canDivideTagList(ae2fcTagOut, factor, countTag))) {
+				(this.canDivideTagList(ae2fcTagIn, factor, countTag) || this.canDivideTagList(ae2fcTagOut,
+					factor,
+					countTag))) {
 				return;
 			}
 
@@ -267,19 +268,19 @@ public class PatternMultiToolPacket implements INAEMessage {
 		toModify.add(tagOut);
 
 		for (var list : toModify) {
-			modifyTagList(list, factor, operation, countTag);
+			this.modifyTagList(list, factor, operation, countTag);
 		}
 
-		NBTTagCompound newNbt = is.getTagCompound();
+		var newNbt = is.getTagCompound();
 		newNbt.setByte("crafting", (byte) 0);
 		newNbt.setByte("substitute", (byte) 0);
 	}
 
 	// Modifies the count of each tag in the list based on the operation and factor
 	private void modifyTagList(NBTTagList tagList, int factor, Operation operation, String countTag) {
-		for (NBTBase tag : tagList) {
-			NBTTagCompound ntc = (NBTTagCompound) tag;
-			int count = ntc.getInteger(countTag);
+		for (var tag : tagList) {
+			var ntc = (NBTTagCompound) tag;
+			var count = ntc.getInteger(countTag);
 			if (count == 0) {
 				continue;
 			}

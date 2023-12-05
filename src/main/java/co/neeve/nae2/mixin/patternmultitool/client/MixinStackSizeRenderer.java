@@ -17,10 +17,10 @@ public abstract class MixinStackSizeRenderer {
 	private void renderStackExtended(FontRenderer fontRenderer, IAEItemStack aeStack, int xPos, int yPos,
 	                                 CallbackInfo ci) {
 		if (aeStack instanceof IExtendedAEItemStack eais && eais.getExtendedCount() > 1) {
-			int count = eais.getExtendedCount();
+			var count = eais.getExtendedCount();
 
-			String str = String.valueOf(count);
-			FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+			var str = String.valueOf(count);
+			var fr = Minecraft.getMinecraft().fontRenderer;
 			fr.drawStringWithShadow(str, (float) (xPos + 19 - 2 - fr.getStringWidth(str)), yPos, 16777215);
 		}
 	}

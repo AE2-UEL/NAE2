@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "normal": {
+      "model": "nae2:crafting/coprocessor_16x"
+    }
+  }
+}

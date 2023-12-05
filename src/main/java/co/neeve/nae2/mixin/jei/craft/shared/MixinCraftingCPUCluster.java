@@ -35,7 +35,7 @@ public abstract class MixinCraftingCPUCluster {
 	public void executeCrafting(IEnergyGrid eg, CraftingGridCache cc, CallbackInfo ci,
 	                            @Local ICraftingPatternDetails details) {
 		if (details instanceof VirtualPatternDetails) {
-			if (this.remainingItemCount == finalOutput.getStackSize()) {
+			if (this.remainingItemCount == this.finalOutput.getStackSize()) {
 				this.cancel();
 				ci.cancel();
 			}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "normal": {
+      "model": "nae2:crafting/storage_crafting_1024k"
+    }
+  }
+}

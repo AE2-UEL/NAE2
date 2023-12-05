@@ -37,12 +37,9 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -82,19 +79,19 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		this.viewingTab = te.getTab();
 
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
-			highlightedSlots = new HashMap<>();
+			this.highlightedSlots = new HashMap<>();
 		}
 
 		// Add slots for the container
-		addSlots();
+		this.addSlots();
 	}
 
 	public HashMap<AppEngSlot, ValidatonResult> getHighlightedSlots() {
-		return highlightedSlots;
+		return this.highlightedSlots;
 	}
 
 	public List<SlotFake> getSearchReplaceSlots() {
-		return srSlots;
+		return this.srSlots;
 	}
 
 	public boolean hasToolbox() {
@@ -122,8 +119,8 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
 				if (Minecraft.getMinecraft().currentScreen instanceof GuiPatternMultiTool gpmt) {
 					if (field.equals("viewingTab")) {
-						assert getPatternMultiToolObject() != null;
-						getPatternMultiToolObject().setTab((PatternMultiToolTabs) newValue);
+						assert this.getPatternMultiToolObject() != null;
+						this.getPatternMultiToolObject().setTab((PatternMultiToolTabs) newValue);
 					}
 					gpmt.setupTabSpecificButtons();
 				}
@@ -143,9 +140,9 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		}
 		this.srSlots = null;
 
-		for (int y = 0; y < 4; ++y) {
-			for (int x = 0; x < 9; ++x) {
-				SlotPatternMultiTool slot = new SlotPatternMultiTool(this.getPatternInventory(), this,
+		for (var y = 0; y < 4; ++y) {
+			for (var x = 0; x < 9; ++x) {
+				var slot = new SlotPatternMultiTool(this.getPatternInventory(), this,
 					y * 9 + x, 8 + x * 18, 19 + y * 18, y, this.getInventoryPlayer());
 				slot.setStackLimit(this.viewingInventory == PatternMultiToolInventories.INTERFACE ? 1 : 64);
 
@@ -155,14 +152,14 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		}
 
 		// Setup upgrade slots
-		setupUpgrades();
+		this.setupUpgrades();
 
 		IInventory pi = this.getPlayerInv();
-		World w = inventoryPlayer.player.world;
+		var w = this.inventoryPlayer.player.world;
 
 		int v;
 		for (v = 0; v < pi.getSizeInventory(); ++v) {
-			ItemStack pii = pi.getStackInSlot(v);
+			var pii = pi.getStackInSlot(v);
 			if (!pii.isEmpty() && pii.getItem() instanceof ToolNetworkTool) {
 				this.lockPlayerInventorySlot(v);
 				this.tbInventory = (NetworkToolViewer) ((IGuiItem) pii.getItem()).getGuiObject(pii, w, new BlockPos(0,
@@ -181,7 +178,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 		if (this.hasToolbox()) {
 			for (v = 0; v < 3; ++v) {
-				for (int u = 0; u < 3; ++u) {
+				for (var u = 0; u < 3; ++u) {
 					this.addSlotToContainer((new SlotRestrictedInput(SlotRestrictedInput.PlacableItemType.UPGRADES,
 						this.tbInventory.getInternalInventory(), u + v * 3, 186 + u * 18, 189 + 18 - 82 + v * 18,
 						this.getInventoryPlayer())).setPlayerSide());
@@ -208,10 +205,10 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	public void setupUpgrades() {
-		UpgradeInventory ui = this.getUpgradeInventory();
+		var ui = this.getUpgradeInventory();
 
 		// Throw because this should never happen.
-		for (int upgradeSlot = 0; upgradeSlot < ui.getSlots(); upgradeSlot++) {
+		for (var upgradeSlot = 0; upgradeSlot < ui.getSlots(); upgradeSlot++) {
 			SlotRestrictedInput slot = new SlotPatternMultiToolUpgrade(SlotRestrictedInput.PlacableItemType.UPGRADES,
 				ui, this, upgradeSlot, 187, 8 + upgradeSlot * 18, this.getInventoryPlayer());
 			slot.setNotDraggable();
@@ -223,7 +220,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	@Override
 	public void detectAndSendChanges() {
 		if (this.iface != null) {
-			TileEntity tileEntity = iface.getTileEntity();
+			var tileEntity = this.iface.getTileEntity();
 			if (tileEntity == null || tileEntity != tileEntity.getWorld().getTileEntity(tileEntity.getPos())) {
 				this.setValidContainer(false);
 				super.detectAndSendChanges();
@@ -231,8 +228,8 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			}
 		}
 
-		ItemStack currentItem = this.getPlayerInv().getCurrentItem();
-		ItemStack toolInvItemStack = this.patternMultiTool.getItemStack();
+		var currentItem = this.getPlayerInv().getCurrentItem();
+		var toolInvItemStack = this.patternMultiTool.getItemStack();
 
 		if (!ItemStack.areItemsEqual(toolInvItemStack, currentItem)) {
 			if (!currentItem.isEmpty()) {
@@ -247,15 +244,15 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	// Handle slot changes
 	public void onSlotChange(Slot s) {
 		if (this.viewingInventory == PatternMultiToolInventories.INTERFACE) {
-			IItemHandler patterns = this.getPatternInventory();
+			var patterns = this.getPatternInventory();
 
 			List<ItemStack> dropList = new ArrayList<>();
 
-			int maxSlots =
-				((UpgradeInventory) iface.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.PATTERN_EXPANSION) * 9;
+			var maxSlots =
+				((UpgradeInventory) this.iface.getInventoryByName("upgrades")).getInstalledUpgrades(Upgrades.PATTERN_EXPANSION) * 9;
 
-			for (int invSlot = 0; invSlot < patterns.getSlots(); ++invSlot) {
-				ItemStack is = patterns.getStackInSlot(invSlot);
+			for (var invSlot = 0; invSlot < patterns.getSlots(); ++invSlot) {
+				var is = patterns.getStackInSlot(invSlot);
 				if (!(is.getItem() instanceof ICraftingPatternItem)) {
 					dropList.add(patterns.extractItem(invSlot, Integer.MAX_VALUE, false));
 				} else if (invSlot > 8 + maxSlots) {
@@ -266,9 +263,9 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			}
 
 			if (dropList.size() > 0) {
-				TileEntity tileEntity = iface.getTileEntity();
-				World world = tileEntity.getWorld();
-				BlockPos blockPos = tileEntity.getPos();
+				var tileEntity = this.iface.getTileEntity();
+				var world = tileEntity.getWorld();
+				var blockPos = tileEntity.getPos();
 				Platform.spawnDrops(world, blockPos, dropList);
 			}
 		}
@@ -288,23 +285,23 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 			var itemBData = ItemStackHelper.stackToNBT(itemB);
 			var crafting = new InventoryCrafting(new ContainerNull(), 3, 3);
 
-			for (var slot : patternMultiToolSlots) {
+			for (var slot : this.patternMultiToolSlots) {
 				var is = slot.getStack();
 				if (!(is.getItem() instanceof ItemEncodedPattern)) continue;
-				NBTTagCompound nbt = is.getTagCompound();
+				var nbt = is.getTagCompound();
 				if (nbt == null) {
 					// Skip this item if it has no NBT data
 					continue;
 				}
 
 				var ae2fc = Platform.isModLoaded("ae2fc") && is.getItem() instanceof ItemFluidEncodedPattern;
-				final String countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
+				final var countTag = ae2fc ? "Cnt" : "Count"; // ¯\_(ツ)_/¯
 
 				var isCrafting = nbt.getBoolean("crafting");
 				ValidatonResult result = null;
 
-				final NBTTagList tagIn = (NBTTagList) nbt.getTag("in").copy();
-				final NBTTagList tagOut = (NBTTagList) nbt.getTag("out").copy();
+				final var tagIn = (NBTTagList) nbt.getTag("in").copy();
+				final var tagOut = (NBTTagList) nbt.getTag("out").copy();
 
 				var lists = new ArrayList<NBTTagList>();
 				lists.add(tagIn);
@@ -316,8 +313,8 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 				for (var list : lists) {
 					var idx = 0;
-					for (NBTBase tag : list.copy()) {
-						NBTTagCompound compound = (NBTTagCompound) tag;
+					for (var tag : list.copy()) {
+						var compound = (NBTTagCompound) tag;
 						var stack = ItemStackHelper.stackFromNBT(compound);
 						if (itemA.isItemEqual(stack)) {
 							result = ValidatonResult.OK;
@@ -364,7 +361,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 						}
 					}
 
-					highlightedSlots.put(slot, result);
+					this.highlightedSlots.put(slot, result);
 				}
 			}
 		}
@@ -393,7 +390,7 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 
 	public int getInstalledCapacityUpgrades() {
 		Upgrades which = null;
-		UpgradeInventory ui = this.getUpgradeInventory();
+		var ui = this.getUpgradeInventory();
 
 		switch (this.viewingInventory) {
 			case PMT -> which = Upgrades.CAPACITY;
@@ -409,11 +406,11 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		// Throw because this should never happen.
 		List<ItemStack> inventory =
 			Lists.newArrayList((AppEngInternalInventory) this.getPatternInventory());
-		int slices = inventory.size() / 9;
-		int lockedUpgrades = slices; // Stub
-		int installedUpgrades = this.getInstalledCapacityUpgrades();
+		var slices = inventory.size() / 9;
+		var lockedUpgrades = slices; // Stub
+		var installedUpgrades = this.getInstalledCapacityUpgrades();
 
-		for (int i = slices - 1; i >= 0; i--) {
+		for (var i = slices - 1; i >= 0; i--) {
 			if (inventory.subList(i * 9, i * 9 + 9).stream().allMatch(ItemStack::isEmpty)) {
 				lockedUpgrades--;
 			} else {
@@ -430,9 +427,9 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 	}
 
 	public void toggleInventory() {
-		viewingInventory = viewingInventory == PatternMultiToolInventories.PMT ?
+		this.viewingInventory = this.viewingInventory == PatternMultiToolInventories.PMT ?
 			PatternMultiToolInventories.INTERFACE : PatternMultiToolInventories.PMT;
-		addSlots();
+		this.addSlots();
 	}
 
 	public void switchTab(PatternMultiToolTabs tab) {
@@ -444,13 +441,13 @@ public class ContainerPatternMultiTool extends AEBaseContainer implements IAEApp
 		// For sync purposes.
 		this.viewingTab = tab;
 
-		addSlots();
-		detectAndSendChanges();
+		this.addSlots();
+		this.detectAndSendChanges();
 	}
 
 	public PatternMultiToolTabs getViewingTab() {
-		assert getPatternMultiToolObject() != null;
-		return getPatternMultiToolObject().getTab();
+		assert this.getPatternMultiToolObject() != null;
+		return this.getPatternMultiToolObject().getTab();
 	}
 
 	public enum ValidatonResult {

@@ -17,7 +17,7 @@ public class TESRReconstructionChamber extends TileEntitySpecialRenderer<TileRec
 		GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
 		GlStateManager.scale(scale, scale, scale);
 
-		float angle = (te.getWorld().getTotalWorldTime() + partialTicks) * 4;
+		var angle = (te.getWorld().getTotalWorldTime() + partialTicks) * 4;
 		GlStateManager.rotate(angle, 0.0f, 1.0f, 0.0f);
 
 		GlStateManager.translate(-0.5f, -0.5f, -0.5f);
@@ -57,7 +57,7 @@ public class TESRReconstructionChamber extends TileEntitySpecialRenderer<TileRec
 			if (progress >= 1) {
 				iter.remove();
 			} else {
-				var f = easeOutCirc(progress);
+				var f = this.easeOutCirc(progress);
 
 				renderIS(te, x, y, z, partialTicks, is, (float) f * 0.25f + 0.5f,
 					0x00FFFFFF | (int) Math.floor((1f - f) * 255) << 24);

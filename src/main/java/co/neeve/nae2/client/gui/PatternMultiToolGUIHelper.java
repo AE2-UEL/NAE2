@@ -3,7 +3,6 @@ package co.neeve.nae2.client.gui;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.buttons.PatternMultiToolButton;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
-import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
@@ -24,10 +23,10 @@ public class PatternMultiToolGUIHelper {
 		gui.drawTexturedModalRect(offsetX + gui.getPMTOffsetX(), offsetY + gui.getPMTOffsetY(), 0, 0, PMT_WIDTH,
 			PMT_HEIGHT);
 
-		ObjPatternMultiTool pmt = gui.getPMTObject();
+		var pmt = gui.getPMTObject();
 		if (pmt != null) {
-			int columns = pmt.getInstalledCapacityUpgrades();
-			for (int i = 1; i <= columns; i++) {
+			var columns = pmt.getInstalledCapacityUpgrades();
+			for (var i = 1; i <= columns; i++) {
 				gui.drawTexturedModalRect(offsetX + gui.getPMTOffsetX() + 8 + (i * 18),
 					offsetY + gui.getPMTOffsetY() + 8, 8, 8, 18, 18 * 9);
 			}
@@ -41,15 +40,15 @@ public class PatternMultiToolGUIHelper {
 	}
 
 	public static <T extends IPatternMultiToolHostGui> boolean hasClickedOutside(T gui, int mouseX, int mouseY) {
-		int offsetX = gui.getGuiLeft() + gui.getPMTOffsetX();
-		int offsetY = gui.getGuiTop() + gui.getPMTOffsetY();
+		var offsetX = gui.getGuiLeft() + gui.getPMTOffsetX();
+		var offsetY = gui.getGuiTop() + gui.getPMTOffsetY();
 
 		return !(mouseX >= offsetX && mouseX <= offsetX + PMT_WIDTH && mouseY >= offsetY && mouseY <= offsetY + PMT_HEIGHT);
 	}
 
 	public static void repositionButtons(List<PatternMultiToolButton> patternMultiToolButtons,
 	                                     int offsetX, int offsetY) {
-		for (PatternMultiToolButton button : patternMultiToolButtons) {
+		for (var button : patternMultiToolButtons) {
 			button.y = button.getY() + offsetY;
 			button.x = button.getX() + offsetX;
 		}

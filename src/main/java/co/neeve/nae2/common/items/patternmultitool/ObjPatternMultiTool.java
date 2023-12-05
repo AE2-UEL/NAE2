@@ -13,7 +13,6 @@ import appeng.util.inv.InvOperation;
 import appeng.util.inv.filter.IAEItemFilter;
 import co.neeve.nae2.common.enums.PatternMultiToolTabs;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -32,10 +31,10 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 		this.inv = new AppEngInternalInventory(this, 36);
 		this.srInv = new AppEngInternalInventory(this, 2, 1);
 		this.inv.setFilter(new ObjPatternMultiToolInventoryFilter());
-		upgrades = new StackUpgradeInventory(this.is, this, UPGRADE_COUNT);
+		this.upgrades = new StackUpgradeInventory(this.is, this, UPGRADE_COUNT);
 
 		if (is.hasTagCompound()) {
-			NBTTagCompound data = Platform.openNbtData(is);
+			var data = Platform.openNbtData(is);
 			data.getCompoundTag("inv").removeTag("Size");
 			data.getCompoundTag("upgrades").removeTag("Size");
 			data.getCompoundTag("srInv").removeTag("Size");
@@ -48,12 +47,12 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 	}
 
 	public void saveChanges() {
-		NBTTagCompound data = Platform.openNbtData(this.is);
+		var data = Platform.openNbtData(this.is);
 
 		this.inv.writeToNBT(data, "inv");
 		this.upgrades.writeToNBT(data, "upgrades");
 		this.srInv.writeToNBT(data, "srInv");
-		data.setInteger("tab", tab.ordinal());
+		data.setInteger("tab", this.tab.ordinal());
 	}
 
 	public void onChangeInventory(IItemHandler inv, int slot, InvOperation mc, ItemStack removedStack,
@@ -77,11 +76,11 @@ public class ObjPatternMultiTool implements IGuiItemObject, IAEAppEngInventory {
 	}
 
 	public int getInstalledCapacityUpgrades() {
-		return upgrades.getInstalledUpgrades(Upgrades.CAPACITY);
+		return this.upgrades.getInstalledUpgrades(Upgrades.CAPACITY);
 	}
 
 	public PatternMultiToolTabs getTab() {
-		return tab;
+		return this.tab;
 	}
 
 	public void setTab(PatternMultiToolTabs tab) {

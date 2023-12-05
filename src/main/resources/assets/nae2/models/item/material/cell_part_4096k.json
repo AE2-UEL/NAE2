@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "nae2:item/material/cell_part_4096k"
+  }
+}

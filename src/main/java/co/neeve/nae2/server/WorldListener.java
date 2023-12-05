@@ -24,12 +24,12 @@ public class WorldListener implements IWorldEventListener {
 
 	public void registerBlockStateListener(IBlockStateListener listener, Iterable<BlockPos> blocks) {
 		for (var bp : blocks) {
-			blockStateListeners.put(bp.toLong(), listener);
+			this.blockStateListeners.put(bp.toLong(), listener);
 		}
 	}
 
 	public void unregisterBlockStateListener(IBlockStateListener listener) {
-		blockStateListeners.entrySet().removeIf(entry -> entry.getValue() == listener);
+		this.blockStateListeners.entrySet().removeIf(entry -> entry.getValue() == listener);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package co.neeve.nae2.common.helpers;
 
 import appeng.api.parts.IPartHost;
 import appeng.helpers.IInterfaceHost;
-import appeng.me.cache.helpers.TunnelCollection;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import net.minecraft.util.EnumFacing;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ public class DualityInterfaceHelper {
 			if (te == null) continue; // :(
 
 			if (te instanceof IPartHost ph && ph.getPart(facing.getOpposite()) instanceof PartP2PInterface p2pi && !p2pi.isOutput()) {
-				TunnelCollection<PartP2PInterface> tc = p2pi.getOutputs();
+				var tc = p2pi.getOutputs();
 
 				// Instead of throwing GridAccessException, we'll just silently discard the entire tunnel.
 				// I mean, even AE2 doesn't seem to handle this exception very well, why should we?

@@ -1,8 +1,8 @@
 package co.neeve.nae2.common.interfaces;
 
-import co.neeve.nae2.common.registries.Upgrades;
+import co.neeve.nae2.common.registration.definitions.Upgrades;
 import net.minecraft.item.ItemStack;
 
 public interface INAEUpgradeModule {
-	Upgrades getType(ItemStack is);
+	Upgrades.UpgradeType getType(ItemStack is);
 }

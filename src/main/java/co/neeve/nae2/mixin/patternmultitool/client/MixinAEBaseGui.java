@@ -51,8 +51,8 @@ public class MixinAEBaseGui extends GuiContainer {
 		remap = false
 	))
 	private static AEItemStack injectItemStack(ItemStack itemStack, Operation<AEItemStack> original, Slot slot) {
-		AEItemStack stack = original.call(itemStack);
-		ItemStack slotIs = slot.getStack();
+		var stack = original.call(itemStack);
+		var slotIs = slot.getStack();
 
 		if (stack instanceof IExtendedAEItemStack eais && slotIs.getItem() instanceof ItemEncodedPattern)
 			eais.setExtendedCount(slotIs.getCount());
@@ -64,16 +64,16 @@ public class MixinAEBaseGui extends GuiContainer {
 	protected void initializePatternMultiTool() {
 		if (this instanceof IPatternMultiToolHostGui host && host.getPMTObject() != null) {
 			// Calculate start position for buttons
-			Container inventorySlots = this.inventorySlots;
+			var inventorySlots = this.inventorySlots;
 			if (inventorySlots == null) return;
 			if (inventorySlots instanceof IPatternMultiToolToolboxHost pmh) {
-				int offsetX = this.guiLeft + pmh.getPatternMultiToolToolboxOffsetX() - 1;
-				int offsetY = this.guiTop + pmh.getPatternMultiToolToolboxOffsetY() - 1;
+				var offsetX = this.guiLeft + pmh.getPatternMultiToolToolboxOffsetX() - 1;
+				var offsetY = this.guiTop + pmh.getPatternMultiToolToolboxOffsetY() - 1;
 
 				offsetY = offsetY + 9 * 18 + 3;
 
-				if (patternMultiToolButtons == null) patternMultiToolButtons = new ArrayList<>();
-				patternMultiToolButtons.clear();
+				if (this.patternMultiToolButtons == null) this.patternMultiToolButtons = new ArrayList<>();
+				this.patternMultiToolButtons.clear();
 
 				// Add buttons to the GUI
 				this.patternMultiToolButtons.add(new PatternMultiToolButton(offsetX, offsetY,
@@ -88,7 +88,7 @@ public class MixinAEBaseGui extends GuiContainer {
 					PatternMultiToolActions.CLEAR));
 				button.setOverrideName("X");
 
-				this.buttonList.addAll(patternMultiToolButtons);
+				this.buttonList.addAll(this.patternMultiToolButtons);
 			}
 		}
 	}
@@ -105,8 +105,8 @@ public class MixinAEBaseGui extends GuiContainer {
 	@Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false, cancellable = true)
 	public void getJEIExclusionArea(CallbackInfoReturnable<List<Rectangle>> cir) {
 		if (this instanceof IPatternMultiToolHostGui pmh && pmh.getPMTObject() != null) {
-			List<Rectangle> returnValue = cir.getReturnValue();
-			List<Rectangle> areas = PatternMultiToolGUIHelper.getJEIExclusionArea(pmh);
+			var returnValue = cir.getReturnValue();
+			var areas = PatternMultiToolGUIHelper.getJEIExclusionArea(pmh);
 			if (returnValue != EMPTY_LIST) returnValue.addAll(areas);
 			else cir.setReturnValue(areas);
 		}
@@ -115,7 +115,7 @@ public class MixinAEBaseGui extends GuiContainer {
 	@Override
 	protected boolean hasClickedOutside(int mouseX, int mouseY, int guiLeft, int guiTop) {
 		if (this instanceof IPatternMultiToolHostGui pmh) {
-			boolean outside = PatternMultiToolGUIHelper.hasClickedOutside(pmh, mouseX, mouseY);
+			var outside = PatternMultiToolGUIHelper.hasClickedOutside(pmh, mouseX, mouseY);
 			if (!outside) return false;
 		}
 

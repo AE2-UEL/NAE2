@@ -1,0 +1,61 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "nae2:part_exists",
+          "name": "beam_former"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.wireless"
+        },
+        {
+          "type": "appliedenergistics2:part_exists",
+          "part": "cable_glass.fluix"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.calculation_processor"
+        },
+        {
+          "type": "minecraft:item_exists",
+          "item": "appliedenergistics2:quartz_glass"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "type": "part",
+    "name": "beam_former",
+    "count": 2
+  },
+  "type": "nae2:shaped_recipe",
+  "pattern": [
+    "sas",
+    "gbg",
+    " c "
+  ],
+  "key": {
+    "a": {
+      "type": "appliedenergistics2:part",
+      "part": "material.wireless"
+    },
+    "c": {
+      "type": "appliedenergistics2:part",
+      "part": "cable_glass.fluix"
+    },
+    "g": {
+      "item": "appliedenergistics2:quartz_glass"
+    },
+    "b": {
+      "type": "appliedenergistics2:part",
+      "part": "material.calculation_processor"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "dustGlowstone"
+    }
+  }
+}

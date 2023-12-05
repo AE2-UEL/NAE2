@@ -37,8 +37,8 @@ public class PMTSwitcherButton extends GuiButton implements ITooltip {
 			minecraft.renderEngine.bindTexture(new ResourceLocation("appliedenergistics2", "textures/guis/states" +
 				".png"));
 			this.hovered = x >= this.x && y >= this.y && x < this.x + this.width && y < this.y + this.height;
-			int uv_x = this.hideEdge > 0 ? 11 : 13;
-			int offsetX = this.hideEdge > 0 ? 1 : 0;
+			var uv_x = this.hideEdge > 0 ? 11 : 13;
+			var offsetX = this.hideEdge > 0 ? 1 : 0;
 			this.drawTexturedModalRect(this.x, this.y, uv_x * 16, 0, 25, 22);
 
 			this.mouseDragged(minecraft, x, y);

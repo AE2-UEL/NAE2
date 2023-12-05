@@ -4,7 +4,6 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.networking.crafting.ICraftingJob;
 import appeng.container.AEBaseContainer;
-import appeng.container.ContainerOpenContext;
 import appeng.container.implementations.ContainerCraftConfirm;
 import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.interfaces.IInventorySlotAware;
@@ -28,7 +27,6 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -68,7 +66,7 @@ public class MixinPacketJEIRecipe {
 	private static <T extends ItemStack> Object2IntMap<T> findOptimalIngredients(List<Set<T>> recipe,
 	                                                                             Hash.Strategy<T> strategy) {
 		Object2IntMap<T> bestIngredients = new Object2IntOpenCustomHashMap<>(strategy);
-		int[] bestIngredientCount = { Integer.MAX_VALUE };
+		var bestIngredientCount = new int[]{ Integer.MAX_VALUE };
 		backtrack(new Object2IntOpenCustomHashMap<>(strategy), recipe, 0, bestIngredients, bestIngredientCount);
 		return bestIngredients;
 	}
@@ -86,7 +84,7 @@ public class MixinPacketJEIRecipe {
 	private static <T> void backtrack(Object2IntMap<T> currentIngredients, List<Set<T>> recipe,
 	                                  int recipeIndex, Object2IntMap<T> bestIngredients, int[] bestIngredientCount) {
 		if (recipeIndex == recipe.size()) {
-			int currentIngredientCount = currentIngredients.size();
+			var currentIngredientCount = currentIngredients.size();
 			if (currentIngredientCount < bestIngredientCount[0]) {
 				bestIngredientCount[0] = currentIngredientCount;
 				bestIngredients.clear();
@@ -95,10 +93,10 @@ public class MixinPacketJEIRecipe {
 			return;
 		}
 
-		for (T ingredient : recipe.get(recipeIndex)) {
+		for (var ingredient : recipe.get(recipeIndex)) {
 			currentIngredients.put(ingredient, currentIngredients.getOrDefault(ingredient, 0) + 1);
 			backtrack(currentIngredients, recipe, recipeIndex + 1, bestIngredients, bestIngredientCount);
-			int count = currentIngredients.getInt(ingredient) - 1;
+			var count = currentIngredients.getInt(ingredient) - 1;
 			if (count == 0) {
 				currentIngredients.removeInt(ingredient);
 			} else {
@@ -115,8 +113,8 @@ public class MixinPacketJEIRecipe {
 	private void ctor(ByteBuf stream, CallbackInfo ci, @Local NBTTagCompound comp) {
 		if (comp == null) return;
 		var nae2 = comp.getCompoundTag("nae2");
-		nae2$craft = nae2.getBoolean("craft");
-		nae2$autoStart = nae2.getBoolean("autoStart");
+		this.nae2$craft = nae2.getBoolean("craft");
+		this.nae2$autoStart = nae2.getBoolean("autoStart");
 	}
 
 	@Inject(method = "serverPacketData", at = @At(
@@ -130,21 +128,21 @@ public class MixinPacketJEIRecipe {
 	                             @Local IGrid grid,
 	                             @Local IContainerCraftingPacket cct) {
 		// Not asked. No do.
-		if (!nae2$craft) return;
+		if (!this.nae2$craft) return;
 
 		// No encoders.
 		if (player.openContainer instanceof ContainerPatternEncoder) return;
 
 		// Not a crafting recipe. No do.
-		if (output.size() != 1) return;
+		if (this.output.size() != 1) return;
 
-		var outputAIS = AEItemStack.fromItemStack(output.get(0));
+		var outputAIS = AEItemStack.fromItemStack(this.output.get(0));
 
 		// Invalid output stack. No do.
 		if (outputAIS == null) return;
 
 		// Not a valid context. No do.
-		final ContainerOpenContext context = ((AEBaseContainer) cct).getOpenContext();
+		final var context = ((AEBaseContainer) cct).getOpenContext();
 		if (context == null) return;
 
 		// Collect all items from the recipe and compare.
@@ -159,7 +157,10 @@ public class MixinPacketJEIRecipe {
 				var stacksInRecipeSlot = this.recipe.get(i);
 				for (var stackInRecipeSlot : stacksInRecipeSlot) {
 					if (!stackInRecipeSlot.isEmpty() &&
-						crafting.getCraftingFor(AEItemStack.fromItemStack(stackInRecipeSlot), null, 0, null).size() > 0) {
+						crafting.getCraftingFor(AEItemStack.fromItemStack(stackInRecipeSlot),
+							null,
+							0,
+							null).size() > 0) {
 						recipe.add(stackInRecipeSlot);
 					}
 				}
@@ -182,7 +183,7 @@ public class MixinPacketJEIRecipe {
 
 		// Create a Virtual Pattern, despite AE2 telling us not to.
 		var pattern = new VirtualPatternDetails(optimal,
-			output.stream().map(AEItemStack::fromItemStack).collect(Collectors.toList()));
+			this.output.stream().map(AEItemStack::fromItemStack).collect(Collectors.toList()));
 
 		// Try firing the crafting job.
 		Future<ICraftingJob> futureJob = null;
@@ -191,7 +192,7 @@ public class MixinPacketJEIRecipe {
 			futureJob = ((IExtendedCraftingGridCache) cg).beginCraftingJobFromDetails(player.world, grid,
 				cct.getActionSource(), outputAIS, pattern, null);
 
-			final TileEntity te = context.getTile();
+			final var te = context.getTile();
 			if (te != null) {
 				Platform.openGUI(player, te, context.getSide(), GuiBridge.GUI_CRAFTING_CONFIRM);
 			} else {
@@ -202,7 +203,7 @@ public class MixinPacketJEIRecipe {
 			}
 
 			if (player.openContainer instanceof ContainerCraftConfirm ccc) {
-				ccc.setAutoStart(nae2$autoStart);
+				ccc.setAutoStart(this.nae2$autoStart);
 				ccc.setJob(futureJob);
 			} else {
 				futureJob.cancel(true);

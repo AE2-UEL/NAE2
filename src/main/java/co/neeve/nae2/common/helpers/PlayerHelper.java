@@ -21,8 +21,8 @@ public class PlayerHelper {
 
 		inventories.add(ep.inventory);
 
-		for (IInventory inv : inventories) {
-			ItemStack pii = getPMTStack(inv);
+		for (var inv : inventories) {
+			var pii = getPMTStack(inv);
 			if (pii == null) continue;
 			return pii;
 		}
@@ -31,8 +31,8 @@ public class PlayerHelper {
 
 	@Nullable
 	private static ItemStack getPMTStack(IInventory ip) {
-		for (int v = 0; v < ip.getSizeInventory(); ++v) {
-			ItemStack pii = ip.getStackInSlot(v);
+		for (var v = 0; v < ip.getSizeInventory(); ++v) {
+			var pii = ip.getStackInSlot(v);
 			if (!pii.isEmpty() && pii.getItem() instanceof ToolPatternMultiTool) {
 				return pii;
 			}
@@ -46,10 +46,12 @@ public class PlayerHelper {
 	}
 
 	public static int getSlotFor(InventoryPlayer inventoryPlayer, ItemStack patternMultiTool) {
-		for (int i = 0; i < inventoryPlayer.mainInventory.size(); ++i) {
+		for (var i = 0; i < inventoryPlayer.mainInventory.size(); ++i) {
 			if (!inventoryPlayer.mainInventory.get(i).isEmpty()) {
-				ItemStack stack2 = inventoryPlayer.mainInventory.get(i);
-				if (patternMultiTool.getItem() == stack2.getItem() && (!patternMultiTool.getHasSubtypes() || patternMultiTool.getMetadata() == stack2.getMetadata()) && ItemStack.areItemStackTagsEqual(patternMultiTool, stack2)) {
+				var stack2 = inventoryPlayer.mainInventory.get(i);
+				if (patternMultiTool.getItem() == stack2.getItem() && (!patternMultiTool.getHasSubtypes() || patternMultiTool.getMetadata() == stack2.getMetadata()) && ItemStack.areItemStackTagsEqual(
+					patternMultiTool,
+					stack2)) {
 					return i;
 				}
 			}

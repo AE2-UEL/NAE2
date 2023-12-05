@@ -1,6 +1,6 @@
 {
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "nae2:items/pattern_multiplier"
-    }
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "nae2:item/pattern_multiplier"
+  }
 }

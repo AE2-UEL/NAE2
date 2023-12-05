@@ -1,8 +1,6 @@
 package co.neeve.nae2.common.slots;
 
 import appeng.api.AEApi;
-import appeng.api.definitions.IDefinitions;
-import appeng.api.definitions.IMaterials;
 import appeng.api.implementations.ICraftingPatternItem;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.items.misc.ItemEncodedPattern;
@@ -56,8 +54,8 @@ public class SlotPatternMultiTool extends SlotRestrictedInput {
 		} else if (!this.isAllowEdit()) {
 			return false;
 		} else {
-			IDefinitions definitions = AEApi.instance().definitions();
-			IMaterials materials = definitions.materials();
+			var definitions = AEApi.instance().definitions();
+			var materials = definitions.materials();
 			if (i.getItem() instanceof ICraftingPatternItem) {
 				return true;
 			}
@@ -69,13 +67,13 @@ public class SlotPatternMultiTool extends SlotRestrictedInput {
 	public ItemStack getDisplayStack() {
 		if (!Platform.isClient()) return super.getStack();
 
-		ItemStack is = super.getStack();
+		var is = super.getStack();
 
 		if (!is.isEmpty() && is.getItem() instanceof ICraftingPatternItem cpi) {
 			if (is.getItem() instanceof ItemEncodedPattern iep) {
 				return iep.getOutput(is);
 			}
-			
+
 			var details = cpi.getPatternForItem(is, null);
 			var stack = Arrays.stream(details.getOutputs()).findFirst().orElse(null);
 

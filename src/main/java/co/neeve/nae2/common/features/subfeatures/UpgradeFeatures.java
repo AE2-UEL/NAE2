@@ -15,11 +15,11 @@ public enum UpgradeFeatures implements ISubFeature {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -29,6 +29,6 @@ public enum UpgradeFeatures implements ISubFeature {
 	@Nullable
 	@Override
 	public String getMixins() {
-		return mixins;
+		return this.mixins;
 	}
 }

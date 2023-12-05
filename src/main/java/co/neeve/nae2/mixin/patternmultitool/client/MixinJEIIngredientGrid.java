@@ -25,7 +25,7 @@ public class MixinJEIIngredientGrid {
 	private void shouldDeleteItemOnClick(Minecraft minecraft, int mouseX, int mouseY,
 	                                     CallbackInfoReturnable<Boolean> cir) {
 		if (this.rectangles != null) {
-			if (rectangles.stream().anyMatch(x -> x.contains(mouseX, mouseY))) {
+			if (this.rectangles.stream().anyMatch(x -> x.contains(mouseX, mouseY))) {
 				cir.setReturnValue(false);
 			}
 		}
@@ -34,6 +34,6 @@ public class MixinJEIIngredientGrid {
 	@Inject(at = @At("HEAD"), method = "updateBounds(Ljava/awt/Rectangle;ILjava/util/Collection;)Z")
 	public void updateBounds(Rectangle availableArea, int minWidth, Collection<Rectangle> exclusionAreas,
 	                         CallbackInfoReturnable<Boolean> cir) {
-		rectangles = exclusionAreas;
+		this.rectangles = exclusionAreas;
 	}
 }

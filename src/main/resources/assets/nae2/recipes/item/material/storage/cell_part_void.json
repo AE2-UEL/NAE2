@@ -1,0 +1,52 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "nae2:material_exists",
+          "name": "cell_part_void"
+        },
+        {
+          "type": "forge:or",
+          "values": [
+            {
+              "type": "minecraft:item_exists",
+              "item": "nae2:storage_cell_void"
+            },
+            {
+              "type": "minecraft:item_exists",
+              "item": "nae2:fluid_storage_cell_void"
+            }
+          ]
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.annihilation_core"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.cell1k_part"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "type": "material",
+    "name": "cell_part_void"
+  },
+  "type": "nae2:shaped_recipe",
+  "pattern": [
+    "aba"
+  ],
+  "key": {
+    "b": {
+      "type": "appliedenergistics2:part",
+      "part": "material.cell1k_part"
+    },
+    "a": {
+      "type": "appliedenergistics2:part",
+      "part": "material.annihilation_core"
+    }
+  }
+}

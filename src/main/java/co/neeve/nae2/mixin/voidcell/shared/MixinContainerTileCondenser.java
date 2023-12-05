@@ -30,7 +30,7 @@ public class MixinContainerTileCondenser extends AEBaseContainer {
 		remap = false
 	))
 	private void ctor(InventoryPlayer ip, TileCondenser condenser, CallbackInfo ci, @Local IItemHandler inv) {
-		SlotRestrictedInput slotRestrictedInput =
+		var slotRestrictedInput =
 			new SlotRestrictedInput(SlotRestrictedInput.PlacableItemType.STORAGE_CELLS,
 				((IExtendedTileCondenser) condenser).getVoidCellInv(), 0, 101, 52 + 26, ip) {
 				@Override

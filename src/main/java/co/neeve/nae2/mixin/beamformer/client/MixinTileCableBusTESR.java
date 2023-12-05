@@ -5,7 +5,6 @@ import appeng.tile.networking.TileCableBusTESR;
 import co.neeve.nae2.common.interfaces.IBeamFormerHost;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -19,9 +18,9 @@ public abstract class MixinTileCableBusTESR extends TileCableBus {
 	public @NotNull AxisAlignedBB getRenderBoundingBox() {
 		if (this.getCableBus() instanceof IBeamFormerHost host) {
 			var hasFormers = host.hasBeamFormers();
-			if (!nae2$oldHasFormers && hasFormers) {
-				var tile = getTile();
-				BlockPos pos = tile.getPos();
+			if (!this.nae2$oldHasFormers && hasFormers) {
+				var tile = this.getTile();
+				var pos = tile.getPos();
 				var x = pos.getX();
 				var y = pos.getY();
 				var z = pos.getZ();
@@ -29,7 +28,7 @@ public abstract class MixinTileCableBusTESR extends TileCableBus {
 					.markBlockRangeForRenderUpdate(x, y, z, x, y, z);
 			}
 
-			nae2$oldHasFormers = hasFormers;
+			this.nae2$oldHasFormers = hasFormers;
 
 			return INFINITE_EXTENT_AABB;
 		}

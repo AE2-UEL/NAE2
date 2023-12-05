@@ -5,8 +5,8 @@ import net.minecraftforge.items.IItemHandler;
 
 public class ItemHandlerHelper {
 	public static ItemStack insertIntoHandler(IItemHandler handler, ItemStack stack) {
-		for (int i = 0; i < handler.getSlots(); i++) {
-			ItemStack remaining = handler.insertItem(i, stack, false);
+		for (var i = 0; i < handler.getSlots(); i++) {
+			var remaining = handler.insertItem(i, stack, false);
 			if (remaining.isEmpty()) {
 				return remaining; // All items were inserted.
 			}

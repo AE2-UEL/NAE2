@@ -16,10 +16,10 @@ public class NetHandler implements IMessageHandler<INAEMessage, INAEMessage> {
 	private final SimpleNetworkWrapper channel;
 
 	public NetHandler() {
-		channel = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
+		this.channel = NetworkRegistry.INSTANCE.newSimpleChannel(Tags.MODID);
 
-		channel.registerMessage(this, PatternMultiToolPacket.class, 0, Side.SERVER);
-		channel.registerMessage(this, ReconstructorFXPacket.class, 1, Side.CLIENT);
+		this.channel.registerMessage(this, PatternMultiToolPacket.class, 0, Side.SERVER);
+		this.channel.registerMessage(this, ReconstructorFXPacket.class, 1, Side.CLIENT);
 	}
 
 	@Override
@@ -37,6 +37,6 @@ public class NetHandler implements IMessageHandler<INAEMessage, INAEMessage> {
 	}
 
 	public SimpleNetworkWrapper getChannel() {
-		return channel;
+		return this.channel;
 	}
 }

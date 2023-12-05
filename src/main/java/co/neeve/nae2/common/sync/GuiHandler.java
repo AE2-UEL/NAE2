@@ -1,6 +1,5 @@
 package co.neeve.nae2.common.sync;
 
-import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.util.AEPartLocation;
 import appeng.client.gui.GuiNull;
@@ -23,18 +22,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class GuiHandler implements IGuiHandler {
-	public void openGUI(@Nonnull final EntityPlayer p, int slot, @Nonnull final GuiBridge type,
-	                    boolean isBauble) {
-		if (Platform.isClient()) {
-			return;
-		}
-
-		if (type.getHostType().isItem()) {
-			p.openGui(NAE2.instance, type.ordinal() << 4, p.getEntityWorld(), slot, isBauble ? 1 : 0,
-				Integer.MIN_VALUE);
-		}
-	}
-
 	public void openGUI(@Nonnull final EntityPlayer p, @Nullable final TileEntity tile,
 	                    @Nonnull final AEPartLocation side, @Nonnull final GuiBridge type) {
 		if (Platform.isClient()) {
@@ -42,8 +29,8 @@ public class GuiHandler implements IGuiHandler {
 		}
 
 		int x;
-		int y = 0;
-		int z = Integer.MIN_VALUE;
+		var y = 0;
+		var z = Integer.MIN_VALUE;
 
 		if (tile != null) {
 			x = tile.getPos().getX();
@@ -77,10 +64,10 @@ public class GuiHandler implements IGuiHandler {
 	@Override
 	public Object getServerGuiElement(final int ordinal, final EntityPlayer player, final World w, final int x,
 	                                  final int y, final int z) {
-		final AEPartLocation side = AEPartLocation.fromOrdinal(ordinal & 0x07);
-		final GuiBridge ID = GuiBridge.getByID(ordinal >> 4);
+		final var side = AEPartLocation.fromOrdinal(ordinal & 0x07);
+		final var ID = GuiBridge.getByID(ordinal >> 4);
 		if (ID != null) {
-			final boolean usingItemOnTile = ((ordinal >> 3) & 1) == 1;
+			final var usingItemOnTile = ((ordinal >> 3) & 1) == 1;
 			if (ID.getHostType().isItem()) {
 				final ItemStack it;
 				final Object myItem;
@@ -89,10 +76,10 @@ public class GuiHandler implements IGuiHandler {
 					myItem = GuiBridge.getGuiObject(it, player, w, x, y, z, side);
 				} else if (y == 0 && x >= 0 && x < player.inventory.mainInventory.size()) {
 					it = player.inventory.getStackInSlot(x);
-					myItem = GuiBridge.getGuiObject(it, player, w);
+					myItem = GuiBridge.getGuiObject(it, w);
 				} else if (y == 1 && z == Integer.MIN_VALUE) {
 					it = BaublesApi.getBaublesHandler(player).getStackInSlot(x);
-					myItem = GuiBridge.getGuiObject(it, player, w);
+					myItem = GuiBridge.getGuiObject(it, w);
 				} else {
 					return new ContainerNull();
 				}
@@ -103,10 +90,10 @@ public class GuiHandler implements IGuiHandler {
 				}
 			}
 			if (!ID.getHostType().isItem()) {
-				final TileEntity TE = w.getTileEntity(new BlockPos(x, y, z));
+				final var TE = w.getTileEntity(new BlockPos(x, y, z));
 				if (TE instanceof IPartHost) {
 					((IPartHost) TE).getPart(side);
-					final IPart part = ((IPartHost) TE).getPart(side);
+					final var part = ((IPartHost) TE).getPart(side);
 					if (ID.CorrectTileOrPart(part)) {
 						return this.updateGui(ID.ConstructContainer(player.inventory, part), w, x, y, z, side,
 							part);
@@ -136,10 +123,10 @@ public class GuiHandler implements IGuiHandler {
 	}
 
 	public Object getClientGuiElement(int ordinal, EntityPlayer player, World w, int x, int y, int z) {
-		AEPartLocation side = AEPartLocation.fromOrdinal(ordinal & 7);
+		var side = AEPartLocation.fromOrdinal(ordinal & 7);
 		var ID = GuiBridge.getByID(ordinal >> 4);
 		if (ID != null) {
-			boolean usingItemOnTile = (ordinal >> 3 & 1) == 1;
+			var usingItemOnTile = (ordinal >> 3 & 1) == 1;
 			if (ID.getHostType().isItem()) {
 				final ItemStack it;
 				final Object myItem;
@@ -148,10 +135,10 @@ public class GuiHandler implements IGuiHandler {
 					myItem = GuiBridge.getGuiObject(it, player, w, x, y, z, side);
 				} else if (y == 0 && x >= 0 && x < player.inventory.mainInventory.size()) {
 					it = player.inventory.getStackInSlot(x);
-					myItem = GuiBridge.getGuiObject(it, player, w);
+					myItem = GuiBridge.getGuiObject(it, w);
 				} else if (y == 1 && z == Integer.MIN_VALUE) {
 					it = BaublesApi.getBaublesHandler(player).getStackInSlot(x);
-					myItem = GuiBridge.getGuiObject(it, player, w);
+					myItem = GuiBridge.getGuiObject(it, w);
 				} else {
 					return new GuiNull(new ContainerNull());
 				}
@@ -162,10 +149,10 @@ public class GuiHandler implements IGuiHandler {
 			}
 
 			if (!ID.getHostType().isItem()) {
-				TileEntity TE = w.getTileEntity(new BlockPos(x, y, z));
+				var TE = w.getTileEntity(new BlockPos(x, y, z));
 				if (TE instanceof IPartHost) {
 					((IPartHost) TE).getPart(side);
-					IPart part = ((IPartHost) TE).getPart(side);
+					var part = ((IPartHost) TE).getPart(side);
 					if (ID.CorrectTileOrPart(part)) {
 						return ID.ConstructGui(player.inventory, part);
 					}

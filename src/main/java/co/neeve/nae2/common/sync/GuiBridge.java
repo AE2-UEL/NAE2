@@ -3,13 +3,9 @@ package co.neeve.nae2.common.sync;
 import appeng.api.AEApi;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.exceptions.AppEngException;
-import appeng.api.features.IWirelessTermHandler;
 import appeng.api.implementations.guiobjects.IGuiItemObject;
-import appeng.api.networking.IGrid;
-import appeng.api.networking.IGridNode;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.ISecurityGrid;
-import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.util.AEPartLocation;
 import appeng.api.util.DimensionalCoord;
@@ -64,7 +60,7 @@ public enum GuiBridge {
 		}
 		this.containerClass = containerClass;
 
-		getGui();
+		this.getGui();
 	}
 
 	GuiBridge() {
@@ -91,11 +87,11 @@ public enum GuiBridge {
 	static Object getGuiObject(final ItemStack it, final EntityPlayer player, final World w, final int x, final int y
 		, final int z, AEPartLocation side) {
 		if (!it.isEmpty()) {
-			if (it.getItem() instanceof INAEGuiItem ngi) {
+			if (it.getItem() instanceof INAEGuiItem<?> ngi) {
 				return ngi.getGuiObject(it, w, new BlockPos(x, y, z), side);
 			}
 
-			final IWirelessTermHandler wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
+			final var wh = AEApi.instance().registries().wireless().getWirelessTerminalHandler(it);
 			if (wh != null) {
 				return new WirelessTerminalGuiObject(wh, it, player, w, x, y, z);
 			}
@@ -104,7 +100,7 @@ public enum GuiBridge {
 		return null;
 	}
 
-	static Object getGuiObject(final ItemStack it, final EntityPlayer player, final World w) {
+	static Object getGuiObject(final ItemStack it, final World w) {
 		if (!it.isEmpty()) {
 			if (it.getItem() instanceof INAEGuiItem<?> ngi) {
 				return ngi.getGuiObject(it, w);
@@ -127,8 +123,8 @@ public enum GuiBridge {
 		if (Platform.isClientInstall()) {
 			//noinspection ResultOfMethodCallIgnored
 			AEBaseGui.class.getName();
-			String start = this.containerClass.getName();
-			String guiClass = start.replaceFirst("common.containers.Container", "client.gui.implementations.Gui");
+			var start = this.containerClass.getName();
+			var guiClass = start.replaceFirst("common.containers.Container", "client.gui.implementations.Gui");
 			if (start.equals(guiClass)) {
 				throw new IllegalStateException("Unable to find gui class");
 			}
@@ -154,15 +150,16 @@ public enum GuiBridge {
 
 	public Object ConstructContainer(final InventoryPlayer inventory, final Object tE) {
 		try {
-			final Constructor<?>[] c = this.containerClass.getConstructors();
+			final var c = this.containerClass.getConstructors();
 			if (c.length == 0) {
 				throw new AppEngException("Invalid Gui Class");
 			}
 
-			final Constructor<?> target = this.findConstructor(c, inventory, tE);
+			final var target = this.findConstructor(c, inventory, tE);
 
 			if (target == null) {
-				throw new IllegalStateException("Cannot find " + this.containerClass.getName() + "( " + this.typeName(inventory) + ", " + this
+				throw new IllegalStateException("Cannot find " + this.containerClass.getName() + "( " + this.typeName(
+					inventory) + ", " + this
 					.typeName(tE) + " )");
 			}
 
@@ -173,20 +170,21 @@ public enum GuiBridge {
 	}
 
 	public GuiHostType getHostType() {
-		return hostType;
+		return this.hostType;
 	}
 
 	public Object ConstructGui(final InventoryPlayer inventory, final Object tE) {
 		try {
-			final Constructor<?>[] c = this.clientGuiClass.getConstructors();
+			final var c = this.clientGuiClass.getConstructors();
 			if (c.length == 0) {
 				throw new AppEngException("Invalid Gui Class");
 			}
 
-			final Constructor<?> target = this.findConstructor(c, inventory, tE);
+			final var target = this.findConstructor(c, inventory, tE);
 
 			if (target == null) {
-				throw new IllegalStateException("Cannot find " + this.containerClass.getName() + "( " + this.typeName(inventory) + ", " + this
+				throw new IllegalStateException("Cannot find " + this.containerClass.getName() + "( " + this.typeName(
+					inventory) + ", " + this
 					.typeName(tE) + " )");
 			}
 
@@ -198,13 +196,13 @@ public enum GuiBridge {
 
 	public boolean hasPermissions(final TileEntity te, final int x, final int y, final int z,
 	                              final AEPartLocation side, final EntityPlayer player) {
-		final World w = player.getEntityWorld();
-		final BlockPos pos = new BlockPos(x, y, z);
+		final var w = player.getEntityWorld();
+		final var pos = new BlockPos(x, y, z);
 
 		if (Platform.hasPermissions(te != null ? new DimensionalCoord(te) : new DimensionalCoord(player.world, pos),
 			player)) {
 			if (this.hostType.isItem()) {
-				final ItemStack it = player.inventory.getCurrentItem();
+				final var it = player.inventory.getCurrentItem();
 				if (!it.isEmpty() && it.getItem() instanceof INAEGuiItem) {
 					final Object myItem = ((INAEGuiItem<?>) it.getItem()).getGuiObject(it, w, pos, side);
 					if (this.CorrectTileOrPart(myItem)) {
@@ -214,10 +212,10 @@ public enum GuiBridge {
 			}
 
 			if (!this.hostType.isItem()) {
-				final TileEntity TE = w.getTileEntity(pos);
+				final var TE = w.getTileEntity(pos);
 				if (TE instanceof IPartHost) {
 					((IPartHost) TE).getPart(side);
-					final IPart part = ((IPartHost) TE).getPart(side);
+					final var part = ((IPartHost) TE).getPart(side);
 					if (this.CorrectTileOrPart(part)) {
 						return this.securityCheck(part, player);
 					}
@@ -234,8 +232,8 @@ public enum GuiBridge {
 	private boolean securityCheck(final Object te, final EntityPlayer player) {
 		if (te instanceof IActionHost && this.securityPermissions != null) {
 
-			final IGridNode gn = ((IActionHost) te).getActionableNode();
-			final IGrid g = gn.getGrid();
+			final var gn = ((IActionHost) te).getActionableNode();
+			final var g = gn.getGrid();
 
 			final ISecurityGrid sg = g.getCache(ISecurityGrid.class);
 			return sg.hasPermission(player, this.securityPermissions);

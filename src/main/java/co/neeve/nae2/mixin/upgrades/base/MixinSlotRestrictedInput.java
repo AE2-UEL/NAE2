@@ -21,7 +21,7 @@ public class MixinSlotRestrictedInput {
 		target = "Lappeng/api/definitions/IDefinitions;items()Lappeng/api/definitions/IItems;"
 	), cancellable = true)
 	private void injectValidityCheck(ItemStack is, CallbackInfoReturnable<Boolean> cir) {
-		if (which == SlotRestrictedInput.PlacableItemType.UPGRADES) {
+		if (this.which == SlotRestrictedInput.PlacableItemType.UPGRADES) {
 			if (is.getItem() instanceof NAEBaseItemUpgrade niu && niu.getType(is) != null) {
 				cir.setReturnValue(true);
 			}

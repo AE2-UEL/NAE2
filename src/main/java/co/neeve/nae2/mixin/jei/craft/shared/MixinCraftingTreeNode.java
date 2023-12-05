@@ -66,8 +66,8 @@ public class MixinCraftingTreeNode implements IExtendedCraftingTreeNode {
 			"Lcom/google/common/collect/ImmutableCollection;"
 	), cancellable = true)
 	private void addNode(CallbackInfo ci) {
-		if (nae2$virtualPatternDetails != null) {
-			this.nodes.add(new CraftingTreeProcess(this.cc, this.job, nae2$virtualPatternDetails,
+		if (this.nae2$virtualPatternDetails != null) {
+			this.nodes.add(new CraftingTreeProcess(this.cc, this.job, this.nae2$virtualPatternDetails,
 				(CraftingTreeNode) (Object) this, this.depth + 1));
 			ci.cancel();
 		}

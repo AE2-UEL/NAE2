@@ -1,7 +1,7 @@
 package co.neeve.nae2.common.interfaces;
 
-import co.neeve.nae2.common.registries.Upgrades;
+import co.neeve.nae2.common.registration.definitions.Upgrades;
 
 public interface INAEUpgradeHost {
-	int getInstalledUpgrades(Upgrades var1);
+	int getInstalledUpgrades(Upgrades.UpgradeType var1);
 }

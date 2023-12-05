@@ -24,7 +24,10 @@ public enum Features implements IFeature {
 		public boolean isEnabled() {
 			return Platform.isModLoaded("actuallyadditions") && super.isEnabled();
 		}
-	};
+	},
+	DENSE_CELLS(EnumSet.allOf(DenseCellFeatures.class)),
+	DENSE_CPU_COPROCESSORS("dense.coprocessor"),
+	DENSE_FLUID_CELLS();
 
 	private String mixins;
 	private EnumSet<? extends ISubFeature> subFeatures = null;
@@ -48,7 +51,7 @@ public enum Features implements IFeature {
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -57,11 +60,11 @@ public enum Features implements IFeature {
 
 	@Nullable
 	public EnumSet<? extends ISubFeature> getSubFeatures() {
-		return subFeatures;
+		return this.subFeatures;
 	}
 
 	@Nullable
 	public String getMixins() {
-		return mixins;
+		return this.mixins;
 	}
 }

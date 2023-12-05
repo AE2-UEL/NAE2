@@ -17,14 +17,15 @@ import appeng.api.parts.IPartModel;
 import appeng.api.util.AECableType;
 import appeng.api.util.AEPartLocation;
 import appeng.core.AELog;
+import appeng.items.parts.PartModels;
 import appeng.me.GridAccessException;
 import appeng.parts.ICableBusContainer;
 import appeng.parts.PartModel;
 import appeng.util.Platform;
+import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.rendering.BeamRenderer;
 import co.neeve.nae2.common.features.subfeatures.BeamFeatures;
 import co.neeve.nae2.common.interfaces.IBeamFormerHost;
-import co.neeve.nae2.common.interfaces.IPartModelProvider;
 import co.neeve.nae2.common.parts.NAEBasePartState;
 import co.neeve.nae2.server.IBlockStateListener;
 import co.neeve.nae2.server.WorldListener;
@@ -61,19 +62,20 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class PartBeamFormer extends NAEBasePartState implements IBlockStateListener, IGridTickable, IPartModelProvider {
+public class PartBeamFormer extends NAEBasePartState implements IBlockStateListener, IGridTickable {
 	// Resources.
-	public static final ResourceLocation PRISM_LOC = new ResourceLocation("nae2",
-		"part/beam_former_prism");
-	private static final ResourceLocation STATUS_OFF_LOC = new ResourceLocation("nae2",
-		"part/beam_former_status_off");
-	private static final ResourceLocation STATUS_ON_LOC = new ResourceLocation("nae2",
-		"part/beam_former_status_on");
-	private static final ResourceLocation STATUS_BEAMING_LOC = new ResourceLocation("nae2",
-		"part/beam_former_status_beaming");
+	public static final ResourceLocation PRISM_LOC =
+		new ResourceLocation(Tags.MODID, "part/beam_former_prism");
+	private static final ResourceLocation STATUS_OFF_LOC =
+		new ResourceLocation(Tags.MODID, "part/beam_former_status_off");
+	private static final ResourceLocation STATUS_ON_LOC =
+		new ResourceLocation(Tags.MODID, "part/beam_former_status_on");
+	private static final ResourceLocation STATUS_BEAMING_LOC =
+		new ResourceLocation(Tags.MODID, "part/beam_former_status_beaming");
 
 	// Models.
-	private static final ResourceLocation MODEL_BASE_LOC = new ResourceLocation("nae2", "part/beam_former_base");
+	private static final ResourceLocation MODEL_BASE_LOC =
+		new ResourceLocation(Tags.MODID, "part/beam_former_base");
 	public static final PartModel MODEL_BEAMING = new PartModel(STATUS_BEAMING_LOC, MODEL_BASE_LOC);
 	public static final PartModel MODEL_ON = new PartModel(STATUS_ON_LOC, MODEL_BASE_LOC, PRISM_LOC);
 	public static final PartModel MODEL_OFF = new PartModel(STATUS_OFF_LOC, MODEL_BASE_LOC, PRISM_LOC);
@@ -105,8 +107,8 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 							BloomEffect.lowBrightnessThreshold = 0.5f;
 							BloomEffect.step = 1;
 
-							lastBrightnessX = OpenGlHelper.lastBrightnessX;
-							lastBrightnessY = OpenGlHelper.lastBrightnessY;
+							this.lastBrightnessX = OpenGlHelper.lastBrightnessX;
+							this.lastBrightnessY = OpenGlHelper.lastBrightnessY;
 
 							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 							GlStateManager.disableTexture2D();
@@ -116,8 +118,8 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 						@SideOnly(Side.CLIENT)
 						public void postDraw(BufferBuilder buffer) {
 							GlStateManager.enableTexture2D();
-							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, lastBrightnessX,
-								lastBrightnessY);
+							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, this.lastBrightnessX,
+								this.lastBrightnessY);
 						}
 					};
 				} catch (NoClassDefFoundError ignored) {}
@@ -139,6 +141,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		this.updateEnergyConsumption();
 	}
 
+	@PartModels
 	public static List<IPartModel> getModels() {
 		return ImmutableList.of(MODEL_ON, MODEL_OFF, MODEL_BEAMING);
 	}
@@ -152,22 +155,22 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	public static void drawCube(BufferBuilder bufferBuilder, double x, double y, double z, double scaleX,
 	                            double scaleY, double scaleZ, float r, float g, float b) {
 		// Calculate the offset for each axis
-		double halfScaleX = scaleX / 2;
-		double halfScaleY = scaleY / 2;
-		double halfScaleZ = scaleZ / 2;
+		var halfScaleX = scaleX / 2;
+		var halfScaleY = scaleY / 2;
+		var halfScaleZ = scaleZ / 2;
 
 		// Bottom vertices of the cube
-		double x1 = x - halfScaleX;
-		double y1 = y - halfScaleY;
-		double z1 = z - halfScaleZ;
+		var x1 = x - halfScaleX;
+		var y1 = y - halfScaleY;
+		var z1 = z - halfScaleZ;
 
 		// Top vertices of the cube
-		double x2 = x + halfScaleX;
-		double y2 = y + halfScaleY;
-		double z2 = z + halfScaleZ;
+		var x2 = x + halfScaleX;
+		var y2 = y + halfScaleY;
+		var z2 = z + halfScaleZ;
 
 		// Down face
-		float alpha = 0.9f;
+		var alpha = 0.9f;
 		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
 		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
 		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
@@ -249,7 +252,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 	@Override
 	public int getLightLevel() {
-		return !hideBeam
+		return !this.hideBeam
 			&& ((Platform.isClient() && this.paired) || this.beamLength != 0 || this.otherBeamFormer != null)
 			&& (this.isActive() && this.isPowered()) ? 15 : 0;
 	}
@@ -279,21 +282,21 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		potentialFormer.otherBeamFormer = this;
 
 		// Copy over hiding.
-		if (potentialFormer.hideBeam || hideBeam) {
+		if (potentialFormer.hideBeam || this.hideBeam) {
 			potentialFormer.hideBeam = true;
-			hideBeam = true;
+			this.hideBeam = true;
 		}
 
 		// Re-register and rehash block positions for world listening.
 		this.unregisterListener();
 		this.otherBeamFormer.unregisterListener();
-		listenerLinkedList = new Long2ObjectLinkedOpenHashMap<>();
+		this.listenerLinkedList = new Long2ObjectLinkedOpenHashMap<>();
 		for (var loc : locs)
-			listenerLinkedList.put(loc.toLong(), loc);
+			this.listenerLinkedList.put(loc.toLong(), loc);
 
 		WorldListener.instance.registerBlockStateListener(this, locs);
 
-		this.beamLength = listenerLinkedList.size();
+		this.beamLength = this.listenerLinkedList.size();
 		this.otherBeamFormer.beamLength = 0;
 
 		// eh
@@ -311,7 +314,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 	public boolean disconnect(@Nullable BlockPos breakPos) {
 		if (this.connection == null) {
-			updateEnergyConsumption();
+			this.updateEnergyConsumption();
 			return false;
 		}
 
@@ -363,16 +366,16 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 				var te = this.getTile().getWorld().getTileEntity(pos);
 				if (te instanceof IPartHost partHost) {
 					if (partHost.getPart(this.getSide()) instanceof PartBeamFormer ||
-						partHost.getPart(getSide().getOpposite()) instanceof PartBeamFormer) {
+						partHost.getPart(this.getSide().getOpposite()) instanceof PartBeamFormer) {
 						isValid = false;
 					}
 				}
 			}
 
-			if (connection != null && !isValid) {
-				disconnect(pos);
+			if (this.connection != null && !isValid) {
+				this.disconnect(pos);
 				this.getProxy().getTick().alertDevice(this.getGridNode());
-			} else if (isValid && connection == null) {
+			} else if (isValid && this.connection == null) {
 				this.getProxy().getTick().alertDevice(this.getGridNode());
 			}
 		} catch (GridAccessException ignored) {}
@@ -382,15 +385,15 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	public boolean onPartActivate(EntityPlayer player, EnumHand hand, Vec3d pos) {
 		if (hand == EnumHand.MAIN_HAND && Platform.isWrench(player, player.getHeldItemMainhand(), new BlockPos(pos))) {
 			if (Platform.isServer()) {
-				hideBeam = !hideBeam;
+				this.hideBeam = !this.hideBeam;
 
-				player.sendMessage(new TextComponentTranslation(hideBeam ? "nae2.part.beam_former.hide" :
+				player.sendMessage(new TextComponentTranslation(this.hideBeam ? "nae2.part.beam_former.hide" :
 					"nae2.part.beam_former.show"));
 				this.getHost().markForUpdate();
 				this.getHost().markForSave();
 
 				if (this.otherBeamFormer != null) {
-					this.otherBeamFormer.hideBeam = hideBeam;
+					this.otherBeamFormer.hideBeam = this.hideBeam;
 					this.otherBeamFormer.getHost().markForUpdate();
 					this.otherBeamFormer.getHost().markForSave();
 				}
@@ -433,8 +436,8 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 			AELog.error("what the hell, where's my node");
 			return TickRateModulation.SLOWER;
 		}
-		IPartHost host = this.getHost();
-		AEPartLocation side = this.getSide();
+		var host = this.getHost();
+		var side = this.getSide();
 
 		var loc = host.getTile().getPos();
 		var dir = side.getFacing();
@@ -442,24 +445,24 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		var opposite = side.getOpposite();
 		var blockSet = new LinkedHashSet<BlockPos>();
 
-		for (int i = 0; i < 32; i++) {
+		for (var i = 0; i < 32; i++) {
 			loc = loc.offset(dir);
 
 			var te = world.getTileEntity(loc);
 			if (te instanceof IPartHost ph) {
 				var part = ph.getPart(opposite);
 				if (part instanceof PartBeamFormer potentialFormer) {
-					if (isConnectionValid && potentialFormer == otherBeamFormer && otherBeamFormer.otherBeamFormer == this) {
+					if (isConnectionValid && potentialFormer == this.otherBeamFormer && this.otherBeamFormer.otherBeamFormer == this) {
 						// we're good.
 						return TickRateModulation.SLEEP;
 					}
 
 					// We're not ok.
-					var disconnected = disconnect(loc);
+					var disconnected = this.disconnect(loc);
 
 					if (potentialFormer.getProxy().isReady() && potentialFormer.otherBeamFormer == null) {
 						try {
-							connect(potentialFormer, blockSet);
+							this.connect(potentialFormer, blockSet);
 							return TickRateModulation.SLEEP;
 
 						} catch (final FailedConnectionException | NullPointerException e) {
@@ -475,14 +478,14 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 				}
 
 				if (ph.getPart(side) instanceof PartBeamFormer) {
-					return disconnect(loc) ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
+					return this.disconnect(loc) ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
 				}
 			}
 
 			var block = world.getBlockState(loc);
 			// No can do. Something is blocking us.
 			if (!isTranslucent(block)) {
-				return disconnect(loc) ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
+				return this.disconnect(loc) ? TickRateModulation.URGENT : TickRateModulation.SLOWER;
 			}
 
 			blockSet.add(loc);
@@ -495,28 +498,28 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderDynamic(double x, double y, double z, float partialTicks, int destroyStage) {
-		if (!hideBeam && this.beamLength != 0 && this.isActive() && this.isPowered()) {
+		if (!this.hideBeam && this.beamLength != 0 && this.isActive() && this.isPowered()) {
 			// Get the direction vector
 			var facing = this.getSide().getFacing();
-			final int dx = facing.getXOffset();
-			final int dy = facing.getYOffset();
-			final int dz = facing.getZOffset();
+			final var dx = facing.getXOffset();
+			final var dy = facing.getYOffset();
+			final var dz = facing.getZOffset();
 
 			if (GREGTECH_BLOOM_HANDLER != null) {
 				BloomEffectUtil.requestCustomBloom((BloomEffectUtil.IBloomRenderFast) GREGTECH_BLOOM_HANDLER,
-					bufferBuilder -> drawBeamGT(x, y, z, dx, dy, dz, bufferBuilder));
+					bufferBuilder -> this.drawBeamGT(x, y, z, dx, dy, dz, bufferBuilder));
 				return;
 			}
 
 			var color = this.getHost().getColor();
 			var scale = 255f;
-			float[] rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
+			var rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
 				((color.mediumVariant >> 8) & 0xff) / scale,
 				(color.mediumVariant & 0xff) / scale };
 
 			// Calculate the pitch, yaw, and roll based on the direction vector
-			float pitch = (float) Math.atan2(Math.sqrt(dx * dx + dz * dz), dy) * (180F / (float) Math.PI);
-			float yaw = (float) (180 - Math.atan2(dz, dx) * (180F / (float) Math.PI) - 90.0F);
+			var pitch = (float) Math.atan2(Math.sqrt(dx * dx + dz * dz), dy) * (180F / (float) Math.PI);
+			var yaw = (float) (180 - Math.atan2(dz, dx) * (180F / (float) Math.PI) - 90.0F);
 
 			GlStateManager.pushMatrix();
 
@@ -528,7 +531,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 			BeamRenderer.renderBeamSegment(0, 0, 0, partialTicks, 1,
 				(double) this.getHost().getTile().getWorld().getTotalWorldTime(), 0,
-				beamLength + 0.3d
+				this.beamLength + 0.3d
 				, rgb, 0.075 * 1.6, 0.075 * 2);
 
 			GlStateManager.popMatrix();
@@ -539,11 +542,11 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	private void drawBeamGT(double x, double y, double z, int dx, int dy, int dz, BufferBuilder bufferBuilder) {
 		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-		var bl = (beamLength + 1) / 2d;
-		double minScale = 0.15d;
+		var bl = (this.beamLength + 1) / 2d;
+		var minScale = 0.15d;
 		var color = this.getHost().getColor();
 		var scale = 255f;
-		float[] rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
+		var rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
 			((color.mediumVariant >> 8) & 0xff) / scale,
 			(color.mediumVariant & 0xff) / scale };
 
@@ -551,9 +554,9 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 			x + 0.5d + dx * bl,
 			y + 0.5d + dy * bl,
 			z + 0.5d + dz * bl,
-			Math.max(minScale, Math.abs(dx * beamLength + dx * 0.25d)),
-			Math.max(minScale, Math.abs(dy * beamLength + dy * 0.25d)),
-			Math.max(minScale, Math.abs(dz * beamLength + dz * 0.25d)),
+			Math.max(minScale, Math.abs(dx * this.beamLength + dx * 0.25d)),
+			Math.max(minScale, Math.abs(dy * this.beamLength + dy * 0.25d)),
+			Math.max(minScale, Math.abs(dz * this.beamLength + dz * 0.25d)),
 			rgb[0],
 			rgb[1],
 			rgb[2]
@@ -576,19 +579,19 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	public boolean readFromStream(ByteBuf data) throws IOException {
 		var shouldRedraw = super.readFromStream(data);
 
-		beamLength = data.readInt();
-		var wasPaired = paired;
-		paired = data.readBoolean();
+		this.beamLength = data.readInt();
+		var wasPaired = this.paired;
+		this.paired = data.readBoolean();
 		// Kick rendering.
-		if (paired != wasPaired) {
-			BlockPos pos = getTile().getPos();
+		if (this.paired != wasPaired) {
+			var pos = this.getTile().getPos();
 			var x = pos.getX();
 			var y = pos.getY();
 			var z = pos.getZ();
 			Minecraft.getMinecraft().renderGlobal
 				.markBlockRangeForRenderUpdate(x, y, z, x, y, z);
 		}
-		hideBeam = data.readBoolean();
+		this.hideBeam = data.readBoolean();
 
 		return shouldRedraw;
 	}
@@ -606,7 +609,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		super.writeToNBT(data);
 
 		var part = data.getCompoundTag("part");
-		if (beamLength > 0) part.setInteger("beamLength", beamLength);
+		if (this.beamLength > 0) part.setInteger("beamLength", this.beamLength);
 		if (this.hideBeam) part.setBoolean("hideBeam", true);
 	}
 

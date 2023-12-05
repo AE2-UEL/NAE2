@@ -3,7 +3,7 @@ package co.neeve.nae2.mixin.upgrades.base;
 import appeng.parts.automation.UpgradeInventory;
 import co.neeve.nae2.common.interfaces.IExtendedUpgradeInventory;
 import co.neeve.nae2.common.items.NAEBaseItemUpgrade;
-import co.neeve.nae2.common.registries.Upgrades;
+import co.neeve.nae2.common.registration.definitions.Upgrades;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 @Mixin(value = UpgradeInventory.class, remap = false)
 public abstract class MixinUpgradeInventory implements IExtendedUpgradeInventory {
 	@Unique
-	private final HashMap<Upgrades, Integer> nae2$installedUpgrades = new HashMap<>();
+	private final HashMap<co.neeve.nae2.common.registration.definitions.Upgrades.UpgradeType, Integer> nae2$installedUpgrades = new HashMap<>();
 	@Shadow
 	private boolean cached;
 
@@ -27,16 +27,16 @@ public abstract class MixinUpgradeInventory implements IExtendedUpgradeInventory
 	private void updateUpgradeInfo() {}
 
 	@Override
-	public int getInstalledUpgrades(Upgrades u) {
+	public int getInstalledUpgrades(co.neeve.nae2.common.registration.definitions.Upgrades.UpgradeType u) {
 		if (!this.cached) {
 			this.updateUpgradeInfo();
 		}
 
-		return nae2$installedUpgrades.getOrDefault(u, 0);
+		return this.nae2$installedUpgrades.getOrDefault(u, 0);
 	}
 
 	@Override
-	public abstract int getMaxInstalled(Upgrades u);
+	public abstract int getMaxInstalled(Upgrades.UpgradeType u);
 
 	@Inject(method = "updateUpgradeInfo", at = @At("HEAD"))
 	private void injectUpdateUpgradeInfo(CallbackInfo ci) {
@@ -54,7 +54,7 @@ public abstract class MixinUpgradeInventory implements IExtendedUpgradeInventory
 		var item = is.getItem();
 		if (item instanceof NAEBaseItemUpgrade niu) {
 			var type = niu.getType(is);
-			nae2$installedUpgrades.put(type, nae2$installedUpgrades.getOrDefault(type, 0) + 1);
+			this.nae2$installedUpgrades.put(type, this.nae2$installedUpgrades.getOrDefault(type, 0) + 1);
 		}
 	}
 }

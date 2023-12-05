@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "nae2:item/cell/storage_cell_fluid_4096k"
+  }
+}

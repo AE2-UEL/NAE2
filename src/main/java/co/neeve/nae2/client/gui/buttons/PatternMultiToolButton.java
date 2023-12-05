@@ -3,7 +3,6 @@ package co.neeve.nae2.client.gui.buttons;
 import appeng.client.gui.widgets.ITooltip;
 import co.neeve.nae2.common.enums.PatternMultiToolActions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -43,19 +42,19 @@ public class PatternMultiToolButton extends GuiButton implements ITooltip {
 	}
 
 	public PatternMultiToolActions getAction() {
-		PatternMultiToolActions shiftAction = this.action.getShiftAction();
-		return isShiftHeld() && shiftAction != null ? shiftAction : this.action;
+		var shiftAction = this.action.getShiftAction();
+		return this.isShiftHeld() && shiftAction != null ? shiftAction : this.action;
 	}
 
 	@Override
 	public void drawButton(@NotNull Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 		if (this.visible) {
-			FontRenderer fontrenderer = mc.fontRenderer;
+			var fontrenderer = mc.fontRenderer;
 			mc.getTextureManager().bindTexture(BUTTON_TEXTURES);
 			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered =
 				mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-			int i = this.getHoverState(this.hovered);
+			var i = this.getHoverState(this.hovered);
 			GlStateManager.enableBlend();
 			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
 				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
@@ -66,10 +65,10 @@ public class PatternMultiToolButton extends GuiButton implements ITooltip {
 			this.drawTexturedModalRect(this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20,
 				this.width / 2, this.height);
 			this.mouseDragged(mc, mouseX, mouseY);
-			int j = 14737632;
+			var j = 14737632;
 
-			if (packedFGColour != 0) {
-				j = packedFGColour;
+			if (this.packedFGColour != 0) {
+				j = this.packedFGColour;
 			} else if (!this.enabled) {
 				j = 10526880;
 			} else if (this.hovered) {
@@ -84,7 +83,7 @@ public class PatternMultiToolButton extends GuiButton implements ITooltip {
 
 	@Override
 	public String getMessage() {
-		PatternMultiToolActions action = this.getAction();
+		var action = this.getAction();
 		return I18n.format(action.getTitle()) + "\n" + I18n.format(action.getDesc());
 	}
 

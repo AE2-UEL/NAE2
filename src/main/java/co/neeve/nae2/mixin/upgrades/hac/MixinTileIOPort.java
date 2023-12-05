@@ -6,7 +6,7 @@ import appeng.parts.automation.UpgradeInventory;
 import appeng.tile.storage.TileIOPort;
 import co.neeve.nae2.common.interfaces.IExtendedUpgradeInventory;
 import co.neeve.nae2.common.interfaces.INAEUpgradeHost;
-import co.neeve.nae2.common.registries.Upgrades;
+import co.neeve.nae2.common.registration.definitions.Upgrades;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalLongRef;
 import org.spongepowered.asm.mixin.Final;
@@ -29,7 +29,8 @@ public class MixinTileIOPort implements INAEUpgradeHost {
 	private void injectTickingRequest(IGridNode node, int ticksSinceLastCall,
 	                                  CallbackInfoReturnable<TickRateModulation> cir,
 	                                  @Local LocalLongRef itemsToSend) {
-		var hyper = this.getInstalledUpgrades(Upgrades.HYPER_ACCELERATION);
+		var hyper =
+			this.getInstalledUpgrades(co.neeve.nae2.common.registration.definitions.Upgrades.UpgradeType.HYPER_ACCELERATION);
 
 		if (hyper > 0) {
 			itemsToSend.set((long) (itemsToSend.get() * 16 * Math.pow(8, hyper - 1)));
@@ -37,7 +38,7 @@ public class MixinTileIOPort implements INAEUpgradeHost {
 	}
 
 	@Override
-	public int getInstalledUpgrades(Upgrades u) {
+	public int getInstalledUpgrades(Upgrades.UpgradeType u) {
 		return ((IExtendedUpgradeInventory) this.upgrades).getInstalledUpgrades(u);
 	}
 }

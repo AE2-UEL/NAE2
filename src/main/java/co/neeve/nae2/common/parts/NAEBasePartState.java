@@ -60,9 +60,9 @@ public abstract class NAEBasePartState extends AEBasePart implements IPowerChann
 
 	@Override
 	public boolean readFromStream(final ByteBuf data) throws IOException {
-		final boolean eh = super.readFromStream(data);
+		final var eh = super.readFromStream(data);
 
-		final int old = this.getClientFlags();
+		final var old = this.getClientFlags();
 		this.setClientFlags(data.readByte());
 
 		return eh || old != this.getClientFlags();

@@ -17,7 +17,6 @@ import de.ellpeck.actuallyadditions.mod.items.lens.LensRecipeHandler;
 import de.ellpeck.actuallyadditions.mod.util.StackUtil;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
@@ -50,20 +49,20 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 
 	public TileReconstructionChamber() {
 		if (Platform.isClient()) {
-			holograms = new LinkedList<>();
+			this.holograms = new LinkedList<>();
 		}
 
 		this.outputInvInternal = new AppEngInternalInventory(this, 1, 512) {
 			@Override
 			protected int getStackLimit(int slot, @NotNull ItemStack stack) {
-				return getSlotLimit(0);
+				return this.getSlotLimit(0);
 			}
 		};
 
 		this.inputInvInternal = new AppEngInternalInventory(this, 1, 512) {
 			@Override
 			protected int getStackLimit(int slot, @NotNull ItemStack stack) {
-				return getSlotLimit(0);
+				return this.getSlotLimit(0);
 			}
 		};
 
@@ -91,8 +90,8 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 				return false;
 			}
 		});
-		this.publicInv = new WrapperChainedItemHandler(inputInv, outputInv);
-		this.internalInv = new WrapperChainedItemHandler(inputInvInternal, outputInvInternal);
+		this.publicInv = new WrapperChainedItemHandler(inputInv, this.outputInv);
+		this.internalInv = new WrapperChainedItemHandler(this.inputInvInternal, this.outputInvInternal);
 
 		this.inputInvInternal.setFilter(new IAEItemFilter() {
 			@Override
@@ -118,7 +117,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	protected void writeToStream(ByteBuf data) throws IOException {
 		super.writeToStream(data);
 
-		var stacks = new ItemStack[]{ displayStack, holoStack };
+		var stacks = new ItemStack[]{ this.displayStack, this.holoStack };
 		for (var stack : stacks) {
 			var aeis = AEItemStack.fromItemStack(stack);
 			data.writeBoolean(aeis != null);
@@ -151,23 +150,23 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	}
 
 	public IItemHandler getInputInvRaw() {
-		return inputInvInternal;
+		return this.inputInvInternal;
 	}
 
 	@NotNull
 	@Override
 	public IItemHandler getInternalInventory() {
-		return publicInv;
+		return this.publicInv;
 	}
 
 	@Override
 	public void onChangeInventory(IItemHandler iItemHandler, int i, InvOperation invOperation, ItemStack removed,
 	                              ItemStack added) {
 		if (!this.outputInv.getStackInSlot(0).isEmpty()) {
-			tryEject();
+			this.tryEject();
 		}
 
-		sync();
+		this.sync();
 	}
 
 	private void sync() {
@@ -217,10 +216,10 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 		var input = this.inputInvInternal.getStackInSlot(0);
 		var recipe = LensRecipeHandler.findMatchingRecipe(input, reconstructor.getLens());
 		if (recipe != null && reconstructor.getEnergy() >= recipe.getEnergyUsed()) {
-			ItemStack output = recipe.getOutput();
+			var output = recipe.getOutput();
 			if (!StackUtil.isValid(output)) return;
 
-			int itemsPossible = Math.min(reconstructor.getEnergy() / recipe.getEnergyUsed(), input.getCount());
+			var itemsPossible = Math.min(reconstructor.getEnergy() / recipe.getEnergyUsed(), input.getCount());
 			if (itemsPossible > 0) {
 				var outputCopy = output.copy();
 				outputCopy.setCount(itemsPossible);
@@ -235,7 +234,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 						new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), this.pos.getX(),
 							this.pos.getY(), this.pos.getZ(), 32));
 
-					sync();
+					this.sync();
 				}
 			}
 		}
@@ -245,7 +244,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	public void update() {
 		this.ticks = (this.ticks + 1) % 20;
 		if (this.ticks == 0 && !this.outputInv.getStackInSlot(0).isEmpty()) {
-			if (tryEject()) this.ticks = 0;
+			if (this.tryEject()) this.ticks = 0;
 		}
 	}
 
@@ -253,7 +252,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 		var is = this.outputInv.getStackInSlot(0);
 		var originalCount = is.getCount();
 		for (var facing : EnumFacing.values()) {
-			is = pushTo(is, facing);
+			is = this.pushTo(is, facing);
 			if (is.isEmpty()) break;
 		}
 
@@ -263,11 +262,11 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 
 	private ItemStack pushTo(ItemStack output, EnumFacing d) {
 		if (!output.isEmpty()) {
-			Object capability = this.neighbors.get(d);
+			var capability = this.neighbors.get(d);
 			if (capability instanceof InventoryAdaptor adaptor) {
-				int size = output.getCount();
+				var size = output.getCount();
 				output = adaptor.addItems(output);
-				int newSize = output.isEmpty() ? 0 : output.getCount();
+				var newSize = output.isEmpty() ? 0 : output.getCount();
 				if (size != newSize) {
 					this.saveChanges();
 				}
@@ -278,10 +277,10 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	}
 
 	public void updateNeighbors() {
-		EnumFacing[] var1 = EnumFacing.VALUES;
+		var var1 = EnumFacing.VALUES;
 
-		for (EnumFacing f : var1) {
-			TileEntity te = this.world.getTileEntity(this.pos.offset(f));
+		for (var f : var1) {
+			var te = this.world.getTileEntity(this.pos.offset(f));
 			Object capability = null;
 			if (te != null) {
 				capability = InventoryAdaptor.getAdaptor(te, f.getOpposite());
@@ -322,7 +321,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 		}
 
 		if (pos.offset(updateFromFacing).equals(neighbor)) {
-			TileEntity te = w.getTileEntity(neighbor);
+			var te = w.getTileEntity(neighbor);
 			Object capability = null;
 			if (te != null) {
 				capability = InventoryAdaptor.getAdaptor(te, updateFromFacing.getOpposite());
@@ -343,7 +342,7 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 	}
 
 	public ItemStack getDisplayStack() {
-		return displayStack;
+		return this.displayStack;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -361,11 +360,11 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 
 	@Override
 	public void onLoad() {
-		updateNeighbors();
+		this.updateNeighbors();
 	}
 
 	public WrapperChainedItemHandler getPrivateInv() {
-		return internalInv;
+		return this.internalInv;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -384,15 +383,15 @@ public class TileReconstructionChamber extends AEBaseInvTile implements ITickabl
 		}
 
 		public double getStart() {
-			return life;
+			return this.life;
 		}
 
 		public double getProgress(double time) {
-			return Math.min(1, Math.max(0, (time - getStart()) / getMaxLife()));
+			return Math.min(1, Math.max(0, (time - this.getStart()) / getMaxLife()));
 		}
 
 		public ItemStack getHoloStack() {
-			return holoStack;
+			return this.holoStack;
 		}
 	}
 }

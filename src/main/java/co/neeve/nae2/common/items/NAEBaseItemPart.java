@@ -3,8 +3,12 @@ package co.neeve.nae2.common.items;
 import appeng.api.AEApi;
 import appeng.api.parts.IPart;
 import appeng.api.parts.IPartItem;
+import appeng.core.features.ActivityState;
+import appeng.core.features.ItemStackSrc;
 import appeng.items.AEBaseItem;
-import co.neeve.nae2.common.registries.Parts;
+import co.neeve.nae2.common.registration.definitions.Parts;
+import com.github.bsideup.jabel.Desugar;
+import com.google.common.base.Preconditions;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,81 +17,174 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 
 @SuppressWarnings("rawtypes")
 public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
+	private static final int INITIAL_REGISTERED_CAPACITY = Parts.PartType.values().length;
+	private static final Comparator<Map.Entry<Integer, PartTypeWithVariant>> REGISTERED_COMPARATOR =
+		new RegisteredComparator();
 	public static NAEBaseItemPart instance;
+	private final Map<Integer, PartTypeWithVariant> registered;
 
 	public NAEBaseItemPart() {
+		this.registered = new HashMap<>(INITIAL_REGISTERED_CAPACITY);
 		this.setHasSubtypes(true);
 
 		instance = this;
 	}
 
 	@Override
-	public @NotNull String getTranslationKey(ItemStack itemStack) {
-		return Parts.getByID(itemStack.getItemDamage()).getTranslationKey();
+	public @NotNull String getTranslationKey(@NotNull ItemStack itemStack) {
+		return this.getTypeByStack(itemStack).getUnlocalizedName().toLowerCase();
 	}
 
-	public ItemStack getPartStack(Parts part) {
-		return new ItemStack(this, 1, part.ordinal());
+	public Parts.PartType getTypeByStack(final @NotNull ItemStack is) {
+		final var pt = this.registered.get(is.getItemDamage());
+		if (pt != null) {
+			return pt.part;
+		}
+
+		return null;
 	}
 
 	@Override
 	protected void getCheckedSubItems(final CreativeTabs creativeTab, final NonNullList<ItemStack> itemStacks) {
-		if (!this.isInCreativeTab(creativeTab)) return;
+		final List<Map.Entry<Integer, PartTypeWithVariant>> types = new ArrayList<>(this.registered.entrySet());
+		types.sort(REGISTERED_COMPARATOR);
 
-		for (Parts part : Parts.values()) {
-			if (!part.isEnabled()) continue;
-
-			itemStacks.add(getPartStack(part));
+		for (final var part : types) {
+			itemStacks.add(new ItemStack(this, 1, part.getKey()));
 		}
 	}
 
 	@Nullable
 	@Override
 	public IPart createPartFromItemStack(ItemStack is) {
-		try {
-			var part = Parts.values()[MathHelper.clamp(
-				is.getItemDamage(), 0, Parts.values().length - 1)];
+		final var type = this.getTypeByStack(is);
+		final var part = type.getPart();
+		if (part == null) {
+			return null;
+		}
 
-			if (part.isEnabled()) {
-				return part.newInstance(is);
+		try {
+			if (type.getConstructor() == null) {
+				type.setConstructor(part.getConstructor(ItemStack.class));
 			}
-		} catch (IllegalAccessException | NoSuchMethodException | InstantiationException |
-		         InvocationTargetException e) {
+
+			return type.getConstructor().newInstance(is);
+		} catch (InvocationTargetException | NoSuchMethodException | InstantiationException |
+		         IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
-
-		return null;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public @NotNull String getItemStackDisplayName(ItemStack stack) {
-		Parts pt = Parts.getByID(stack.getItemDamage());
-		final String name;
-		if (pt.getTranslationKey().equals("p2p_tunnel")) {
-			name = I18n.translateToLocal("item.appliedenergistics2.multi_part." + pt.getTranslationKey() + ".name");
-		} else {
-			name = super.getItemStackDisplayName(stack);
+	public @NotNull String getItemStackDisplayName(final @NotNull ItemStack is) {
+		final var pt = this.getTypeByStack(is);
+
+		if (pt.getExtraName() != null) {
+			return super.getItemStackDisplayName(is) + " - " + pt.getExtraName().getLocal();
 		}
 
-		return pt.getExtraName() != null ?
-			name + " - " + pt.getExtraName().getLocal() :
-			name;
+		return super.getItemStackDisplayName(is);
 	}
 
 	public @NotNull EnumActionResult onItemUse(@NotNull EntityPlayer player, @NotNull World w, @NotNull BlockPos pos,
 	                                           @NotNull EnumHand hand, @NotNull EnumFacing side, float hitX,
 	                                           float hitY, float hitZ) {
 		return AEApi.instance().partHelper().placeBus(player.getHeldItem(hand), pos, side, player, hand, w);
+	}
+
+	@Nonnull
+	public final ItemStackSrc createPart(Parts.PartType mat) {
+		Preconditions.checkNotNull(mat);
+		return this.createPart(mat, 0);
+	}
+
+	public ItemStackSrc createPart(Parts.PartType partType, int varID) {
+		assert partType != null;
+		assert varID >= 0;
+
+		// verify
+		for (final var p : this.registered.values()) {
+			if (p.part == partType && p.variant == varID) {
+				throw new IllegalStateException("Cannot create the same material twice...");
+			}
+		}
+
+		var enabled = partType.isEnabled();
+
+		final var partDamage = partType.getBaseDamage() + varID;
+		final var state = ActivityState.from(enabled);
+		final var output = new ItemStackSrc(this, partDamage, state);
+
+		final var pti = new PartTypeWithVariant(partType, varID);
+
+		this.processMetaOverlap(enabled, partDamage, partType, pti);
+
+		return output;
+	}
+
+	private void processMetaOverlap(final boolean enabled, final int partDamage, final Parts.PartType mat,
+	                                final PartTypeWithVariant pti) {
+		assert partDamage >= 0;
+		assert mat != null;
+		assert pti != null;
+
+		final var registeredPartType = this.registered.get(partDamage);
+		if (registeredPartType != null) {
+			throw new IllegalStateException("Meta Overlap detected with type " + mat + " and damage " + partDamage +
+				". Found " + registeredPartType + " there already.");
+		}
+
+		if (enabled) {
+			this.registered.put(partDamage, pti);
+		}
+	}
+
+	public int variantOf(final int itemDamage) {
+		final var registeredPartType = this.registered.get(itemDamage);
+		if (registeredPartType != null) {
+			return registeredPartType.variant;
+		}
+
+		return 0;
+	}
+
+	@Desugar
+	record PartTypeWithVariant(Parts.PartType part, int variant) {
+		PartTypeWithVariant {
+			assert part != null;
+			assert variant >= 0;
+
+		}
+
+		@Override
+		public String toString() {
+			return "PartTypeWithVariant{" + "part=" + this.part + ", variant=" + this.variant + '}';
+		}
+	}
+
+	private static final class RegisteredComparator implements Comparator<Map.Entry<Integer, PartTypeWithVariant>> {
+		@Override
+		public int compare(final Map.Entry<Integer, PartTypeWithVariant> o1,
+		                   final Map.Entry<Integer, PartTypeWithVariant> o2) {
+			final var string1 = o1.getValue().part.name();
+			final var string2 = o2.getValue().part.name();
+			final var comparedString = string1.compareTo(string2);
+
+			if (comparedString == 0) {
+				return Integer.compare(o1.getKey(), o2.getKey());
+			}
+
+			return comparedString;
+		}
 	}
 }

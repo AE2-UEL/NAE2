@@ -2,6 +2,7 @@ package co.neeve.nae2.common.parts.p2p;
 
 import appeng.api.parts.IPartModel;
 import appeng.parts.PartModel;
+import co.neeve.nae2.Tags;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ class P2PModels {
 	private final IPartModel modelsHasChannel;
 
 	public P2PModels(String frontModelPath) {
-		ResourceLocation frontModel = new ResourceLocation("nae2", frontModelPath);
+		var frontModel = new ResourceLocation(Tags.MODID, frontModelPath);
 		this.modelsOff = new PartModel(MODEL_STATUS_OFF, MODEL_FREQUENCY, frontModel);
 		this.modelsOn = new PartModel(MODEL_STATUS_ON, MODEL_FREQUENCY, frontModel);
 		this.modelsHasChannel = new PartModel(MODEL_STATUS_HAS_CHANNEL, MODEL_FREQUENCY,

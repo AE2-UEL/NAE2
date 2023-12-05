@@ -1,0 +1,55 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "minecraft:item_exists",
+          "item": "appliedenergistics2:quartz_glass"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.calculation_processor"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.cell4k_part"
+        },
+        {
+          "type": "minecraft:item_exists",
+          "item": "nae2:coprocessor_4x"
+        },
+        {
+          "type": "minecraft:item_exists",
+          "item": "appliedenergistics2:crafting_accelerator"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:coprocessor_4x"
+  },
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "aba",
+    "cdc",
+    "aca"
+  ],
+  "key": {
+    "b": {
+      "type": "appliedenergistics2:part",
+      "part": "material.calculation_processor"
+    },
+    "c": {
+      "item": "appliedenergistics2:crafting_accelerator"
+    },
+    "d": {
+      "type": "appliedenergistics2:part",
+      "part": "material.cell4k_part"
+    },
+    "a": {
+      "type": "forge:ore_dict",
+      "ore": "dustFluix"
+    }
+  }
+}

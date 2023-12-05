@@ -1,7 +1,6 @@
 package co.neeve.nae2.client.rendering;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -17,7 +16,7 @@ public class BeamRenderer {
 	                                     double beamRadius, double glowRadius) {
 		Minecraft.getMinecraft().renderEngine.bindTexture(END_GATEWAY_BEAM_TEXTURE);
 
-		double i = yOffset + height;
+		var i = yOffset + height;
 		GlStateManager.disableFog();
 		GlStateManager.alphaFunc(516, 0.1F);
 		GlStateManager.glTexParameteri(3553, 10242, 10497);
@@ -28,27 +27,26 @@ public class BeamRenderer {
 
 		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE,
 			GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
-		double d0 = totalWorldTime + partialTicks;
-		double d1 = height < 0 ? d0 : -d0;
-		double d2 = MathHelper.frac(d1 * 0.2D - (double) MathHelper.floor(d1 * 0.1D));
-		float f = colors[0];
-		float f1 = colors[1];
-		float f2 = colors[2];
-		double d3 = d0 * 0.025D * -1.5D;
-		double d4 = 0.5D + Math.cos(d3 + 2.356194490192345D) * beamRadius;
-		double d5 = 0.5D + Math.sin(d3 + 2.356194490192345D) * beamRadius;
-		double d6 = 0.5D + Math.cos(d3 + (Math.PI / 4D)) * beamRadius;
-		double d7 = 0.5D + Math.sin(d3 + (Math.PI / 4D)) * beamRadius;
-		double d8 = 0.5D + Math.cos(d3 + 3.9269908169872414D) * beamRadius;
-		double d9 = 0.5D + Math.sin(d3 + 3.9269908169872414D) * beamRadius;
-		double d10 = 0.5D + Math.cos(d3 + 5.497787143782138D) * beamRadius;
-		double d11 = 0.5D + Math.sin(d3 + 5.497787143782138D) * beamRadius;
-		double d12 = 0.0D;
-		double d13 = 1.0D;
-		double d14 = -1.0D + d2;
-		double d15 = height * textureScale * (0.5D / beamRadius) + d14;
+		var tessellator = Tessellator.getInstance();
+		var bufferbuilder = tessellator.getBuffer();
+		var d0 = totalWorldTime + partialTicks;
+		var d1 = height < 0 ? d0 : -d0;
+		var d2 = MathHelper.frac(d1 * 0.2D - (double) MathHelper.floor(d1 * 0.1D));
+		var f = colors[0];
+		var f1 = colors[1];
+		var f2 = colors[2];
+		var d3 = d0 * 0.025D * -1.5D;
+		var d4 = 0.5D + Math.cos(d3 + 2.356194490192345D) * beamRadius;
+		var d5 = 0.5D + Math.sin(d3 + 2.356194490192345D) * beamRadius;
+		var d6 = 0.5D + Math.cos(d3 + (Math.PI / 4D)) * beamRadius;
+		var d7 = 0.5D + Math.sin(d3 + (Math.PI / 4D)) * beamRadius;
+		var d8 = 0.5D + Math.cos(d3 + 3.9269908169872414D) * beamRadius;
+		var d9 = 0.5D + Math.sin(d3 + 3.9269908169872414D) * beamRadius;
+		var d10 = 0.5D + Math.cos(d3 + 5.497787143782138D) * beamRadius;
+		var d11 = 0.5D + Math.sin(d3 + 5.497787143782138D) * beamRadius;
+		var d13 = 1.0D;
+		var d14 = -1.0D + d2;
+		var d15 = height * textureScale * (0.5D / beamRadius) + d14;
 		var alpha = 0.8f;
 		GlStateManager.enableBlend();
 		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
@@ -83,8 +81,6 @@ public class BeamRenderer {
 		d8 = 0.5D + glowRadius;
 		d9 = 0.5D + glowRadius;
 		d10 = 0.5D + glowRadius;
-		d11 = 0.0D;
-		d12 = 1.0D;
 		d13 = -1.0D + d2;
 		d14 = height * textureScale + d13;
 		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);

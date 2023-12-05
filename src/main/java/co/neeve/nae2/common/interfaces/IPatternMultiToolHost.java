@@ -10,20 +10,20 @@ public interface IPatternMultiToolHost {
 	ObjPatternMultiTool getPatternMultiToolObject();
 
 	default @Nullable IItemHandler getPatternInventory() {
-		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
+		var pmtObject = this.getPatternMultiToolObject();
 		if (pmtObject == null) return null;
 		return pmtObject.getPatternInventory();
 	}
 
 	default @Nullable IItemHandler getSearchReplaceInventory() {
-		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
+		var pmtObject = this.getPatternMultiToolObject();
 		if (pmtObject == null) return null;
 		return pmtObject.getSearchReplaceInventory();
 	}
 
 
 	default boolean isPatternRowEnabled(int i) {
-		ObjPatternMultiTool pmtObject = this.getPatternMultiToolObject();
+		var pmtObject = this.getPatternMultiToolObject();
 		if (pmtObject == null) return false;
 		return i <= this.getPatternMultiToolObject().getInstalledCapacityUpgrades();
 	}
