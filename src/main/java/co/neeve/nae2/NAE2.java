@@ -22,7 +22,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.File;
 
 @Mod(modid = Tags.MODID, version = Tags.VERSION, name = Tags.MODNAME, acceptedMinecraftVersions = "[1.12.2]",
-	dependencies = "required-after:appliedenergistics2;required-after:mixinbooter@[8.9,)")
+	dependencies = "required-after:appliedenergistics2;required-after:mixinbooter@[8.3,)")
 public class NAE2 {
 	public static NAE2 instance;
 	private static ConfigManager configManager;
