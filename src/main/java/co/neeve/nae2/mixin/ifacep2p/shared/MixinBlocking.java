@@ -83,9 +83,8 @@ public class MixinBlocking {
 				var outputTiles = Streams.stream(outputs)
 					.filter(x -> !x.hasItemsToSend())
 					.map((output) -> {
-						var outputTile = output.getFacingTileEntity();
-						return outputTile == null ? null : Pair.of(output.getSide().getFacing(),
-							outputTile);
+						var outputTile = output.getFacingTileEntity().orElse(null);
+						return outputTile == null ? null : Pair.of(output.getSide().getFacing(), outputTile);
 					})
 					.filter(Objects::nonNull)
 					.collect(Collectors.toCollection(LinkedList::new));

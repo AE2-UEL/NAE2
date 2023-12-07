@@ -124,7 +124,7 @@ public abstract class MixinPushPattern {
 
 			facingRef.set(tunnel.getSide().getFacing());
 			currentOutputTunnel.set(tunnel);
-			return tunnel.getFacingTileEntity();
+			return tunnel.getFacingTileEntity().orElse(null);
 		}
 
 		// Fetch entity using the original method. Get current facing.
