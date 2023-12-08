@@ -1,8 +1,11 @@
 package co.neeve.nae2.mixin.ifacep2p.shared;
 
+import appeng.api.implementations.IUpgradeableHost;
 import appeng.api.parts.IPartHost;
 import appeng.helpers.DualityInterface;
 import appeng.helpers.IInterfaceHost;
+import appeng.util.Platform;
+import co.neeve.nae2.common.integration.ae2fc.AE2FCIntegrationHelper;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import com.google.common.collect.Streams;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -46,6 +49,12 @@ public abstract class MixinPushPattern {
 	private LinkedList<PartP2PInterface> nae2$tunnelsToVisit = null;
 	@Unique
 	private EnumFacing nae2$originalFacing = null;
+
+	@Shadow
+	public abstract TileEntity getTile();
+
+	@Shadow
+	public abstract IUpgradeableHost getHost();
 
 	@WrapOperation(method = "pushPattern", at = @At(
 		value = "INVOKE",
@@ -95,11 +104,13 @@ public abstract class MixinPushPattern {
 	                                 @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnel) {
 		// There's a pending inputTunnel to be iterated. Iterate it instead.
 		if (this.nae2$tunnelsToVisit != null) {
+			var originalFacing = this.nae2$originalFacing;
+
 			// Are we still the same?
 			var te = world.getTileEntity(this.nae2$inputTunnel.getHost().getTile().getPos());
-			if (!(te instanceof IPartHost ph && ph.getPart(this.nae2$originalFacing.getOpposite()) == this.nae2$inputTunnel)) {
+			if (!(te instanceof IPartHost ph && ph.getPart(originalFacing.getOpposite()) == this.nae2$inputTunnel)) {
 				this.nae2$tunnelsToVisit = null;
-				this.visitedFaces.remove(this.nae2$originalFacing);
+				this.visitedFaces.remove(originalFacing);
 				return null;
 			}
 
@@ -124,6 +135,22 @@ public abstract class MixinPushPattern {
 
 			facingRef.set(tunnel.getSide().getFacing());
 			currentOutputTunnel.set(tunnel);
+
+			if (Platform.isModLoaded("ae2fc")) {
+				final IInterfaceHost interfaceHost;
+				if (this.getHost() instanceof IInterfaceHost iInterfaceHost) {
+					interfaceHost = iInterfaceHost;
+				} else if (this.getTile() instanceof IInterfaceHost iInterfaceHost) {
+					interfaceHost = iInterfaceHost;
+				} else {
+					interfaceHost = null;
+				}
+
+				AE2FCIntegrationHelper.setEnumFacingOverride(originalFacing.getOpposite());
+				AE2FCIntegrationHelper.setInterfaceOverride(
+					interfaceHost != null ? interfaceHost.getTileEntity() : null);
+			}
+
 			return tunnel.getFacingTileEntity().orElse(null);
 		}
 
@@ -147,6 +174,11 @@ public abstract class MixinPushPattern {
 			}
 
 			return null; // Skip. :)
+		}
+
+		if (Platform.isModLoaded("ae2fc")) {
+			AE2FCIntegrationHelper.setEnumFacingOverride(null);
+			AE2FCIntegrationHelper.setInterfaceOverride(null);
 		}
 
 		currentOutputTunnel.set(null);

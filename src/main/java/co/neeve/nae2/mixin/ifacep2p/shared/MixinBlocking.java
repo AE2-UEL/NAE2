@@ -1,7 +1,11 @@
 package co.neeve.nae2.mixin.ifacep2p.shared;
 
+import appeng.api.implementations.IUpgradeableHost;
 import appeng.api.parts.IPartHost;
 import appeng.helpers.DualityInterface;
+import appeng.helpers.IInterfaceHost;
+import appeng.util.Platform;
+import co.neeve.nae2.common.integration.ae2fc.AE2FCIntegrationHelper;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import com.google.common.collect.Streams;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -10,6 +14,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import de.ellpeck.actuallyadditions.mod.tile.TileEntityPhantomface;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -17,11 +22,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-import javax.annotation.Nullable;
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -35,16 +39,15 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("rawtypes")
 @Mixin(value = DualityInterface.class, remap = false)
-public class MixinBlocking {
+public abstract class MixinBlocking {
 	@Unique
-	@Nullable
-	private static Method nae2$getMethodSafe(Class<?> clazz, String name, Class<?>... parameterTypes) {
-		try {
-			return clazz.getMethod(name, parameterTypes);
-		} catch (NoSuchMethodException ignored) {
-			return null;
-		}
-	}
+	private EnumFacing nae2$originalFacing;
+
+	@Shadow
+	public abstract TileEntity getTile();
+
+	@Shadow
+	public abstract IUpgradeableHost getHost();
 
 	@WrapOperation(
 		method = "isBusy",
@@ -69,6 +72,21 @@ public class MixinBlocking {
 				tunnelTEs.set(null);
 
 			facingRef.set(pair.getLeft());
+
+			if (Platform.isModLoaded("ae2fc")) {
+				final IInterfaceHost interfaceHost;
+				if (this.getHost() instanceof IInterfaceHost iInterfaceHost) {
+					interfaceHost = iInterfaceHost;
+				} else if (this.getTile() instanceof IInterfaceHost iInterfaceHost) {
+					interfaceHost = iInterfaceHost;
+				} else {
+					interfaceHost = null;
+				}
+
+				AE2FCIntegrationHelper.setEnumFacingOverride(this.nae2$originalFacing.getOpposite());
+				AE2FCIntegrationHelper.setInterfaceOverride(
+					interfaceHost != null ? interfaceHost.getTileEntity() : null);
+			}
 			return pair.getRight();
 		}
 
@@ -79,6 +97,7 @@ public class MixinBlocking {
 		// Is the entity an input tunnel?
 		if (te instanceof IPartHost ph && ph.getPart(facing.getOpposite()) instanceof PartP2PInterface tunnel && !tunnel.isOutput()) {
 			var outputs = tunnel.getOutputs();
+
 			if (outputs != null) {
 				var outputTiles = Streams.stream(outputs)
 					.filter(x -> !x.hasItemsToSend())
@@ -91,6 +110,7 @@ public class MixinBlocking {
 
 				// Sure it is, and we have TEs. Let the other part of this method know we're iterating them next.
 				if (!outputTiles.isEmpty()) {
+					this.nae2$originalFacing = tunnel.getSide().getFacing().getOpposite();
 					tunnelTEs.set(outputTiles);
 				}
 			}
@@ -98,6 +118,10 @@ public class MixinBlocking {
 			return null; // Skip. :)
 		}
 
+		if (Platform.isModLoaded("ae2fc")) {
+			AE2FCIntegrationHelper.setEnumFacingOverride(null);
+			AE2FCIntegrationHelper.setInterfaceOverride(null);
+		}
 		return te;
 	}
 
@@ -134,8 +158,7 @@ public class MixinBlocking {
 	))
 	private IBlockState wrapBlockingFixUp(World instance, BlockPos blockPos, Operation<IBlockState> operation,
 	                                      @Local(name = "te") TileEntity te) {
-		// We're in the wrong place. Bets on this blowing up sometime later?
-		if (nae2$getMethodSafe(te.getClass(), "hasBoundPosition") != null)
+		if (Platform.isModLoaded("actuallyadditions") && te instanceof TileEntityPhantomface)
 			return operation.call(instance, blockPos);
 
 		return instance.getBlockState(te.getPos());

@@ -56,7 +56,9 @@ public class NAE2MixinPlugin implements IFMLLoadingPlugin, ILateMixinLoader {
 
 			var featureMixins = feature.getMixins();
 			if (featureMixins != null) {
-				mixins.add(String.format(MIXIN_PATH_FORMAT, featureMixins));
+				for (var featureMixin : featureMixins) {
+					mixins.add(String.format(MIXIN_PATH_FORMAT, featureMixin));
+				}
 			}
 
 			var subFeatures = feature.getSubFeatures();

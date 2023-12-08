@@ -17,7 +17,14 @@ public enum Features implements IFeature {
 			return Platform.isModLoaded("jei") && super.isEnabled();
 		}
 	},
-	INTERFACE_P2P("ifacep2p"),
+	INTERFACE_P2P() {
+		@Override
+		public String[] getMixins() {
+			return Platform.isModLoaded("ae2fc")
+				? new String[]{ "ifacep2p", "ifacep2p.ae2fc" }
+				: new String[]{ "ifacep2p" };
+		}
+	},
 	UPGRADES(EnumSet.allOf(UpgradeFeatures.class), "upgrades"),
 	RECONSTRUCTION_CHAMBER("reconchamber") {
 		@Override
@@ -29,7 +36,7 @@ public enum Features implements IFeature {
 	DENSE_CPU_COPROCESSORS("dense.coprocessor"),
 	DENSE_FLUID_CELLS();
 
-	private String mixins;
+	private String[] mixins;
 	private EnumSet<? extends ISubFeature> subFeatures = null;
 	private boolean enabled;
 
@@ -37,7 +44,7 @@ public enum Features implements IFeature {
 
 	Features(String mixins) {
 		this();
-		this.mixins = mixins;
+		this.mixins = new String[]{ mixins };
 	}
 
 	Features(EnumSet<? extends ISubFeature> subFeatures) {
@@ -47,7 +54,7 @@ public enum Features implements IFeature {
 	Features(EnumSet<? extends ISubFeature> subFeatures, String mixins) {
 		this(subFeatures);
 
-		this.mixins = mixins;
+		this.mixins = new String[]{ mixins };
 	}
 
 	public boolean isEnabled() {
@@ -64,7 +71,7 @@ public enum Features implements IFeature {
 	}
 
 	@Nullable
-	public String getMixins() {
+	public String[] getMixins() {
 		return this.mixins;
 	}
 }
