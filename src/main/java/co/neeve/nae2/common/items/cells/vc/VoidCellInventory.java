@@ -53,6 +53,7 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 		if (mode == Actionable.MODULATE) {
 			this.item.addCondenserPowerFromInput(this.itemStack, input.getStackSize());
 		}
+
 		return null;
 	}
 

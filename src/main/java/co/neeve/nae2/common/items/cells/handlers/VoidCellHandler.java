@@ -1,18 +1,18 @@
 package co.neeve.nae2.common.items.cells.handlers;
 
-import appeng.api.storage.ICellHandler;
 import appeng.api.storage.ICellInventoryHandler;
 import appeng.api.storage.ISaveProvider;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.channels.IFluidStorageChannel;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEStack;
+import co.neeve.nae2.common.interfaces.IVoidingCellHandler;
 import co.neeve.nae2.common.items.cells.vc.FluidStorageCellVoid;
 import co.neeve.nae2.common.items.cells.vc.StorageCellVoid;
 import co.neeve.nae2.common.items.cells.vc.VoidCellInventory;
 import net.minecraft.item.ItemStack;
 
-public final class VoidCellHandler implements ICellHandler {
+public final class VoidCellHandler implements IVoidingCellHandler {
 	public VoidCellHandler() {
 	}
 

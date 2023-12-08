@@ -1,4 +1,4 @@
-package co.neeve.nae2.mixin.voidcell.shared;
+package co.neeve.nae2.mixin.voidcell.condenser.shared;
 
 import appeng.api.parts.IPart;
 import appeng.container.AEBaseContainer;

@@ -1,4 +1,4 @@
-package co.neeve.nae2.mixin.voidcell.client;
+package co.neeve.nae2.mixin.voidcell.condenser.client;
 
 import appeng.client.gui.AEBaseGui;
 import appeng.client.gui.implementations.GuiCondenser;

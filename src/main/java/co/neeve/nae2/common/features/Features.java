@@ -9,7 +9,7 @@ import java.util.EnumSet;
 // TODO: this should optimally be split into factories.
 public enum Features implements IFeature {
 	PATTERN_MULTI_TOOL(EnumSet.allOf(PatternMultiToolFeatures.class)),
-	VOID_CELLS(EnumSet.allOf(VoidCellFeatures.class)),
+	VOID_CELLS(EnumSet.allOf(VoidCellFeatures.class), "void"),
 	BEAM_FORMERS(EnumSet.allOf(BeamFeatures.class), "beam_former"),
 	JEI_HOOKS(EnumSet.allOf(JEIFeatures.class)) {
 		@Override

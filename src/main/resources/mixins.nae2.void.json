@@ -6,11 +6,9 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "voidcell.condenser.shared.MixinContainerTileCondenser",
-    "voidcell.condenser.shared.MixinTileCondenser"
+    "voidcell.MixinDriveWatcher"
   ],
   "client": [
-    "voidcell.condenser.client.MixinGuiCondenser"
   ],
   "server": []
 }

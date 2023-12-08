@@ -1,4 +1,4 @@
-package co.neeve.nae2.mixin.voidcell.shared;
+package co.neeve.nae2.mixin.voidcell.condenser.shared;
 
 import appeng.tile.AEBaseInvTile;
 import appeng.tile.inventory.AppEngInternalInventory;
