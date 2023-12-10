@@ -99,7 +99,7 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 		UpgradeType(String id, IFeature features) {
 			this.id = id;
 			this.features = features;
-			this.translationKey = "item." + Tags.MODID + ".upgrade." + id + ".name";
+			this.translationKey = "item." + Tags.MODID + ".upgrade." + id;
 			this.model = new ModelResourceLocation(new ResourceLocation(Tags.MODID, "upgrade/" + id), "inventory");
 		}
 
@@ -130,6 +130,10 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 
 		public boolean isRegistered() {
 			return this.isRegistered;
+		}
+
+		public boolean isEnabled() {
+			return this.features.isEnabled();
 		}
 
 		public void markReady() {

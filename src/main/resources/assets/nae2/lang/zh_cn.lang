@@ -4,6 +4,7 @@
 itemGroup.nae2=Neeve的AE2:EL附加工具
 
 # Items
+item.nae2.invalid.name=Invalid or Disabled Item
 item.nae2.pattern_multiplier.name=多功能样板工具
 
 # Cells

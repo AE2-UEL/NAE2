@@ -42,9 +42,16 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 
 	@Override
 	public @NotNull String getTranslationKey(@NotNull ItemStack itemStack) {
-		return this.getTypeByStack(itemStack).getUnlocalizedName().toLowerCase();
+		var type = this.getTypeByStack(itemStack);
+
+		if (type == null) {
+			return "item.nae2.invalid";
+		}
+
+		return type.getUnlocalizedName().toLowerCase();
 	}
 
+	@Nullable
 	public Parts.PartType getTypeByStack(final @NotNull ItemStack is) {
 		final var pt = this.registered.get(is.getItemDamage());
 		if (pt != null) {
@@ -68,6 +75,10 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 	@Override
 	public IPart createPartFromItemStack(ItemStack is) {
 		final var type = this.getTypeByStack(is);
+		if (type == null) {
+			return null;
+		}
+
 		final var part = type.getPart();
 		if (part == null) {
 			return null;
@@ -89,7 +100,7 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 	public @NotNull String getItemStackDisplayName(final @NotNull ItemStack is) {
 		final var pt = this.getTypeByStack(is);
 
-		if (pt.getExtraName() != null) {
+		if (pt != null && pt.getExtraName() != null) {
 			return super.getItemStackDisplayName(is) + " - " + pt.getExtraName().getLocal();
 		}
 

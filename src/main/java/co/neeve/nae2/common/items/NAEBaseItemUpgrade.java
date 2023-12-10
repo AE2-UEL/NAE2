@@ -24,7 +24,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -52,7 +51,7 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 			return upgrade.get().getTranslationKey();
 		}
 
-		return "Invalid Upgrade";
+		return "item.nae2.invalid";
 	}
 
 	@Override
@@ -64,12 +63,6 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 
 			itemStacks.add(new ItemStack(this, 1, upgrade.ordinal()));
 		}
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public @NotNull String getItemStackDisplayName(@NotNull ItemStack stack) {
-		return I18n.translateToLocal(this.getTranslationKey(stack));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -142,7 +135,7 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 	public IStackSrc createUpgrade(Upgrades.UpgradeType upgradeType) {
 		Preconditions.checkState(!upgradeType.isRegistered(), "Cannot create the same material twice.");
 
-		var enabled = upgradeType.getFeature().isEnabled();
+		var enabled = upgradeType.isEnabled();
 
 		upgradeType.setStackSrc(new co.neeve.nae2.common.registration.definitions.Upgrades.UpgradeStackSrc(upgradeType,
 			enabled));

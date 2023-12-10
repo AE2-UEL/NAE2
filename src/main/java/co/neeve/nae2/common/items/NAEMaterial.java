@@ -10,7 +10,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.translation.I18n;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -32,7 +31,7 @@ public class NAEMaterial extends AEBaseItem {
 			return material.get().getTranslationKey();
 		}
 
-		return "Invalid Material";
+		return "item.nae2.invalid";
 	}
 
 	@Override
@@ -46,16 +45,10 @@ public class NAEMaterial extends AEBaseItem {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public @NotNull String getItemStackDisplayName(@NotNull ItemStack stack) {
-		return I18n.translateToLocal(this.getTranslationKey(stack));
-	}
-
 	public IStackSrc createMaterial(Materials.MaterialType materialType) {
 		Preconditions.checkState(!materialType.isRegistered(), "Cannot create the same material twice.");
 
-		var enabled = materialType.getFeature().isEnabled();
+		var enabled = materialType.isEnabled();
 
 		materialType.setStackSrc(new Materials.MaterialStackSrc(materialType, enabled));
 

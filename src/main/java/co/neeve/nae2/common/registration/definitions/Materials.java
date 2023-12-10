@@ -144,7 +144,7 @@ public class Materials implements DamagedDefinitions<DamagedItemDefinition, Mate
 		MaterialType(String id, Features features) {
 			this.id = id;
 			this.features = features;
-			this.translationKey = "item." + Tags.MODID + ".material." + id + ".name";
+			this.translationKey = "item." + Tags.MODID + ".material." + id;
 			this.model = new ModelResourceLocation(new ResourceLocation(Tags.MODID, "material/" + id), "inventory");
 		}
 
@@ -175,6 +175,11 @@ public class Materials implements DamagedDefinitions<DamagedItemDefinition, Mate
 
 		public boolean isRegistered() {
 			return this.isRegistered;
+		}
+
+		@Override
+		public boolean isEnabled() {
+			return this.features.isEnabled();
 		}
 
 		public void markReady() {

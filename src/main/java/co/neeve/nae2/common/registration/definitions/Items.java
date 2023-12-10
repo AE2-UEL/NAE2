@@ -19,6 +19,7 @@ import co.neeve.nae2.common.recipes.handlers.DisassembleRecipe;
 import co.neeve.nae2.common.recipes.handlers.VoidCellRecipe;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.interfaces.Definitions;
+import co.neeve.nae2.common.registration.registry.rendering.NoItemRendering;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -44,7 +45,10 @@ public class Items implements Definitions<IItemDefinition> {
 	private final IItemDefinition virtualPattern;
 
 	public Items(Registry registry) {
-		this.virtualPattern = this.registerById(registry.item("virtual_pattern", VirtualPattern::new).hide().build());
+		this.virtualPattern = this.registerById(registry.item("virtual_pattern", VirtualPattern::new)
+			.hide()
+			.rendering(new NoItemRendering())
+			.build());
 
 		this.patternMultiTool = this.registerById(registry.item("pattern_multiplier", ToolPatternMultiTool::new)
 			.features(Features.PATTERN_MULTI_TOOL)

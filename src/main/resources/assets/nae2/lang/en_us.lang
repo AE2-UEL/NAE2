@@ -4,6 +4,7 @@
 itemGroup.nae2=Neeve's AE2:EL Additions
 
 # Items
+item.nae2.invalid.name=Invalid or Disabled Item
 item.nae2.pattern_multiplier.name=Pattern Multi-Tool
 
 # Cells

@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class ItemPartRendering extends ItemRenderingCustomizer {
 
+	private static final ModelResourceLocation MODEL_MISSING = new ModelResourceLocation("builtin/missing", "missing");
 	private final NAEBaseItemPart item;
 
 	public ItemPartRendering(NAEBaseItemPart item) {
@@ -32,6 +33,7 @@ public class ItemPartRendering extends ItemRenderingCustomizer {
 
 		// Register all item models as variants so they get loaded
 		rendering.variants(Arrays.stream(Parts.PartType.values())
+			.filter(Parts.PartType::isEnabled)
 			.flatMap(part -> part.getItemModels().stream())
 			.collect(Collectors.toList()));
 	}
@@ -39,6 +41,9 @@ public class ItemPartRendering extends ItemRenderingCustomizer {
 	private ModelResourceLocation getItemMeshDefinition(ItemStack is) {
 		var partType = this.item.getTypeByStack(is);
 		var variant = this.item.variantOf(is.getItemDamage());
+		if (partType == null) {
+			return MODEL_MISSING;
+		}
 		return partType.getItemModels().get(variant);
 	}
 }
