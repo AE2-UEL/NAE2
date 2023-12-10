@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -18,6 +20,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 abstract class DenseCraftingCubeBakedModel implements IBakedModel {
 	private final VertexFormat format;
 	private final TextureAtlasSprite ringCorner;

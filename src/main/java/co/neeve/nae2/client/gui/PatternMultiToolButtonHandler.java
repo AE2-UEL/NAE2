@@ -9,7 +9,10 @@ import co.neeve.nae2.common.net.messages.PatternMultiToolPacket;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class PatternMultiToolButtonHandler {
 	@SubscribeEvent
 	public void handlePatternMultiToolPress(GuiScreenEvent.ActionPerformedEvent.Post event) {

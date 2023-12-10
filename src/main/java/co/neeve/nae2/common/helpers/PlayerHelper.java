@@ -40,6 +40,7 @@ public class PlayerHelper {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Optional.Method(modid = "baubles")
 	public static IInventory getBaubles(EntityPlayer ep) throws NoSuchMethodError {
 		return BaublesApi.getBaubles(ep);

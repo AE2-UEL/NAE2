@@ -16,6 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.HashMap;
 import java.util.Map;
 
+@SideOnly(Side.CLIENT)
 public class DenseCraftingCubeRendering extends BlockRenderingCustomizer {
 	private final String registryName;
 	private final BlockDenseCraftingUnit.DenseCraftingUnitType type;

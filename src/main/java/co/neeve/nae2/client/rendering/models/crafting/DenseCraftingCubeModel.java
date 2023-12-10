@@ -11,12 +11,15 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Function;
 
+@SideOnly(Side.CLIENT)
 class DenseCraftingCubeModel implements IModel {
 	private static final ResourceLocation RING_CORNER = texture("ring_corner");
 	private static final ResourceLocation RING_SIDE_HOR = texture("ring_side_hor");

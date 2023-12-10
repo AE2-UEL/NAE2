@@ -8,8 +8,11 @@ import co.neeve.nae2.common.tiles.TileReconstructionChamber;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SuppressWarnings("unused")
+@SideOnly(Side.CLIENT)
 public class GuiReconstructionChamber extends AEBaseGui {
 	public GuiReconstructionChamber(InventoryPlayer inventoryPlayer, TileReconstructionChamber procurer) {
 		super(new ContainerReconstructionChamber(inventoryPlayer, procurer));

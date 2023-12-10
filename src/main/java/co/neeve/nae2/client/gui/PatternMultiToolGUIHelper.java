@@ -6,11 +6,14 @@ import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public class PatternMultiToolGUIHelper {
 	public static final int PMT_WIDTH = 86;
 	public static final int PMT_HEIGHT = 198;

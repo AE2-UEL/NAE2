@@ -5,7 +5,10 @@ import appeng.client.render.cablebus.CubeBuilder;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 class DenseLightBakedModel extends DenseCraftingCubeBakedModel {
 	private final TextureAtlasSprite baseTexture;
 	private final TextureAtlasSprite lightTexture;

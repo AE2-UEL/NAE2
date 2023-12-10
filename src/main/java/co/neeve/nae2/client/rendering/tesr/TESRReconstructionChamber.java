@@ -6,8 +6,11 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
+@SideOnly(Side.CLIENT)
 public class TESRReconstructionChamber extends TileEntitySpecialRenderer<TileReconstructionChamber> {
 	private static void renderIS(@NotNull TileReconstructionChamber te, double x, double y, double z,
 	                             float partialTicks, ItemStack is, float scale, int color) {
