@@ -27,6 +27,7 @@ public abstract class MixinUpgradeInventory implements IExtendedUpgradeInventory
 	private void updateUpgradeInfo() {}
 
 	@Override
+	@Unique
 	public int getInstalledUpgrades(co.neeve.nae2.common.registration.definitions.Upgrades.UpgradeType u) {
 		if (!this.cached) {
 			this.updateUpgradeInfo();
@@ -36,6 +37,7 @@ public abstract class MixinUpgradeInventory implements IExtendedUpgradeInventory
 	}
 
 	@Override
+	@Unique
 	public abstract int getMaxInstalled(Upgrades.UpgradeType u);
 
 	@Inject(method = "updateUpgradeInfo", at = @At("HEAD"))
