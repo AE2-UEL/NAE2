@@ -8,6 +8,7 @@ import appeng.core.api.ApiClientHelper;
 import co.neeve.nae2.common.features.subfeatures.JEIFeatures;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import mezz.jei.config.KeyBindings;
 import net.minecraft.client.resources.I18n;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,9 +35,10 @@ public class MixinApiClientHelper {
 			"Lappeng/api/storage/data/IItemList;"
 	))
 	private <T extends IAEStack<T>> IItemList<T> getAvailableItems(ICellInventory<T> instance, IItemList<T> in,
-	                                                               Operation<IItemList<T>> operation) {
+	                                                               Operation<IItemList<T>> operation,
+	                                                               @Local ICellInventoryHandler<T> handler) {
 		// Return the same list without filling it.
-		if (JEIFeatures.CELL_VIEW.isEnabled()) return in;
+		if (!handler.isPreformatted() && JEIFeatures.CELL_VIEW.isEnabled()) return in;
 
 		return operation.call(instance, in);
 	}
