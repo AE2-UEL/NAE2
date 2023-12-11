@@ -28,4 +28,5 @@ dependencies {
     compileOnlyApi rfg.deobf("curse.maven:jei-238222:4538010")
     implementation rfg.deobf("curse.maven:gregtechceu-557242:4480237")
     implementation rfg.deobf("curse.maven:actually-additions-228404:3117927")
+    implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848")
 }
