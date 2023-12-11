@@ -31,7 +31,7 @@ import java.util.List;
 import static java.util.Collections.EMPTY_LIST;
 
 @SuppressWarnings({ "SameReturnValue", "AddedMixinMembersNamePattern" })
-@Mixin(value = AEBaseGui.class, remap = false)
+@Mixin(value = AEBaseGui.class)
 public class MixinAEBaseGui extends GuiContainer {
 	@Unique
 	protected List<PatternMultiToolButton> patternMultiToolButtons = null;

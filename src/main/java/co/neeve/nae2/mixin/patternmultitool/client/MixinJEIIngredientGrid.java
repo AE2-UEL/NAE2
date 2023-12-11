@@ -20,8 +20,11 @@ public class MixinJEIIngredientGrid {
 	@Unique
 	private Collection<Rectangle> rectangles = null;
 
-	@Inject(at = @At("HEAD"), method = "shouldDeleteItemOnClick(Lnet/minecraft/client/Minecraft;II)Z", cancellable =
-		true)
+	@Inject(
+		at = @At("HEAD"),
+		method = "shouldDeleteItemOnClick(Lnet/minecraft/client/Minecraft;II)Z",
+		cancellable = true
+	)
 	private void shouldDeleteItemOnClick(Minecraft minecraft, int mouseX, int mouseY,
 	                                     CallbackInfoReturnable<Boolean> cir) {
 		if (this.rectangles != null) {
