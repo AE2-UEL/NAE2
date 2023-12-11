@@ -19,13 +19,11 @@ import appeng.api.util.AEPartLocation;
 import appeng.core.AELog;
 import appeng.items.parts.PartModels;
 import appeng.me.GridAccessException;
-import appeng.parts.ICableBusContainer;
 import appeng.parts.PartModel;
 import appeng.util.Platform;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.rendering.BeamRenderer;
 import co.neeve.nae2.common.features.subfeatures.BeamFeatures;
-import co.neeve.nae2.common.interfaces.IBeamFormerHost;
 import co.neeve.nae2.common.parts.NAEBasePartState;
 import co.neeve.nae2.server.IBlockStateListener;
 import co.neeve.nae2.server.WorldListener;
@@ -569,9 +567,6 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean requireDynamicRender() {
-		if (this.getHost() instanceof ICableBusContainer bc && bc instanceof IBeamFormerHost beamFormerHost) {
-			beamFormerHost.notifyBeamFormerState();
-		}
 		return true;
 	}
 

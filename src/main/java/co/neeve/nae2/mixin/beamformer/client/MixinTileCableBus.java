@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(value = TileCableBus.class, remap = false)
+@Mixin(value = TileCableBus.class)
 public abstract class MixinTileCableBus {
-	@Shadow
+	@Shadow(remap = false)
 	public abstract CableBusContainer getCableBus();
 
 	@Inject(method = "getMaxRenderDistanceSquared", at = @At("HEAD"), cancellable = true)
