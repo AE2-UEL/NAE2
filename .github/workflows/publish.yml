@@ -8,7 +8,7 @@ on:
 
 env:
   # type of release
-  RELEASE_TYPE: "beta"
+  RELEASE_TYPE: "release"
 
 jobs:
   Publish:
