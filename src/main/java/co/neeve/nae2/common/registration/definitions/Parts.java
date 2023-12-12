@@ -10,6 +10,7 @@ import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
 import co.neeve.nae2.common.items.NAEBaseItemPart;
 import co.neeve.nae2.common.parts.implementations.PartBeamFormer;
+import co.neeve.nae2.common.parts.implementations.PartPuller;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.helpers.PartModelsHelper;
@@ -30,9 +31,10 @@ import java.util.*;
 
 public class Parts implements Definitions<DamagedItemDefinition> {
 	private final Object2ObjectOpenHashMap<String, DamagedItemDefinition> byId = new Object2ObjectOpenHashMap<>();
+	private final NAEBaseItemPart itemPart;
 	private final DamagedItemDefinition beamFormer;
 	private final DamagedItemDefinition p2pTunnelInterface;
-	private final NAEBaseItemPart itemPart;
+	private final DamagedItemDefinition puller;
 
 	public Parts(Registry registry) {
 		this.itemPart = new NAEBaseItemPart();
@@ -48,6 +50,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 
 		this.beamFormer = this.createPart(this.itemPart, PartType.BEAM_FORMER);
 		this.p2pTunnelInterface = this.createPart(this.itemPart, PartType.P2P_TUNNEL_INTERFACE);
+		this.puller = this.createPart(this.itemPart, PartType.PULLER);
 	}
 
 	public static Optional<PartType> getById(int itemDamage) {
@@ -84,7 +87,8 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 			public String getUnlocalizedName() {
 				return "item.appliedenergistics2.multi_part.p2p_tunnel";
 			}
-		};
+		},
+		PULLER("puller", PartPuller.class, Features.PULLER);
 
 		private static Int2ObjectLinkedOpenHashMap<PartType> cachedValues;
 		private final String id;

@@ -18,6 +18,7 @@ item.nae2.storage_cell_fluid_256k.name=§c256k§r ME Fluid Storage Cell
 item.nae2.storage_cell_fluid_1024k.name=§61024k§r ME Fluid Storage Cell
 item.nae2.storage_cell_fluid_4096k.name=§e4096k§r ME Fluid Storage Cell
 item.nae2.storage_cell_fluid_16384k.name=§a16384k§r ME Fluid Storage Cell
+tile.nae2.puller.name=ME Puller
 
 # Materials
 item.nae2.material.cell_part_void.name=ME虚空聚合组件

@@ -3,7 +3,6 @@ package co.neeve.nae2.common.sync;
 import appeng.api.AEApi;
 import appeng.api.config.SecurityPermissions;
 import appeng.api.exceptions.AppEngException;
-import appeng.api.implementations.guiobjects.IGuiItemObject;
 import appeng.api.networking.security.IActionHost;
 import appeng.api.networking.security.ISecurityGrid;
 import appeng.api.parts.IPartHost;
@@ -13,12 +12,13 @@ import appeng.client.gui.AEBaseGui;
 import appeng.container.AEBaseContainer;
 import appeng.core.sync.GuiHostType;
 import appeng.helpers.WirelessTerminalGuiObject;
-import appeng.tile.AEBaseTile;
 import appeng.util.Platform;
 import co.neeve.nae2.common.containers.ContainerPatternMultiTool;
+import co.neeve.nae2.common.containers.ContainerPuller;
 import co.neeve.nae2.common.containers.ContainerReconstructionChamber;
 import co.neeve.nae2.common.interfaces.INAEGuiItem;
 import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
+import co.neeve.nae2.common.parts.implementations.IPullerHost;
 import co.neeve.nae2.common.tiles.TileReconstructionChamber;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -38,7 +38,8 @@ public enum GuiBridge {
 	PATTERN_MULTI_TOOL(ObjPatternMultiTool.class, ContainerPatternMultiTool.class, GuiHostType.ITEM,
 		SecurityPermissions.BUILD),
 	RECONSTRUCTION_CHAMBER(TileReconstructionChamber.class, ContainerReconstructionChamber.class, GuiHostType.WORLD,
-		SecurityPermissions.BUILD);
+		SecurityPermissions.BUILD),
+	PULLER(IPullerHost.class, ContainerPuller.class, GuiHostType.WORLD, SecurityPermissions.BUILD);
 
 	private static GuiBridge[] cachedValues;
 	private final Class<?> clazz;
@@ -53,11 +54,7 @@ public enum GuiBridge {
 	          SecurityPermissions securityPermissions) {
 		this.hostType = hostType;
 		this.securityPermissions = securityPermissions;
-		if (IGuiItemObject.class.isAssignableFrom(clazz) || AEBaseTile.class.isAssignableFrom(clazz)) {
-			this.clazz = clazz;
-		} else {
-			throw new IllegalArgumentException("Invalid GuiBridge class");
-		}
+		this.clazz = clazz;
 		this.containerClass = containerClass;
 
 		this.getGui();

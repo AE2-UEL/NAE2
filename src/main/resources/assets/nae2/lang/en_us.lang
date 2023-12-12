@@ -46,6 +46,7 @@ tile.nae2.storage_crafting_256k.name=§c256k§r Crafting Storage
 tile.nae2.storage_crafting_1024k.name=§61024k§r Crafting Storage
 tile.nae2.storage_crafting_4096k.name=§e4096k§r Crafting Storage
 tile.nae2.storage_crafting_16384k.name=§a16384k§r Crafting Storage
+tile.nae2.puller.name=ME Puller
 
 # Pattern Multi-Tool GUI
 nae2.pattern_multiplier.unencode=Clear

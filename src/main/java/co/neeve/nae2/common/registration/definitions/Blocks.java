@@ -8,12 +8,14 @@ import appeng.bootstrap.IItemRendering;
 import appeng.bootstrap.definitions.TileEntityDefinition;
 import co.neeve.nae2.client.rendering.tesr.TESRReconstructionChamber;
 import co.neeve.nae2.common.blocks.BlockDenseCraftingUnit;
+import co.neeve.nae2.common.blocks.BlockPuller;
 import co.neeve.nae2.common.blocks.BlockReconstructionChamber;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.DenseCellFeatures;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.rendering.DenseCraftingCubeRendering;
 import co.neeve.nae2.common.tiles.TileDenseCraftingUnit;
+import co.neeve.nae2.common.tiles.TilePuller;
 import co.neeve.nae2.common.tiles.TileReconstructionChamber;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -28,6 +30,7 @@ public class Blocks {
 	private final ITileDefinition coprocessor4x;
 	private final ITileDefinition coprocessor16x;
 	private final ITileDefinition coprocessor64x;
+	private final ITileDefinition puller;
 
 	public Blocks(Registry registry) {
 		this.reconstructionChamber = registry.block("reconstruction_chamber",
@@ -115,6 +118,11 @@ public class Blocks {
 				BlockDenseCraftingUnit.DenseCraftingUnitType.COPROCESSOR_64X))
 			.useCustomItemModel()
 			.features(Features.DENSE_CPU_COPROCESSORS)
+			.build();
+
+		this.puller = registry.block("puller", BlockPuller::new)
+			.tileEntity(new TileEntityDefinition(TilePuller.class, "puller"))
+			.features(Features.PULLER)
 			.build();
 	}
 
