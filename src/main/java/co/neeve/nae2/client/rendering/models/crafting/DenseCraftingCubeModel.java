@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.function.Function;
 
 @SideOnly(Side.CLIENT)
+public
 class DenseCraftingCubeModel implements IModel {
 	private static final ResourceLocation RING_CORNER = texture("ring_corner");
 	private static final ResourceLocation RING_SIDE_HOR = texture("ring_side_hor");
@@ -39,7 +40,7 @@ class DenseCraftingCubeModel implements IModel {
 	private static final ResourceLocation STORAGE_16384K_LIGHT = naetexture("crafting_storage_16384k_light");
 	private final BlockDenseCraftingUnit.DenseCraftingUnitType type;
 
-	DenseCraftingCubeModel(BlockDenseCraftingUnit.DenseCraftingUnitType type) {
+	public DenseCraftingCubeModel(BlockDenseCraftingUnit.DenseCraftingUnitType type) {
 		this.type = type;
 	}
 

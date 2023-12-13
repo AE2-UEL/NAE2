@@ -38,6 +38,7 @@ public class ItemPartRendering extends ItemRenderingCustomizer {
 			.collect(Collectors.toList()));
 	}
 
+	@SideOnly(Side.CLIENT)
 	private ModelResourceLocation getItemMeshDefinition(ItemStack is) {
 		var partType = this.item.getTypeByStack(is);
 		var variant = this.item.variantOf(is.getItemDamage());

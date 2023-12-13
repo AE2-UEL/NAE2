@@ -1,10 +1,11 @@
-package co.neeve.nae2.client.rendering.models.crafting;
+package co.neeve.nae2.common.registration.registry.rendering;
 
 import appeng.block.crafting.BlockCraftingUnit;
 import appeng.bootstrap.BlockRenderingCustomizer;
 import appeng.bootstrap.IBlockRendering;
 import appeng.bootstrap.IItemRendering;
 import co.neeve.nae2.Tags;
+import co.neeve.nae2.client.rendering.models.crafting.DenseCraftingCubeModel;
 import co.neeve.nae2.common.blocks.BlockDenseCraftingUnit;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -16,7 +17,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.HashMap;
 import java.util.Map;
 
-@SideOnly(Side.CLIENT)
 public class DenseCraftingCubeRendering extends BlockRenderingCustomizer {
 	private final String registryName;
 	private final BlockDenseCraftingUnit.DenseCraftingUnitType type;
@@ -38,6 +38,7 @@ public class DenseCraftingCubeRendering extends BlockRenderingCustomizer {
 		rendering.modelCustomizer((loc, model) -> model);
 	}
 
+	@SideOnly(Side.CLIENT)
 	private Map<IBlockState, ModelResourceLocation> mapState(Block block, ModelResourceLocation defaultModel,
 	                                                         ModelResourceLocation formedModel) {
 		Map<IBlockState, ModelResourceLocation> result = new HashMap<>();
