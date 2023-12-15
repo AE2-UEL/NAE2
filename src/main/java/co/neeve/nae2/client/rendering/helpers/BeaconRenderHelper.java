@@ -1,4 +1,4 @@
-package co.neeve.nae2.client.rendering;
+package co.neeve.nae2.client.rendering.helpers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -10,7 +10,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class BeamRenderer {
+public class BeaconRenderHelper {
 	private static final ResourceLocation END_GATEWAY_BEAM_TEXTURE = new ResourceLocation("textures/entity" +
 		"/end_gateway_beam.png");
 

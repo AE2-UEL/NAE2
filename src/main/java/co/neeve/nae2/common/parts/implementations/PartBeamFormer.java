@@ -15,6 +15,7 @@ import appeng.api.parts.IPartCollisionHelper;
 import appeng.api.parts.IPartHost;
 import appeng.api.parts.IPartModel;
 import appeng.api.util.AECableType;
+import appeng.api.util.AEColor;
 import appeng.api.util.AEPartLocation;
 import appeng.core.AELog;
 import appeng.items.parts.PartModels;
@@ -22,45 +23,40 @@ import appeng.me.GridAccessException;
 import appeng.parts.PartModel;
 import appeng.util.Platform;
 import co.neeve.nae2.Tags;
-import co.neeve.nae2.client.rendering.BeamRenderer;
-import co.neeve.nae2.common.features.subfeatures.BeamFeatures;
+import co.neeve.nae2.client.rendering.helpers.BeamFormerRenderHelper;
+import co.neeve.nae2.common.interfaces.IBeamFormer;
 import co.neeve.nae2.common.parts.NAEBasePartState;
 import co.neeve.nae2.server.IBlockStateListener;
 import co.neeve.nae2.server.WorldListener;
 import com.google.common.collect.ImmutableList;
-import gregtech.client.shader.postprocessing.BloomEffect;
-import gregtech.client.utils.BloomEffectUtil;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagDouble;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-public class PartBeamFormer extends NAEBasePartState implements IBlockStateListener, IGridTickable {
+@Optional.Interface(iface = "gregtech.client.utils.IBloomEffect", modid = "gregtech")
+public class PartBeamFormer extends NAEBasePartState implements IBlockStateListener, IGridTickable, IBeamFormer {
 	// Resources.
 	public static final ResourceLocation PRISM_LOC =
 		new ResourceLocation(Tags.MODID, "part/beam_former_prism");
@@ -77,54 +73,6 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	public static final PartModel MODEL_BEAMING = new PartModel(STATUS_BEAMING_LOC, MODEL_BASE_LOC);
 	public static final PartModel MODEL_ON = new PartModel(STATUS_ON_LOC, MODEL_BASE_LOC, PRISM_LOC);
 	public static final PartModel MODEL_OFF = new PartModel(STATUS_OFF_LOC, MODEL_BASE_LOC, PRISM_LOC);
-
-	@SideOnly(Side.CLIENT)
-	private static Object GREGTECH_BLOOM_HANDLER;
-
-	static {
-		if (Platform.isClientInstall()) {
-			GREGTECH_BLOOM_HANDLER = null;
-			if (BeamFeatures.GREGTECH_SHADERS.isEnabled()) {
-				try {
-					GREGTECH_BLOOM_HANDLER = new BloomEffectUtil.IBloomRenderFast() {
-						float lastBrightnessX;
-						float lastBrightnessY;
-
-						@Override
-						@SideOnly(Side.CLIENT)
-						public int customBloomStyle() {
-							return 1;
-						}
-
-						@Override
-						@SideOnly(Side.CLIENT)
-						public void preDraw(BufferBuilder buffer) {
-							BloomEffect.strength = 0.8f;
-							BloomEffect.baseBrightness = 0.0f;
-							BloomEffect.highBrightnessThreshold = 1.25f;
-							BloomEffect.lowBrightnessThreshold = 0.5f;
-							BloomEffect.step = 1;
-
-							this.lastBrightnessX = OpenGlHelper.lastBrightnessX;
-							this.lastBrightnessY = OpenGlHelper.lastBrightnessY;
-
-							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-							GlStateManager.disableTexture2D();
-						}
-
-						@Override
-						@SideOnly(Side.CLIENT)
-						public void postDraw(BufferBuilder buffer) {
-							GlStateManager.enableTexture2D();
-							OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, this.lastBrightnessX,
-								this.lastBrightnessY);
-						}
-					};
-				} catch (NoClassDefFoundError ignored) {}
-			}
-		}
-	}
-
 	private int beamLength = 0;
 	private PartBeamFormer otherBeamFormer = null;
 	private IGridConnection connection = null;
@@ -132,6 +80,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	private boolean hideBeam;
 	@SideOnly(Side.CLIENT)
 	private boolean paired;
+	private boolean rendererRegistered;
 
 	public PartBeamFormer(ItemStack is) {
 		super(is);
@@ -149,60 +98,38 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 		return !newState.getMaterial().isOpaque() || newState.getBlock().getLightOpacity(newState) != 255;
 	}
 
-	@SideOnly(Side.CLIENT)
-	public static void drawCube(BufferBuilder bufferBuilder, double x, double y, double z, double scaleX,
-	                            double scaleY, double scaleZ, float r, float g, float b) {
-		// Calculate the offset for each axis
-		var halfScaleX = scaleX / 2;
-		var halfScaleY = scaleY / 2;
-		var halfScaleZ = scaleZ / 2;
+	@Override
+	public AEColor getColor() {
+		return this.getHost().getColor();
+	}
 
-		// Bottom vertices of the cube
-		var x1 = x - halfScaleX;
-		var y1 = y - halfScaleY;
-		var z1 = z - halfScaleZ;
+	public int getBeamLength() {
+		return this.beamLength;
+	}
 
-		// Top vertices of the cube
-		var x2 = x + halfScaleX;
-		var y2 = y + halfScaleY;
-		var z2 = z + halfScaleZ;
+	@Override
+	public EnumFacing getDirection() {
+		return this.getSide().getFacing();
+	}
 
-		// Down face
-		var alpha = 0.9f;
-		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y1, z2).color(r, g, b, alpha).endVertex();
+	@Override
+	public World getWorld() {
+		return this.getHost().getTile().getWorld();
+	}
 
-		// Up face
-		bufferBuilder.pos(x1, y2, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y2, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y2, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y2, z1).color(r, g, b, alpha).endVertex();
+	@Override
+	public boolean isValid() {
+		return !this.getTile().isInvalid() && this.getHost().getPart(this.getSide()) == this;
+	}
 
-		// North face
-		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y2, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y2, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
+	@Override
+	public boolean shouldRenderBeam() {
+		return !this.hideBeam && this.beamLength != 0 && this.isActive() && this.isPowered();
+	}
 
-		// South face
-		bufferBuilder.pos(x1, y1, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y2, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y2, z2).color(r, g, b, alpha).endVertex();
-
-		// West face
-		bufferBuilder.pos(x1, y1, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y1, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y2, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x1, y2, z1).color(r, g, b, alpha).endVertex();
-
-		// East face
-		bufferBuilder.pos(x2, y1, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y2, z1).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y2, z2).color(r, g, b, alpha).endVertex();
-		bufferBuilder.pos(x2, y1, z2).color(r, g, b, alpha).endVertex();
+	@Override
+	public BlockPos getPos() {
+		return this.getHost().getTile().getPos();
 	}
 
 	public @NotNull IPartModel getStaticModels() {
@@ -242,6 +169,7 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@Override
 	public void addToWorld() {
 		super.addToWorld();
+
 		try {
 			this.getProxy().getTick().alertDevice(this.getGridNode());
 		} catch (GridAccessException ignored) {
@@ -496,78 +424,19 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void renderDynamic(double x, double y, double z, float partialTicks, int destroyStage) {
-		if (!this.hideBeam && this.beamLength != 0 && this.isActive() && this.isPowered()) {
-			// Get the direction vector
-			var facing = this.getSide().getFacing();
-			final var dx = facing.getXOffset();
-			final var dy = facing.getYOffset();
-			final var dz = facing.getZOffset();
-
-			if (GREGTECH_BLOOM_HANDLER != null) {
-				BloomEffectUtil.requestCustomBloom((BloomEffectUtil.IBloomRenderFast) GREGTECH_BLOOM_HANDLER,
-					bufferBuilder -> this.drawBeamGT(x, y, z, dx, dy, dz, bufferBuilder));
-				return;
-			}
-
-			var color = this.getHost().getColor();
-			var scale = 255f;
-			var rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
-				((color.mediumVariant >> 8) & 0xff) / scale,
-				(color.mediumVariant & 0xff) / scale };
-
-			// Calculate the pitch, yaw, and roll based on the direction vector
-			var pitch = (float) Math.atan2(Math.sqrt(dx * dx + dz * dz), dy) * (180F / (float) Math.PI);
-			var yaw = (float) (180 - Math.atan2(dz, dx) * (180F / (float) Math.PI) - 90.0F);
-
-			GlStateManager.pushMatrix();
-
-			// Translate and rotate
-			GlStateManager.translate(x + 0.5, y + 0.5, z + 0.5);
-			GlStateManager.rotate(yaw, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(pitch, 1.0F, 0.0F, 0.0F);
-			GlStateManager.translate(-0.5, 0.35, -0.5);
-
-			BeamRenderer.renderBeamSegment(0, 0, 0, partialTicks, 1,
-				(double) this.getHost().getTile().getWorld().getTotalWorldTime(), 0,
-				this.beamLength + 0.3d
-				, rgb, 0.075 * 1.6, 0.075 * 2);
-
-			GlStateManager.popMatrix();
-		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	private void drawBeamGT(double x, double y, double z, int dx, int dy, int dz, BufferBuilder bufferBuilder) {
-		bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-
-		var bl = (this.beamLength + 1) / 2d;
-		var minScale = 0.15d;
-		var color = this.getHost().getColor();
-		var scale = 255f;
-		var rgb = new float[]{ ((color.mediumVariant >> 16) & 0xff) / scale,
-			((color.mediumVariant >> 8) & 0xff) / scale,
-			(color.mediumVariant & 0xff) / scale };
-
-		drawCube(bufferBuilder,
-			x + 0.5d + dx * bl,
-			y + 0.5d + dy * bl,
-			z + 0.5d + dz * bl,
-			Math.max(minScale, Math.abs(dx * this.beamLength + dx * 0.25d)),
-			Math.max(minScale, Math.abs(dy * this.beamLength + dy * 0.25d)),
-			Math.max(minScale, Math.abs(dz * this.beamLength + dz * 0.25d)),
-			rgb[0],
-			rgb[1],
-			rgb[2]
-		);
-
-		GlStateManager.color(1f, 1f, 1f, 1f);
-		Tessellator.getInstance().draw();
+		BeamFormerRenderHelper.renderDynamic(this, x, y, z, partialTicks);
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean requireDynamicRender() {
-		return true;
+		if (Platform.isClient()) {
+			if (!this.rendererRegistered) {
+				this.rendererRegistered = true;
+				BeamFormerRenderHelper.init(this);
+			}
+		}
+		return BeamFormerRenderHelper.shouldRenderDynamic(this);
 	}
 
 	@Override

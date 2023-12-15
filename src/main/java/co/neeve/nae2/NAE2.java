@@ -18,6 +18,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
@@ -26,6 +28,7 @@ import java.io.File;
 public class NAE2 {
 	public static NAE2 instance;
 	private static ConfigManager configManager;
+	private final Logger logger = LogManager.getLogger("NAE2");
 	private final NetHandler network = new NetHandler();
 	private Registration registration;
 
@@ -55,6 +58,10 @@ public class NAE2 {
 	@SideOnly(Side.CLIENT)
 	public static ItemStack icon() {
 		return instance.icon;
+	}
+
+	public static Logger logger() {
+		return instance.logger;
 	}
 
 	@EventHandler
