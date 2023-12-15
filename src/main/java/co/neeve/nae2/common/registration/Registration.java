@@ -2,6 +2,9 @@ package co.neeve.nae2.common.registration;
 
 import appeng.bootstrap.IModelRegistry;
 import appeng.bootstrap.components.*;
+import appeng.core.AEConfig;
+import appeng.core.features.AEFeature;
+import co.neeve.nae2.common.recipes.handlers.DisassembleRecipe;
 import co.neeve.nae2.common.registration.definitions.*;
 import co.neeve.nae2.common.registration.registry.Registry;
 import net.minecraft.block.Block;
@@ -69,6 +72,11 @@ public class Registration {
 	public void registerRecipes(RegistryEvent.Register<IRecipe> event) {
 		final var registry = event.getRegistry();
 		final var side = FMLCommonHandler.instance().getEffectiveSide();
+
+		if (AEConfig.instance().isFeatureEnabled(AEFeature.ENABLE_DISASSEMBLY_CRAFTING)) {
+			registry.register(new DisassembleRecipe().setRegistryName("disassemble"));
+		}
+
 		this.registry.getBootstrapComponents(IRecipeRegistrationComponent.class)
 			.forEachRemaining(b -> b.recipeRegistration(side, registry));
 	}

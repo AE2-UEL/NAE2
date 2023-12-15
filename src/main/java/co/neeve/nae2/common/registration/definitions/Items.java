@@ -15,7 +15,6 @@ import co.neeve.nae2.common.items.cells.DenseItemCell;
 import co.neeve.nae2.common.items.cells.handlers.VoidCellHandler;
 import co.neeve.nae2.common.items.cells.vc.StorageCellVoid;
 import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
-import co.neeve.nae2.common.recipes.handlers.DisassembleRecipe;
 import co.neeve.nae2.common.recipes.handlers.VoidCellRecipe;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.interfaces.Definitions;
@@ -79,8 +78,6 @@ public class Items implements Definitions<IItemDefinition> {
 		});
 
 		registry.addBootstrapComponent((IRecipeRegistrationComponent) (side, r) -> {
-			r.register(new DisassembleRecipe().setRegistryName("disassemble"));
-
 			NAE2.definitions().materials().cellPartVoid().maybeStack(1).ifPresent(voidComponent ->
 				AEApi.instance().definitions().materials().emptyStorageCell().maybeStack(1).ifPresent(stack -> {
 					this.storageCellVoid.maybeStack(1).ifPresent((itemStack -> r.register(new VoidCellRecipe(
