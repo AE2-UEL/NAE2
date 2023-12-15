@@ -43,7 +43,6 @@ public class NAEItemDefinitionBuilder implements INAEItemBuilder {
 
 	private CreativeTabs creativeTab = CreativeTab.instance;
 
-	@SideOnly(Side.CLIENT)
 	private boolean hidden;
 
 	public NAEItemDefinitionBuilder(Registry registry, String registryName, Supplier<Item> itemSupplier) {
@@ -94,9 +93,7 @@ public class NAEItemDefinitionBuilder implements INAEItemBuilder {
 
 	@Override
 	public INAEItemBuilder hide() {
-		if (Platform.isClient()) {
-			this.hidden = true;
-		}
+		this.hidden = true;
 		return this;
 	}
 
@@ -112,7 +109,9 @@ public class NAEItemDefinitionBuilder implements INAEItemBuilder {
 		var definition = new ItemDefinition(this.registryName, item);
 
 		item.setTranslationKey(Tags.MODID + "." + this.registryName);
-		item.setCreativeTab(this.creativeTab);
+		if (!this.hidden) {
+			item.setCreativeTab(this.creativeTab);
+		}
 
 		// Register all extra handlers
 		this.boostrapComponents.forEach(component -> this.registry.addBootstrapComponent(component.apply(item)));
