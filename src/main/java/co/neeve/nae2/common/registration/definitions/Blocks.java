@@ -5,16 +5,20 @@ import appeng.block.crafting.ItemCraftingStorage;
 import appeng.bootstrap.BlockRenderingCustomizer;
 import appeng.bootstrap.IBlockRendering;
 import appeng.bootstrap.IItemRendering;
+import appeng.bootstrap.components.IPreInitComponent;
 import appeng.bootstrap.definitions.TileEntityDefinition;
+import appeng.util.Platform;
 import co.neeve.nae2.client.rendering.tesr.TESRReconstructionChamber;
 import co.neeve.nae2.common.blocks.BlockDenseCraftingUnit;
 import co.neeve.nae2.common.blocks.BlockReconstructionChamber;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.DenseCellFeatures;
+import co.neeve.nae2.common.integration.jei.NAEJEIPlugin;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.rendering.DenseCraftingCubeRendering;
 import co.neeve.nae2.common.tiles.TileDenseCraftingUnit;
 import co.neeve.nae2.common.tiles.TileReconstructionChamber;
+import de.ellpeck.actuallyadditions.mod.jei.reconstructor.ReconstructorRecipeCategory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -41,6 +45,11 @@ public class Blocks {
 				}
 			})
 			.withJEIDescription()
+			.bootstrap((block, item) -> (IPreInitComponent) side -> {
+				if (side == Side.CLIENT && Platform.isModLoaded("jei")) {
+					NAEJEIPlugin.registerCatalyst(this.reconstructionChamber(), ReconstructorRecipeCategory.NAME);
+				}
+			})
 			.features(Features.RECONSTRUCTION_CHAMBER)
 			.build();
 

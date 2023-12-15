@@ -129,7 +129,7 @@ public class NAEItemDefinitionBuilder implements INAEItemBuilder {
 		this.registry.addBootstrapComponent((IItemRegistrationComponent) (side, reg) -> reg.register(item));
 
 		if (Platform.isClient()) {
-			if (this.hidden) {
+			if (this.hidden && Platform.isModLoaded("jei")) {
 				NAEJEIPlugin.registerBlacklist(definition);
 			}
 

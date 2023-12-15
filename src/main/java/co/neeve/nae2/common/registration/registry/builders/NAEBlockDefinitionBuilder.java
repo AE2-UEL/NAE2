@@ -213,7 +213,7 @@ public class NAEBlockDefinitionBuilder implements INAEBlockBuilder {
 			definition = (T) new BlockDefinition(this.registryName, block, item);
 		}
 
-		if (Platform.isClient()) {
+		if (Platform.isClient() && Platform.isModLoaded("jei")) {
 			if (this.jeiDescription && item != null) {
 				NAEJEIPlugin.registerDescription(definition, item.getTranslationKey() + ".desc");
 			}
