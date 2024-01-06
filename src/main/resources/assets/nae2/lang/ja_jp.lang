@@ -1,0 +1,84 @@
+#PARSE_ESCAPES
+
+# Meta
+itemGroup.nae2=Neeve's AE2:EL Additions
+
+# Items
+item.nae2.invalid.name=無効または使用不可の項目
+item.nae2.pattern_multiplier.name=パターンマルチツール
+
+# Cells
+item.nae2.storage_cell_void.name=MEボイドストレージセル
+item.nae2.fluid_storage_cell_void.name=ME液体ボイドストレージセル
+item.nae2.storage_cell_256k.name=§c256k§r MEストレージセル
+item.nae2.storage_cell_1024k.name=§61024k§r MEストレージセル
+item.nae2.storage_cell_4096k.name=§e4096k§r MEストレージセル
+item.nae2.storage_cell_16384k.name=§a16384k§r MEストレージセル
+item.nae2.storage_cell_fluid_256k.name=§c256k§r ME液体ストレージセル
+item.nae2.storage_cell_fluid_1024k.name=§61024k§r ME液体ストレージセル
+item.nae2.storage_cell_fluid_4096k.name=§e4096k§r ME液体ストレージセル
+item.nae2.storage_cell_fluid_16384k.name=§a16384k§r ME液体ストレージセル
+
+# Materials
+item.nae2.material.cell_part_void.name=MEボイドストレージコンポーネント
+item.nae2.material.cell_part_256k.name=§c256k§r MEストレージコンポーネント
+item.nae2.material.cell_part_1024k.name=§61024k§r MEストレージコンポーネント
+item.nae2.material.cell_part_4096k.name=§e4096k§r MEストレージコンポーネント
+item.nae2.material.cell_part_16384k.name=§a16384k§r MEストレージコンポーネント
+item.nae2.material.cell_part_fluid_256k.name=§c256k§r ME液体ストレージコンポーネント
+item.nae2.material.cell_part_fluid_1024k.name=§61024k§r ME液体ストレージコンポーネント
+item.nae2.material.cell_part_fluid_4096k.name=§e4096k§r ME液体ストレージコンポーネント
+item.nae2.material.cell_part_fluid_16384k.name=§a16384k§r ME液体ストレージコンポーネント
+
+# Parts
+item.nae2.part.beam_former.name=MEビームフォーマー
+
+# Upgrades
+item.nae2.upgrade.hyper_acceleration.name=超加速カード
+
+# Tiles
+tile.nae2.reconstruction_chamber.name=原子再構成機
+tile.nae2.reconstruction_chamber.desc=ActuallyAditionsの原子再構成にて、アイテムを地面に置かなくてもクラフトを行う。もうアイテムを落とすことはない!\n\n近くのインベントリやMEインターフェイスに完成品を自動格納してくれます。
+tile.nae2.coprocessor_4x.name=§b4x§r クラフティング並列処理ユニット
+tile.nae2.coprocessor_16x.name=§d16x§r クラフティング並列処理ユニット
+tile.nae2.coprocessor_64x.name=§964x§r クラフティング並列処理ユニット
+tile.nae2.storage_crafting_256k.name=§c256k§r クラフティングストレージ
+tile.nae2.storage_crafting_1024k.name=§61024k§r クラフティングストレージ
+tile.nae2.storage_crafting_4096k.name=§e4096k§r クラフティングストレージ
+tile.nae2.storage_crafting_16384k.name=§a16384k§r クラフティングストレージ
+
+# Pattern Multi-Tool GUI
+nae2.pattern_multiplier.unencode=削除
+nae2.pattern_multiplier.unencode.desc=エンコードされたパターンをブランクパターンに変える。この操作はやり直せません!
+nae2.pattern_multiplier.replace=入れ替え
+nae2.pattern_multiplier.replace.desc=1番目のスロットにあるアイテムを2番目のスロットに置き換える。§4この操作はやり直せません!§7\n\n§c赤§7は一致する項目が見つかったが、置換すると無効なパターンになることを意味する。スロットはスキップされます。\n\n§aGreen緑§7は入れ替えが成功することを意味する。
+nae2.pattern_multiplier.tab.multiply=調整
+nae2.pattern_multiplier.tab.replace=入れ替え
+
+# Beam Former GUI
+nae2.part.beam_former.hide=ビームを非表示
+nae2.part.beam_former.show=ビームを表示
+
+# Storage Cell GUI
+nae2.storage_cell_void.warning.1=全てを消し去ります!
+nae2.storage_cell_void.warning.2=設定変更は%sで行ってください。
+nae2.storage_cell_void.count=%s個の%sが貯蔵されている
+
+# JEI Ctrl-Craft GUI
+nae2.jei.missing.craft.1=[NAE2] 在庫は不足しているがクラフトは可能。
+nae2.jei.missing.craft.2=押している間、不足している項目を並べる。
+
+nae2.jei.cellview.items=アイテム
+nae2.jei.cellview.buckets=バケツ
+nae2.jei.cellview.units=バケツ
+# count / max unit_name
+nae2.jei.cellview.stored=格納中: %s / %s %s
+nae2.jei.cellview.hover.stored=格納中: %s %s
+# count unit_name
+nae2.jei.cellview=セルの中身
+nae2.jei.cellview.loss=全量: %s %s
+nae2.jei.cellview.used=使用量: %s
+nae2.jei.cellview.hover.1=%sタイプ使用済み
+nae2.jei.cellview.hover.2=使用するタイプごとに容量は減っていく。
+nae2.jei.cellview.hover.3=%s バイト/タイプ * %s = %s バイト消費
+nae2.jei.cellview.keybind=%sキーで中身を確認
