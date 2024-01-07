@@ -70,13 +70,13 @@ nae2.jei.missing.craft.2=押している間、不足している項目を並べ�
 
 nae2.jei.cellview.items=アイテム
 nae2.jei.cellview.buckets=バケツ
-nae2.jei.cellview.units=バケツ
+nae2.jei.cellview.units=ユニット
 # count / max unit_name
 nae2.jei.cellview.stored=格納中: %s / %s %s
 nae2.jei.cellview.hover.stored=格納中: %s %s
 # count unit_name
 nae2.jei.cellview=セルの中身
-nae2.jei.cellview.loss=全量: %s %s
+nae2.jei.cellview.loss=総容量: %s %s
 nae2.jei.cellview.used=使用量: %s
 nae2.jei.cellview.hover.1=%sタイプ使用済み
 nae2.jei.cellview.hover.2=使用するタイプごとに容量は減っていく。
