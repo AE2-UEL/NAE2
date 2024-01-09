@@ -1,6 +1,5 @@
 package co.neeve.nae2.common.parts.p2p;
 
-import akka.japi.Pair;
 import appeng.api.AEApi;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGridNode;
@@ -47,6 +46,7 @@ import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -348,7 +348,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			for (var input : this.getCachedInputs()) {
 				var pair = input.capabilityCache.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
 				pair.ifPresent(objectOpenHashSetObjectPair ->
-					this.cachedInv = (IItemHandler) objectOpenHashSetObjectPair.second());
+					this.cachedInv = (IItemHandler) objectOpenHashSetObjectPair.getRight());
 			}
 		}
 		return this.cachedInv;
@@ -361,7 +361,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			for (var input : this.getCachedInputs()) {
 				var pair = input.capabilityCache.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
 				pair.ifPresent(objectOpenHashSetObjectPair ->
-					this.cachedTank = (IFluidHandler) objectOpenHashSetObjectPair.second());
+					this.cachedTank = (IFluidHandler) objectOpenHashSetObjectPair.getRight());
 			}
 
 		}
@@ -533,7 +533,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		public <T> Optional<Pair<ObjectOpenHashSet<T>, Object>> get(Capability<T> capability) {
 			var set = this.cachedCapabilities.getOrDefault(capability, null);
 			if (set != null) {
-				return Optional.of(Pair.apply((ObjectOpenHashSet<T>) set, this.cachedHandlers.get(capability)));
+				return Optional.of(Pair.of((ObjectOpenHashSet<T>) set, this.cachedHandlers.get(capability)));
 			}
 
 			return Optional.empty();
@@ -545,7 +545,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			if (capabilities == null && present) return false;
 			if (capabilities != null && !present) return false;
 
-			return capabilities != null && capabilities.equals(cached.get().first());
+			return capabilities != null && capabilities.equals(cached.get().getLeft());
 		}
 	}
 }
