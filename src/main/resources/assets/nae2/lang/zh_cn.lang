@@ -8,8 +8,8 @@ item.nae2.invalid.name=无效或禁用的物品
 item.nae2.pattern_multiplier.name=多功能样板工具
 
 # Cells
-item.nae2.storage_cell_void.name=ME虚空存储单元
-item.nae2.fluid_storage_cell_void.name=ME流体虚空存储单元
+item.nae2.storage_cell_void.name=ME虚空存储元件
+item.nae2.fluid_storage_cell_void.name=ME流体虚空存储元件
 item.nae2.storage_cell_256k.name=§c256k§r-ME存储元件
 item.nae2.storage_cell_1024k.name=§61024k§r-ME存储元件
 item.nae2.storage_cell_4096k.name=§e4096k§r-ME存储元件
