@@ -3,12 +3,15 @@ package co.neeve.nae2.common.parts.implementations;
 import appeng.api.networking.GridFlags;
 import appeng.api.parts.IPartCollisionHelper;
 import appeng.api.parts.IPartModel;
+import appeng.items.parts.PartModels;
 import appeng.parts.PartBasicState;
+import appeng.parts.PartModel;
 import appeng.util.Platform;
 import co.neeve.nae2.common.helpers.exposer.ExposerBootstrapper;
 import co.neeve.nae2.common.interfaces.IExposerHost;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -16,9 +19,27 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 
-import static appeng.parts.misc.PartInterface.*;
-
 public class PartExposer extends PartBasicState implements IExposerHost {
+	public static final ResourceLocation MODEL_BASE = new ResourceLocation("nae2", "part/exposer");
+
+	@PartModels
+	private static final PartModel MODELS_OFF;
+
+	@PartModels
+	private static final PartModel MODELS_ON;
+
+	@PartModels
+	private static final PartModel MODELS_HAS_CHANNEL;
+
+	static {
+		MODELS_OFF = new PartModel(MODEL_BASE, new ResourceLocation("appliedenergistics2",
+			"part/interface_off"));
+		MODELS_ON = new PartModel(MODEL_BASE, new ResourceLocation("appliedenergistics2",
+			"part/interface_on"));
+		MODELS_HAS_CHANNEL = new PartModel(MODEL_BASE, new ResourceLocation("appliedenergistics2",
+			"part/interface_has_channel"));
+	}
+
 	private ExposerBootstrapper exposer;
 	private EnumFacing facing;
 
