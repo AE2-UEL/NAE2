@@ -7,12 +7,19 @@ import co.neeve.nae2.common.interfaces.IExposerHost;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMaps;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 /**
  * API for the Exposer block/part.
@@ -22,6 +29,34 @@ import java.lang.reflect.InvocationTargetException;
 public class ExposerAPI {
 	@SuppressWarnings("rawtypes")
 	private final DataHolder dataHolder = new DataHolder();
+
+	@SideOnly(Side.CLIENT)
+	public void addTooltipInformation(ItemStack stack, World world, List<String> lines,
+	                                  ITooltipFlag advancedTooltips) {
+		lines.add(I18n.format("nae2.exposer.tooltip"));
+
+		var registered = this.getRegisteredHandlers();
+		if (registered.isEmpty()) {
+			lines.add("");
+			lines.add(I18n.format("nae2.exposer.noneregistered"));
+		} else {
+			lines.add("");
+			lines.add(I18n.format("nae2.exposer.registered"));
+
+			for (var handler : registered.object2ObjectEntrySet()) {
+				var name = handler.getKey().getName();
+
+				// If name is a class path, strip everything but the name.
+				if (name.contains(".")) {
+					name = name.substring(name.lastIndexOf('.') + 1);
+				}
+
+				lines.add(" - "
+					+ "§6" + name + "§r"
+					+ " (" + handler.getValue().getMod().getAnnotation(Mod.class).name() + ")");
+			}
+		}
+	}
 
 	/**
 	 * Creates a handler for the given host and capability.

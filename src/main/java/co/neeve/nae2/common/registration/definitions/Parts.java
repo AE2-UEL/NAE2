@@ -5,6 +5,7 @@ import appeng.api.parts.IPart;
 import appeng.core.features.DamagedItemDefinition;
 import appeng.core.localization.GuiText;
 import appeng.util.Platform;
+import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
@@ -21,7 +22,10 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +96,13 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 				return "item.appliedenergistics2.multi_part.p2p_tunnel";
 			}
 		},
-		EXPOSER("exposer", PartExposer.class, Features.EXPOSER);
+		EXPOSER("exposer", PartExposer.class, Features.EXPOSER) {
+			@Override
+			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+			                                  ITooltipFlag advancedTooltips) {
+				NAE2.api().exposer().addTooltipInformation(stack, world, lines, advancedTooltips);
+			}
+		};
 
 		private static Int2ObjectLinkedOpenHashMap<PartType> cachedValues;
 		private final String id;
@@ -191,6 +201,10 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 
 		public String getId() {
 			return this.id;
+		}
+
+		public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+		                                  ITooltipFlag advancedTooltips) {
 		}
 	}
 }
