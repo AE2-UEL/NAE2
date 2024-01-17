@@ -1,24 +1,46 @@
 package co.neeve.nae2.common.blocks;
 
 import appeng.block.AEBaseTileBlock;
-import net.minecraft.block.Block;
+import co.neeve.nae2.NAE2;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.NotNull;
+import net.minecraftforge.fml.common.Mod;
+
+import java.util.List;
 
 public class BlockExposer extends AEBaseTileBlock {
 	public BlockExposer() {
 		super(Material.IRON);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
-	public void neighborChanged(@NotNull IBlockState state, World world, @NotNull BlockPos pos,
-	                            @NotNull Block blockIn, @NotNull BlockPos fromPos) {
-		// if (world.getTileEntity(pos) instanceof TileExposer tileExposer) {
-		//	tileExposer.onNeighborChange();
-		//}
+	public void addInformation(ItemStack is, World world, List<String> lines, ITooltipFlag advancedItemTooltips) {
+		super.addInformation(is, world, lines, advancedItemTooltips);
+
+		lines.add("Exposes the network contents as capabilities.");
+
+		var registered = NAE2.api().exposer().getRegisteredHandlers();
+		if (registered.isEmpty()) {
+			lines.add("");
+			lines.add("No handlers registered.");
+		} else {
+			lines.add("");
+			lines.add("Registered handlers:");
+
+			for (var handler : registered.object2ObjectEntrySet()) {
+				var name = handler.getKey().getName();
+
+				// If name is a class path, strip everything but the name.
+				if (name.contains(".")) {
+					name = name.substring(name.lastIndexOf('.') + 1);
+				}
+
+				lines.add(" - "
+					+ "§6" + name + "§r"
+					+ " (" + handler.getValue().getMod().getAnnotation(Mod.class).name() + ")");
+			}
+		}
 	}
 }

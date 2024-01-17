@@ -6,7 +6,7 @@ import appeng.api.util.AEPartLocation;
 import appeng.api.util.DimensionalCoord;
 import appeng.tile.grid.AENetworkPowerTile;
 import appeng.util.inv.InvOperation;
-import co.neeve.nae2.common.helpers.exposer.Exposer;
+import co.neeve.nae2.common.helpers.exposer.ExposerBootstrapper;
 import co.neeve.nae2.common.interfaces.IExposerHost;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 
 public class TileExposer extends AENetworkPowerTile implements IExposerHost, ICapabilityProvider {
-	private final Exposer exposer = new Exposer(this, EnumSet.allOf(EnumFacing.class));
+	private final ExposerBootstrapper exposer = new ExposerBootstrapper(this, EnumSet.allOf(EnumFacing.class));
 
 	public TileExposer() {
 		this.getProxy().setFlags(GridFlags.REQUIRE_CHANNEL);

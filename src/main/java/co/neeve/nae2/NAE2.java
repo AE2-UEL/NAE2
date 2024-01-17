@@ -30,10 +30,9 @@ public class NAE2 {
 	private static ConfigManager configManager;
 	private final Logger logger = LogManager.getLogger("NAE2");
 	private final NetHandler network = new NetHandler();
+	private final API api = new API();
 	private Registration registration;
-
 	private GuiHandler guiHandler;
-
 	@SideOnly(Side.CLIENT)
 	private ItemStack icon;
 
@@ -53,6 +52,15 @@ public class NAE2 {
 
 	public static Registration definitions() {
 		return instance.registration;
+	}
+
+	/**
+	 * Returns the API for NAE2.
+	 *
+	 * @return NAE2 API
+	 */
+	public static API api() {
+		return instance.api;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -122,4 +130,5 @@ public class NAE2 {
 			config.save();
 		}
 	}
+
 }

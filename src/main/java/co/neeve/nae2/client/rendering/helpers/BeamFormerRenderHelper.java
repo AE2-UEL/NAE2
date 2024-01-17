@@ -18,7 +18,7 @@ import java.util.WeakHashMap;
 
 @SideOnly(Side.CLIENT)
 public class BeamFormerRenderHelper {
-	private static final double MIN_SCALE = 0.05d;
+	private static final double MIN_SCALE = 0.15d;
 	private static final WeakHashMap<IBeamFormer, StaticBloomMetadata> META_CACHE = new WeakHashMap<>();
 	private static final EnumSet<EnumFacing> FACINGS_ALONG_Z =
 		EnumSet.of(EnumFacing.UP, EnumFacing.DOWN, EnumFacing.EAST, EnumFacing.WEST);

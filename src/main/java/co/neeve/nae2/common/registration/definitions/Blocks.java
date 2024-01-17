@@ -9,13 +9,13 @@ import appeng.bootstrap.components.IPostInitComponent;
 import appeng.bootstrap.components.IPreInitComponent;
 import appeng.bootstrap.definitions.TileEntityDefinition;
 import appeng.util.Platform;
+import co.neeve.nae2.NAE2;
 import co.neeve.nae2.client.rendering.tesr.TESRReconstructionChamber;
 import co.neeve.nae2.common.blocks.BlockDenseCraftingUnit;
 import co.neeve.nae2.common.blocks.BlockExposer;
 import co.neeve.nae2.common.blocks.BlockReconstructionChamber;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.DenseCellFeatures;
-import co.neeve.nae2.common.helpers.exposer.ExposerHandler;
 import co.neeve.nae2.common.helpers.exposer.FluidExposerHandler;
 import co.neeve.nae2.common.helpers.exposer.ItemExposerHandler;
 import co.neeve.nae2.common.integration.jei.NAEJEIPlugin;
@@ -139,9 +139,13 @@ public class Blocks {
 			.tileEntity(new TileEntityDefinition(TileExposer.class))
 			.features(Features.EXPOSER)
 			.bootstrap((block, item) -> (IPostInitComponent) side -> {
-				ExposerHandler.registerHandler(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+				var api = NAE2.api().exposer();
+				api.registerHandler(NAE2.class,
+					CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
 					ItemExposerHandler.class);
-				ExposerHandler.registerHandler(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
+				
+				api.registerHandler(NAE2.class,
+					CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
 					FluidExposerHandler.class);
 			})
 			.build();
