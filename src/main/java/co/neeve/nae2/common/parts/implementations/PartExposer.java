@@ -7,6 +7,7 @@ import appeng.items.parts.PartModels;
 import appeng.parts.PartBasicState;
 import appeng.parts.PartModel;
 import appeng.util.Platform;
+import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.helpers.exposer.ExposerBootstrapper;
 import co.neeve.nae2.common.interfaces.IExposerHost;
 import net.minecraft.item.ItemStack;
@@ -16,11 +17,12 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
 public class PartExposer extends PartBasicState implements IExposerHost {
-	public static final ResourceLocation MODEL_BASE = new ResourceLocation("nae2", "part/exposer");
+	public static final ResourceLocation MODEL_BASE = new ResourceLocation(Tags.MODID, "part/exposer");
 
 	@PartModels
 	private static final PartModel MODELS_OFF;
@@ -40,6 +42,7 @@ public class PartExposer extends PartBasicState implements IExposerHost {
 			"part/interface_has_channel"));
 	}
 
+	@Nullable
 	private ExposerBootstrapper exposer;
 	private EnumFacing facing;
 
@@ -81,5 +84,10 @@ public class PartExposer extends PartBasicState implements IExposerHost {
 	@Override
 	public boolean hasCapability(Capability<?> capabilityClass) {
 		return this.exposer != null && this.exposer.hasCapability(capabilityClass, this.facing);
+	}
+
+	@Override
+	public ExposerBootstrapper getExposerBootstrapper() {
+		return this.exposer;
 	}
 }

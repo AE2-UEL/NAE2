@@ -32,7 +32,8 @@ public class ExposerBootstrapper implements ICapabilityProvider {
 	 */
 	@Override
 	public boolean hasCapability(@NotNull Capability<?> capability, @Nullable EnumFacing facing) {
-		return facing == null || this.targets.contains(facing) && NAE2.api().exposer().isCapabilityRegistered(capability);
+		return (facing == null || this.targets.contains(facing))
+			&& NAE2.api().exposer().isCapabilityRegistered(capability);
 	}
 
 	/**

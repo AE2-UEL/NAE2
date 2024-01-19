@@ -28,9 +28,9 @@ import java.io.File;
 public class NAE2 {
 	public static NAE2 instance;
 	private static ConfigManager configManager;
-	private final Logger logger = LogManager.getLogger("NAE2");
+	private final Logger logger = LogManager.getLogger(Tags.MODID.toUpperCase());
 	private final NetHandler network = new NetHandler();
-	private final API api = new API();
+	private final NAE2API api = new NAE2API();
 	private Registration registration;
 	private GuiHandler guiHandler;
 	@SideOnly(Side.CLIENT)
@@ -55,11 +55,11 @@ public class NAE2 {
 	}
 
 	/**
-	 * Returns the API for NAE2.
+	 * Returns the NAE2API for NAE2.
 	 *
-	 * @return NAE2 API
+	 * @return NAE2 NAE2API
 	 */
-	public static API api() {
+	public static NAE2API api() {
 		return instance.api;
 	}
 

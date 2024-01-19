@@ -58,7 +58,7 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 	 * @return Pulled stack, or null if the stack could not be pulled
 	 */
 	@Nullable
-	private T pullStackInternal(T stack, boolean simulate) {
+	protected T pullStackInternal(T stack, boolean simulate) {
 		if (!this.cache.isEmpty()) {
 			try {
 				return Platform.poweredExtraction(this.getProxy().getEnergy(),
@@ -104,8 +104,7 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 					this.cache.makeFirst(stack);
 				}
 
-				return this.pullStackInternal(stack.copy().setStackSize(Math.min(maxAmt, stack.getStackSize())),
-					simulate);
+				return this.pullStackInternal(stack.copy().setStackSize(maxAmt), simulate);
 			}
 		}
 

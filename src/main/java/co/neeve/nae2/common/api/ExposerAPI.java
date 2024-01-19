@@ -1,4 +1,4 @@
-package co.neeve.nae2.common.helpers.exposer;
+package co.neeve.nae2.common.api;
 
 import appeng.api.storage.data.IAEStack;
 import co.neeve.nae2.NAE2;

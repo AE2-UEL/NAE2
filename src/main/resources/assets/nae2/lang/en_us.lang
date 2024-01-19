@@ -86,6 +86,6 @@ nae2.jei.cellview.hover.3=%s bytes/type * %s = %s bytes lost.
 nae2.jei.cellview.keybind=Press %s to view contents
 
 # Exposer
-nae2.exposer.tooltip=Exposes the network contents as capabilities.
+nae2.exposer.tooltip=Exposes the network contents as capabilities. The cooler ME Interface.
 nae2.exposer.noneregistered=No handlers registered.
 nae2.exposer.registered=Registered handlers:

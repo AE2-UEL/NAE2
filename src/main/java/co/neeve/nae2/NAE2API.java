@@ -1,13 +1,11 @@
 package co.neeve.nae2;
 
-import co.neeve.nae2.common.helpers.exposer.ExposerAPI;
+import co.neeve.nae2.common.api.ExposerAPI;
 
-public class API {
+public class NAE2API {
 	private final ExposerAPI exposerAPI = new ExposerAPI();
 
-	API() {
-
-	}
+	NAE2API() {}
 
 	/**
 	 * Returns the Exposer API.
