@@ -9,6 +9,7 @@ import appeng.items.AEBaseItem;
 import co.neeve.nae2.common.registration.definitions.Parts;
 import com.github.bsideup.jabel.Desugar;
 import com.google.common.base.Preconditions;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -167,6 +168,18 @@ public class NAEBaseItemPart extends AEBaseItem implements IPartItem {
 		}
 
 		return 0;
+	}
+
+	@Override
+	protected void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+	                                     ITooltipFlag advancedTooltips) {
+		super.addCheckedInformation(stack, world, lines, advancedTooltips);
+
+		final var pt = this.getTypeByStack(stack);
+
+		if (pt != null) {
+			pt.addCheckedInformation(stack, world, lines, advancedTooltips);
+		}
 	}
 
 	@Desugar

@@ -5,22 +5,30 @@ import appeng.block.crafting.ItemCraftingStorage;
 import appeng.bootstrap.BlockRenderingCustomizer;
 import appeng.bootstrap.IBlockRendering;
 import appeng.bootstrap.IItemRendering;
+import appeng.bootstrap.components.IPostInitComponent;
 import appeng.bootstrap.components.IPreInitComponent;
 import appeng.bootstrap.definitions.TileEntityDefinition;
 import appeng.util.Platform;
+import co.neeve.nae2.NAE2;
 import co.neeve.nae2.client.rendering.tesr.TESRReconstructionChamber;
 import co.neeve.nae2.common.blocks.BlockDenseCraftingUnit;
+import co.neeve.nae2.common.blocks.BlockExposer;
 import co.neeve.nae2.common.blocks.BlockReconstructionChamber;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.DenseCellFeatures;
+import co.neeve.nae2.common.helpers.exposer.FluidExposerHandler;
+import co.neeve.nae2.common.helpers.exposer.ItemExposerHandler;
 import co.neeve.nae2.common.integration.jei.NAEJEIPlugin;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.rendering.DenseCraftingCubeRendering;
 import co.neeve.nae2.common.tiles.TileDenseCraftingUnit;
+import co.neeve.nae2.common.tiles.TileExposer;
 import co.neeve.nae2.common.tiles.TileReconstructionChamber;
 import de.ellpeck.actuallyadditions.mod.jei.reconstructor.ReconstructorRecipeCategory;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 @SuppressWarnings("unused")
 public class Blocks {
@@ -32,6 +40,7 @@ public class Blocks {
 	private final ITileDefinition coprocessor4x;
 	private final ITileDefinition coprocessor16x;
 	private final ITileDefinition coprocessor64x;
+	private final ITileDefinition exposer;
 
 	public Blocks(Registry registry) {
 		this.reconstructionChamber = registry.block("reconstruction_chamber",
@@ -125,6 +134,21 @@ public class Blocks {
 			.useCustomItemModel()
 			.features(Features.DENSE_CPU_COPROCESSORS)
 			.build();
+
+		this.exposer = registry.block("exposer", BlockExposer::new)
+			.tileEntity(new TileEntityDefinition(TileExposer.class))
+			.features(Features.EXPOSER)
+			.bootstrap((block, item) -> (IPostInitComponent) side -> {
+				var api = NAE2.api().exposer();
+				api.registerHandler(NAE2.class,
+					CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
+					ItemExposerHandler.class);
+				
+				api.registerHandler(NAE2.class,
+					CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
+					FluidExposerHandler.class);
+			})
+			.build();
 	}
 
 	public ITileDefinition reconstructionChamber() {
@@ -157,5 +181,9 @@ public class Blocks {
 
 	public ITileDefinition coprocessor64x() {
 		return this.coprocessor64x;
+	}
+
+	public ITileDefinition exposer() {
+		return this.exposer;
 	}
 }

@@ -34,7 +34,8 @@ public enum Features implements IFeature {
 	},
 	DENSE_CELLS(EnumSet.allOf(DenseCellFeatures.class)),
 	DENSE_CPU_COPROCESSORS("dense.coprocessor"),
-	DENSE_FLUID_CELLS();
+	DENSE_FLUID_CELLS(),
+	EXPOSER();
 
 	private String[] mixins;
 	private EnumSet<? extends ISubFeature> subFeatures = null;

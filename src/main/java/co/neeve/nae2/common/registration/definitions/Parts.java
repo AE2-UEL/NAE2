@@ -5,11 +5,13 @@ import appeng.api.parts.IPart;
 import appeng.core.features.DamagedItemDefinition;
 import appeng.core.localization.GuiText;
 import appeng.util.Platform;
+import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
 import co.neeve.nae2.common.items.NAEBaseItemPart;
 import co.neeve.nae2.common.parts.implementations.PartBeamFormer;
+import co.neeve.nae2.common.parts.implementations.PartExposer;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.helpers.PartModelsHelper;
@@ -20,7 +22,10 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
@@ -30,9 +35,10 @@ import java.util.*;
 
 public class Parts implements Definitions<DamagedItemDefinition> {
 	private final Object2ObjectOpenHashMap<String, DamagedItemDefinition> byId = new Object2ObjectOpenHashMap<>();
+	private final NAEBaseItemPart itemPart;
 	private final DamagedItemDefinition beamFormer;
 	private final DamagedItemDefinition p2pTunnelInterface;
-	private final NAEBaseItemPart itemPart;
+	private final DamagedItemDefinition exposer;
 
 	public Parts(Registry registry) {
 		this.itemPart = new NAEBaseItemPart();
@@ -48,6 +54,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 
 		this.beamFormer = this.createPart(this.itemPart, PartType.BEAM_FORMER);
 		this.p2pTunnelInterface = this.createPart(this.itemPart, PartType.P2P_TUNNEL_INTERFACE);
+		this.exposer = this.createPart(this.itemPart, PartType.EXPOSER);
 	}
 
 	public static Optional<PartType> getById(int itemDamage) {
@@ -71,6 +78,10 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 		return this.p2pTunnelInterface;
 	}
 
+	public DamagedItemDefinition exposer() {
+		return this.exposer;
+	}
+
 	@Override
 	public Optional<DamagedItemDefinition> getById(String id) {
 		return Optional.ofNullable(this.byId.getOrDefault(id, null));
@@ -83,6 +94,13 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 			@Override
 			public String getUnlocalizedName() {
 				return "item.appliedenergistics2.multi_part.p2p_tunnel";
+			}
+		},
+		EXPOSER("exposer", PartExposer.class, Features.EXPOSER) {
+			@Override
+			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+			                                  ITooltipFlag advancedTooltips) {
+				NAE2.api().exposer().addTooltipInformation(stack, world, lines, advancedTooltips);
 			}
 		};
 
@@ -183,6 +201,10 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 
 		public String getId() {
 			return this.id;
+		}
+
+		public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+		                                  ITooltipFlag advancedTooltips) {
 		}
 	}
 }

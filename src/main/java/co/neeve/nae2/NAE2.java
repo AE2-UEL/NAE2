@@ -28,12 +28,11 @@ import java.io.File;
 public class NAE2 {
 	public static NAE2 instance;
 	private static ConfigManager configManager;
-	private final Logger logger = LogManager.getLogger("NAE2");
+	private final Logger logger = LogManager.getLogger(Tags.MODID.toUpperCase());
 	private final NetHandler network = new NetHandler();
+	private final NAE2API api = new NAE2API();
 	private Registration registration;
-
 	private GuiHandler guiHandler;
-
 	@SideOnly(Side.CLIENT)
 	private ItemStack icon;
 
@@ -53,6 +52,15 @@ public class NAE2 {
 
 	public static Registration definitions() {
 		return instance.registration;
+	}
+
+	/**
+	 * Returns the NAE2API for NAE2.
+	 *
+	 * @return NAE2 NAE2API
+	 */
+	public static NAE2API api() {
+		return instance.api;
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -122,4 +130,5 @@ public class NAE2 {
 			config.save();
 		}
 	}
+
 }

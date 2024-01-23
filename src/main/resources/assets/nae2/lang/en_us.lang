@@ -32,6 +32,7 @@ item.nae2.material.cell_part_fluid_16384k.name=§a16384k§r ME Fluid Storage Com
 
 # Parts
 item.nae2.part.beam_former.name=ME Beam Former
+item.nae2.part.exposer.name=ME Storage Exposer
 
 # Upgrades
 item.nae2.upgrade.hyper_acceleration.name=Hyper-Acceleration Card
@@ -46,6 +47,7 @@ tile.nae2.storage_crafting_256k.name=§c256k§r Crafting Storage
 tile.nae2.storage_crafting_1024k.name=§61024k§r Crafting Storage
 tile.nae2.storage_crafting_4096k.name=§e4096k§r Crafting Storage
 tile.nae2.storage_crafting_16384k.name=§a16384k§r Crafting Storage
+tile.nae2.exposer.name=ME Storage Exposer
 
 # Pattern Multi-Tool GUI
 nae2.pattern_multiplier.unencode=Clear
@@ -82,3 +84,8 @@ nae2.jei.cellview.hover.1=%s types used up.
 nae2.jei.cellview.hover.2=Each used type decreases the capacity.
 nae2.jei.cellview.hover.3=%s bytes/type * %s = %s bytes lost.
 nae2.jei.cellview.keybind=Press %s to view contents
+
+# Exposer
+nae2.exposer.tooltip=Exposes the network contents as capabilities. The cooler ME Interface.
+nae2.exposer.noneregistered=No handlers registered.
+nae2.exposer.registered=Registered handlers:
