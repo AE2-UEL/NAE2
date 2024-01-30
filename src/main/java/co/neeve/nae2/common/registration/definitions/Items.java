@@ -13,6 +13,7 @@ import co.neeve.nae2.common.items.VirtualPattern;
 import co.neeve.nae2.common.items.cells.DenseFluidCell;
 import co.neeve.nae2.common.items.cells.DenseItemCell;
 import co.neeve.nae2.common.items.cells.handlers.VoidCellHandler;
+import co.neeve.nae2.common.items.cells.vc.FluidStorageCellVoid;
 import co.neeve.nae2.common.items.cells.vc.StorageCellVoid;
 import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
 import co.neeve.nae2.common.recipes.handlers.VoidCellRecipe;
@@ -67,9 +68,10 @@ public class Items implements Definitions<IItemDefinition> {
 			.features(Features.VOID_CELLS)
 			.build());
 
-		this.fluidStorageCellVoid = this.registerById(registry.item("fluid_storage_cell_void", StorageCellVoid::new)
-			.features(Features.VOID_CELLS)
-			.build());
+		this.fluidStorageCellVoid = this.registerById(
+			registry.item("fluid_storage_cell_void", FluidStorageCellVoid::new)
+				.features(Features.VOID_CELLS)
+				.build());
 
 		registry.addBootstrapComponent((IPostInitComponent) r -> {
 			if (this.storageCellVoid.isEnabled() || this.fluidStorageCellVoid.isEnabled()) {
