@@ -6,7 +6,7 @@ import appeng.container.implementations.ContainerCondenser;
 import appeng.container.slot.SlotRestrictedInput;
 import appeng.tile.misc.TileCondenser;
 import co.neeve.nae2.common.interfaces.IExtendedTileCondenser;
-import co.neeve.nae2.common.items.cells.vc.BaseStorageCellVoid;
+import co.neeve.nae2.common.items.cells.vc.VoidCell;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
@@ -35,7 +35,7 @@ public class MixinContainerTileCondenser extends AEBaseContainer {
 				((IExtendedTileCondenser) condenser).getVoidCellInv(), 0, 101, 52 + 26, ip) {
 				@Override
 				public boolean isItemValid(ItemStack i) {
-					return i.getItem() instanceof BaseStorageCellVoid<?>;
+					return i.getItem() instanceof VoidCell<?>;
 				}
 			};
 		this.addSlotToContainer(slotRestrictedInput.setStackLimit(1));

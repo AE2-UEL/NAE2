@@ -1,10 +1,11 @@
 package co.neeve.nae2.common.items.cells.vc;
 
-import appeng.api.config.AccessRestriction;
-import appeng.api.config.Actionable;
+import appeng.api.config.*;
+import appeng.api.implementations.items.IUpgradeModule;
 import appeng.api.networking.security.IActionSource;
+import appeng.api.storage.ICellInventory;
 import appeng.api.storage.ICellInventoryHandler;
-import appeng.api.storage.IMEInventoryHandler;
+import appeng.api.storage.ISaveProvider;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
@@ -12,26 +13,35 @@ import appeng.fluids.helper.FluidCellConfig;
 import appeng.fluids.items.FluidDummyItem;
 import appeng.fluids.util.AEFluidStack;
 import appeng.items.contents.CellConfig;
-import appeng.me.storage.BasicCellInventoryHandler;
+import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
+import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import org.jetbrains.annotations.Nullable;
 
-public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHandler<T> {
-	private final IStorageChannel<T> channel;
-	private final ItemStack itemStack;
-	private final IItemList<T> itemListCache;
-	private final BaseStorageCellVoid<T> item;
+public class VoidCellInventory<T extends IAEStack<T>> implements ICellInventoryHandler<T> {
+	protected final IStorageChannel<T> channel;
+	protected final ItemStack itemStack;
+	protected final IItemList<T> itemListCache;
+	protected final VoidCell<T> item;
+	protected final CellConfig cellConfig;
+	protected final ISaveProvider saveProvider;
+	protected boolean hasSticky;
+	protected boolean hasInverter;
+	protected boolean hasFuzzy;
 
 	@SuppressWarnings("unchecked")
-	protected VoidCellInventory(ItemStack o) {
+	public VoidCellInventory(ItemStack o, ISaveProvider iSaveProvider) {
 		this.itemStack = o;
 
-		this.item = (BaseStorageCellVoid<T>) o.getItem();
+		this.item = (VoidCell<T>) o.getItem();
 		this.channel = this.item.getStorageChannel();
 		this.itemListCache = this.getChannel().createList();
+		this.saveProvider = iSaveProvider;
 
-		var cc = this.isFluid() ? new FluidCellConfig(o) : new CellConfig(o);
-		for (final var is : cc) {
+		this.cellConfig = this.isFluid() ? new FluidCellConfig(o) : new CellConfig(o);
+		for (final var is : this.cellConfig) {
 			if (!is.isEmpty()) {
 				if (this.isFluid() && is.getItem() instanceof FluidDummyItem fdi) {
 					this.itemListCache.add((T) AEFluidStack.fromFluidStack(fdi.getFluidStack(is)));
@@ -40,15 +50,33 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 				}
 			}
 		}
+
+		var upgrades = this.item.getUpgradesInventory(this.itemStack);
+
+		int x;
+		ItemStack is;
+		for (x = 0; x < upgrades.getSlots(); ++x) {
+			is = upgrades.getStackInSlot(x);
+			if (!is.isEmpty() && is.getItem() instanceof IUpgradeModule) {
+				var u = ((IUpgradeModule) is.getItem()).getType(is);
+				if (u != null) {
+					switch (u) {
+						case FUZZY -> this.hasFuzzy = true;
+						case INVERTER -> this.hasInverter = true;
+						case STICKY -> this.hasSticky = true;
+					}
+				}
+			}
+		}
 	}
 
-	public static <T extends IAEStack<T>> ICellInventoryHandler<T> getCell(final ItemStack o) {
-		var inv = new VoidCellInventory<T>(o);
-		return new BasicCellInventoryHandler<>(inv, inv.getChannel());
+	public CellConfig getCellConfig() {
+		return this.cellConfig;
 	}
 
+	@Override
 	public T injectItems(T input, Actionable mode, IActionSource src) {
-		if (!this.itemListCache.isEmpty() && this.itemListCache.findPrecise(input) == null) return input;
+		if (!this.isValidInput(input)) return input;
 
 		if (mode == Actionable.MODULATE) {
 			this.item.addCondenserPowerFromInput(this.itemStack, input.getStackSize());
@@ -57,10 +85,24 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 		return null;
 	}
 
+	private boolean isValidInput(T input) {
+		if (this.itemListCache.isEmpty()) {
+			return true;
+		}
+
+		if (this.item.getUpgradesInventory(this.itemStack).getInstalledUpgrades(Upgrades.FUZZY) > 0) {
+			return !this.itemListCache.findFuzzy(input, this.item.getFuzzyMode(this.itemStack)).isEmpty();
+		} else {
+			return this.itemListCache.findPrecise(input) != null;
+		}
+	}
+
+	@Override
 	public T extractItems(T request, Actionable mode, IActionSource src) {
 		return null;
 	}
 
+	@Override
 	public IItemList<T> getAvailableItems(IItemList<T> out) {
 		return out;
 	}
@@ -71,30 +113,104 @@ public class VoidCellInventory<T extends IAEStack<T>> implements IMEInventoryHan
 	}
 
 	private boolean isFluid() {
-		return this.itemStack.getItem() instanceof FluidStorageCellVoid;
+		return this.itemStack.getItem() instanceof VoidFluidCell;
 	}
 
+	@Override
 	public AccessRestriction getAccess() {
 		return AccessRestriction.WRITE;
 	}
 
+	@Override
 	public boolean isPrioritized(T input) {
-		return this.itemListCache.isEmpty() || this.itemListCache.findPrecise(input) != null;
+		return this.itemListCache.isEmpty() || this.isValidInput(input);
 	}
 
+	@Override
 	public boolean canAccept(T input) {
-		return this.itemListCache.isEmpty() || this.itemListCache.findPrecise(input) != null;
+		return this.itemListCache.isEmpty() || this.isValidInput(input);
 	}
 
+	@Override
 	public int getPriority() {
 		return 0;
 	}
 
+	@Override
 	public int getSlot() {
 		return 0;
 	}
 
+	@Override
 	public boolean validForPass(int i) {
 		return true;
+	}
+
+	@Nullable
+	@Override
+	public ICellInventory<T> getCellInv() {
+		return null;
+	}
+
+	@Override
+	public boolean isPreformatted() {
+		return !this.itemListCache.isEmpty();
+	}
+
+	public boolean isFuzzy() {
+		return this.hasFuzzy;
+	}
+
+	public IncludeExclude getIncludeExcludeMode() {
+		return this.hasInverter ? IncludeExclude.BLACKLIST : IncludeExclude.WHITELIST;
+	}
+
+	@Override
+	public boolean isSticky() {
+		return this.hasSticky;
+	}
+
+	public FuzzyMode getFuzzyMode() {
+		var fz = Platform.openNbtData(this.itemStack).getString("FuzzyMode");
+
+		try {
+			return FuzzyMode.valueOf(fz);
+		} catch (Throwable var4) {
+			return FuzzyMode.IGNORE_ALL;
+		}
+	}
+
+	public void setFuzzyMode(FuzzyMode fzMode) {
+		Platform.openNbtData(this.itemStack).setString("FuzzyMode", fzMode.name());
+	}
+
+	public void addCondenserPowerFromInput(double power) {
+		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
+
+		this.setCondenserPower(this.getCondenserPower() + power / (double) this.getChannel().transferFactor());
+	}
+
+	public double getCondenserPower() {
+		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return 0;
+
+		var compound = this.itemStack.getTagCompound();
+		if (compound != null) {
+			return compound.getDouble("power");
+		}
+
+		return 0;
+	}
+
+	public void setCondenserPower(double power) {
+		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
+
+		var compound = this.itemStack.getTagCompound();
+		if (compound == null) {
+			this.itemStack.setTagCompound(compound = new NBTTagCompound());
+		}
+		compound.setDouble("power", power);
+		if (this.saveProvider != null) {
+			this.saveProvider.saveChanges(null);
+		}
 	}
 }

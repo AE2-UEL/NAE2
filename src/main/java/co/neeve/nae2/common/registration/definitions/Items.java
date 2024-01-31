@@ -13,8 +13,8 @@ import co.neeve.nae2.common.items.VirtualPattern;
 import co.neeve.nae2.common.items.cells.DenseFluidCell;
 import co.neeve.nae2.common.items.cells.DenseItemCell;
 import co.neeve.nae2.common.items.cells.handlers.VoidCellHandler;
-import co.neeve.nae2.common.items.cells.vc.FluidStorageCellVoid;
-import co.neeve.nae2.common.items.cells.vc.StorageCellVoid;
+import co.neeve.nae2.common.items.cells.vc.VoidFluidCell;
+import co.neeve.nae2.common.items.cells.vc.VoidItemCell;
 import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
 import co.neeve.nae2.common.recipes.handlers.VoidCellRecipe;
 import co.neeve.nae2.common.registration.registry.Registry;
@@ -24,6 +24,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 @SuppressWarnings("unused")
@@ -64,12 +66,12 @@ public class Items implements Definitions<IItemDefinition> {
 			})
 			.build());
 
-		this.storageCellVoid = this.registerById(registry.item("storage_cell_void", StorageCellVoid::new)
+		this.storageCellVoid = this.registerById(registry.item("storage_cell_void", VoidItemCell::new)
 			.features(Features.VOID_CELLS)
 			.build());
 
 		this.fluidStorageCellVoid = this.registerById(
-			registry.item("fluid_storage_cell_void", FluidStorageCellVoid::new)
+			registry.item("fluid_storage_cell_void", VoidFluidCell::new)
 				.features(Features.VOID_CELLS)
 				.build());
 
@@ -79,21 +81,20 @@ public class Items implements Definitions<IItemDefinition> {
 			}
 		});
 
-		registry.addBootstrapComponent((IRecipeRegistrationComponent) (side, r) -> {
-			NAE2.definitions().materials().cellPartVoid().maybeStack(1).ifPresent(voidComponent ->
-				AEApi.instance().definitions().materials().emptyStorageCell().maybeStack(1).ifPresent(stack -> {
-					this.storageCellVoid.maybeStack(1).ifPresent((itemStack -> r.register(new VoidCellRecipe(
-						stack, voidComponent, itemStack).setRegistryName("storage_cell_void"))));
+		registry.addBootstrapComponent((IRecipeRegistrationComponent) (side, r) -> NAE2.definitions().materials().cellPartVoid().maybeStack(
+			1).ifPresent(voidComponent ->
+			AEApi.instance().definitions().materials().emptyStorageCell().maybeStack(1).ifPresent(stack -> {
+				this.storageCellVoid.maybeStack(1).ifPresent((itemStack -> r.register(new VoidCellRecipe(
+					stack, voidComponent, itemStack).setRegistryName("storage_cell_void"))));
 
-					this.fluidStorageCellVoid.maybeStack(1).ifPresent((itemStack -> r.register(new VoidCellRecipe(
-						voidComponent, stack, itemStack).setRegistryName("fluid_storage_cell_void"))));
-				}));
-		});
+				this.fluidStorageCellVoid.maybeStack(1).ifPresent((itemStack -> r.register(new VoidCellRecipe(
+					voidComponent, stack, itemStack).setRegistryName("fluid_storage_cell_void"))));
+			})));
 
 		this.storageCell256K = this.registerById(registry.item("storage_cell_256k", () ->
 				new DenseItemCell(Materials.MaterialType.CELL_PART_256K,
-					(int) Math.pow(2, 8))).
-			features(Features.DENSE_CELLS)
+					(int) Math.pow(2, 8)))
+			.features(Features.DENSE_CELLS)
 			.build());
 
 		this.storageCell1024K = this.registerById(registry.item("storage_cell_1024k", () ->
@@ -137,6 +138,46 @@ public class Items implements Definitions<IItemDefinition> {
 					(int) Math.pow(2, 14)))
 			.features(Features.DENSE_FLUID_CELLS)
 			.build());
+
+		registry.addBootstrapComponent((IPostInitComponent) r -> {
+			var items = AEApi.instance().definitions().items();
+			var cellDef = items.cell1k();
+			if (Features.DENSE_CELLS.isEnabled() && cellDef.isEnabled()) {
+				mirrorCellUpgrades(cellDef, new IItemDefinition[]{
+					this.storageCell256K,
+					this.storageCell1024K,
+					this.storageCell4096K,
+					this.storageCell16384K,
+					this.storageCellVoid
+				});
+			}
+
+			var fluidCellDef = items.fluidCell1k();
+			if (Features.DENSE_FLUID_CELLS.isEnabled() && fluidCellDef.isEnabled()) {
+				mirrorCellUpgrades(fluidCellDef, new IItemDefinition[]{
+					this.storageCellFluid256K,
+					this.storageCellFluid1024K,
+					this.storageCellFluid4096K,
+					this.storageCellFluid16384K,
+					this.fluidStorageCellVoid
+				});
+			}
+		});
+	}
+
+	private static void mirrorCellUpgrades(IItemDefinition cellDef, IItemDefinition[] cells) {
+		var supported = new java.util.HashMap<Upgrades, Integer>();
+		Arrays.stream(Upgrades.values())
+			.forEach(upgrade ->
+				upgrade.getSupported().entrySet().stream()
+					.filter(x -> cellDef.isSameAs(x.getKey()))
+					.map(Map.Entry::getValue)
+					.findFirst()
+					.ifPresent(value -> supported.put(upgrade, value)));
+
+		Arrays.stream(cells).forEach(iItemDefinition ->
+			supported.forEach((key, value) ->
+				key.registerItem(iItemDefinition, value)));
 	}
 
 	private IItemDefinition registerById(ItemDefinition item) {

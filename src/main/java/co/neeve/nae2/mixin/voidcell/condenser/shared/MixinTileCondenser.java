@@ -5,7 +5,7 @@ import appeng.tile.inventory.AppEngInternalInventory;
 import appeng.tile.misc.TileCondenser;
 import appeng.util.inv.InvOperation;
 import co.neeve.nae2.common.interfaces.IExtendedTileCondenser;
-import co.neeve.nae2.common.items.cells.vc.BaseStorageCellVoid;
+import co.neeve.nae2.common.items.cells.vc.VoidCell;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -70,7 +70,7 @@ public abstract class MixinTileCondenser extends AEBaseInvTile implements IExten
 	}, cancellable = true)
 	private void onChangeInventory(IItemHandler inv, int slot, InvOperation mc, ItemStack removed, ItemStack added,
 	                               CallbackInfo ci) {
-		if (inv == this.nae2$voidCell && removed.isEmpty() && added.getItem() instanceof BaseStorageCellVoid) {
+		if (inv == this.nae2$voidCell && removed.isEmpty() && added.getItem() instanceof VoidCell) {
 			this.addPower(0);
 			ci.cancel();
 		}
@@ -114,7 +114,7 @@ public abstract class MixinTileCondenser extends AEBaseInvTile implements IExten
 
 	@Unique
 	private void refillFromVoidCell(ItemStack is) {
-		if (is.getItem() instanceof BaseStorageCellVoid<?> cell) {
+		if (is.getItem() instanceof VoidCell<?> cell) {
 			var cellPower = cell.getCondenserPower(is);
 			if (cellPower != 0) {
 				var toAdd = this.getStorage() - this.getStoredPower();

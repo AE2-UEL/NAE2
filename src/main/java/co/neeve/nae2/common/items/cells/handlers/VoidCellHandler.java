@@ -7,17 +7,19 @@ import appeng.api.storage.channels.IFluidStorageChannel;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEStack;
 import co.neeve.nae2.common.interfaces.IVoidingCellHandler;
-import co.neeve.nae2.common.items.cells.vc.FluidStorageCellVoid;
-import co.neeve.nae2.common.items.cells.vc.StorageCellVoid;
+import co.neeve.nae2.common.items.cells.vc.VoidCell;
 import co.neeve.nae2.common.items.cells.vc.VoidCellInventory;
+import co.neeve.nae2.common.items.cells.vc.VoidFluidCell;
+import co.neeve.nae2.common.items.cells.vc.VoidItemCell;
 import net.minecraft.item.ItemStack;
 
 public final class VoidCellHandler implements IVoidingCellHandler {
 	public VoidCellHandler() {
 	}
 
+	@Override
 	public boolean isCell(ItemStack is) {
-		return is.getItem() instanceof StorageCellVoid || is.getItem() instanceof FluidStorageCellVoid;
+		return is.getItem() instanceof VoidCell;
 	}
 
 	@Override
@@ -26,16 +28,18 @@ public final class VoidCellHandler implements IVoidingCellHandler {
 	                                                                         IStorageChannel<T> iStorageChannel) {
 		return !itemStack.isEmpty()
 			&& (
-			(itemStack.getItem() instanceof StorageCellVoid && iStorageChannel instanceof IItemStorageChannel)
-				|| (itemStack.getItem() instanceof FluidStorageCellVoid && iStorageChannel instanceof IFluidStorageChannel)
-		) ? VoidCellInventory.getCell(itemStack) : null;
+			(itemStack.getItem() instanceof VoidItemCell && iStorageChannel instanceof IItemStorageChannel)
+				|| (itemStack.getItem() instanceof VoidFluidCell && iStorageChannel instanceof IFluidStorageChannel)
+		) ? new VoidCellInventory<>(itemStack, iSaveProvider) : null;
 	}
 
+	@Override
 	public int getStatusForCell(ItemStack is, ICellInventoryHandler handler) {
 		return 2;
 	}
 
+	@Override
 	public double cellIdleDrain(ItemStack is, ICellInventoryHandler handler) {
-		return 0.0;
+		return 2.0;
 	}
 }

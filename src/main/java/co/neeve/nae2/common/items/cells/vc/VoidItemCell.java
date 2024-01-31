@@ -5,11 +5,9 @@ import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.storage.data.IAEItemStack;
 
-public class StorageCellVoid extends BaseStorageCellVoid<IAEItemStack> {
+public class VoidItemCell extends VoidCell<IAEItemStack> {
 	@Override
 	public IStorageChannel<IAEItemStack> getStorageChannel() {
 		return AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class);
 	}
-
-
 }

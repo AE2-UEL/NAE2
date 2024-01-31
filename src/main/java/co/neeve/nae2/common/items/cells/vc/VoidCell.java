@@ -2,10 +2,9 @@ package co.neeve.nae2.common.items.cells.vc;
 
 import appeng.api.AEApi;
 import appeng.api.config.FuzzyMode;
+import appeng.api.config.IncludeExclude;
 import appeng.api.exceptions.MissingDefinitionException;
-import appeng.api.storage.ICellInventoryHandler;
 import appeng.api.storage.ICellWorkbenchItem;
-import appeng.api.storage.IMEInventoryHandler;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.data.IAEStack;
 import appeng.core.AEConfig;
@@ -13,15 +12,16 @@ import appeng.core.features.AEFeature;
 import appeng.core.localization.GuiText;
 import appeng.items.AEBaseItem;
 import appeng.items.contents.CellConfig;
+import appeng.items.contents.CellUpgrades;
 import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -30,39 +30,34 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
 import java.util.List;
 
-public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseItem implements ICellWorkbenchItem {
+public abstract class VoidCell<T extends IAEStack<T>> extends AEBaseItem implements ICellWorkbenchItem {
 	private static final NumberFormat decimalFormat = NumberFormat.getInstance();
 
-	public BaseStorageCellVoid() {
+	public VoidCell() {
 		this.setMaxStackSize(1);
 	}
 
+	@Override
 	public boolean isEditable(ItemStack is) {
 		return true;
 	}
 
-	public IItemHandler getUpgradesInventory(ItemStack is) {
-		return null;
+	@Override
+	public CellUpgrades getUpgradesInventory(ItemStack is) {
+		return new CellUpgrades(is, 2);
 	}
 
-	public FuzzyMode getFuzzyMode(ItemStack is) {
-		return FuzzyMode.IGNORE_ALL;
-	}
-
-	public void setFuzzyMode(ItemStack is, FuzzyMode fzMode) {}
-
+	@Override
 	public IItemHandler getConfigInventory(ItemStack is) {
-		return new CellConfig(is);
+		return this.getCellInventory(is).getCellConfig();
 	}
 
-	@Nullable
-	public ICellInventoryHandler<T> getCellInventory(ItemStack stack) {
-		return AEApi.instance().registries().cell().getCellInventory(stack,
+	public VoidCellInventory<T> getCellInventory(ItemStack stack) {
+		return (VoidCellInventory<T>) AEApi.instance().registries().cell().getCellInventory(stack,
 			null, this.getStorageChannel());
 	}
 
@@ -75,16 +70,31 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 		super.addCheckedInformation(stack, world, lines, advancedTooltips);
 
 		var empty = true;
-
-		IMEInventoryHandler<?> inventory = this.getCellInventory(stack);
+		var inventory = this.getCellInventory(stack);
 		if (inventory != null) {
 			var cc = new CellConfig(stack);
-
+			var storageList = new ObjectArrayList<String>();
 			for (var is : cc) {
 				if (!is.isEmpty()) {
-					empty = false;
-					lines.add(is.getDisplayName());
+					storageList.add(is.getDisplayName());
 				}
+			}
+
+			if (!storageList.isEmpty()) {
+				var list = (this.getIncludeExcludeMode(stack) == IncludeExclude.WHITELIST ? GuiText.Included :
+					GuiText.Excluded).getLocal();
+				if (this.isFuzzy(stack)) {
+					lines.add("[" + GuiText.Partitioned.getLocal() + "] - " + list + ' ' + GuiText.Fuzzy.getLocal());
+				} else {
+					lines.add("[" + GuiText.Partitioned.getLocal() + "] - " + list + ' ' + GuiText.Precise.getLocal());
+				}
+
+				if (this.isSticky(stack)) {
+					lines.add(GuiText.Sticky.getLocal());
+				}
+
+				lines.addAll(storageList);
+				empty = false;
 			}
 		}
 
@@ -106,27 +116,20 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 
 	}
 
-	public double getCondenserPower(ItemStack stack) {
-		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return 0;
+	public boolean isSticky(ItemStack itemStack) {
+		return this.getCellInventory(itemStack).isSticky();
+	}
 
-		var compound = stack.getTagCompound();
-		if (compound == null) return 0;
-		return compound.getDouble("power");
+	public double getCondenserPower(ItemStack stack) {
+		return this.getCellInventory(stack).getCondenserPower();
 	}
 
 	public void setCondenserPower(ItemStack stack, double power) {
-		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
-
-		var compound = stack.getTagCompound();
-		if (compound == null) stack.setTagCompound(compound = new NBTTagCompound());
-		compound.setDouble("power", power);
+		this.getCellInventory(stack).setCondenserPower(power);
 	}
 
 	public void addCondenserPowerFromInput(ItemStack stack, double power) {
-		if (!VoidCellFeatures.CONDENSER_POWER.isEnabled()) return;
-
-		this.setCondenserPower(stack,
-			this.getCondenserPower(stack) + power / (double) this.getStorageChannel().transferFactor());
+		this.getCellInventory(stack).addCondenserPowerFromInput(power);
 	}
 
 	@Override
@@ -136,7 +139,7 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 		return new ActionResult<>(EnumActionResult.SUCCESS, player.getHeldItem(hand));
 	}
 
-	private void disassembleDrive(ItemStack stack, EntityPlayer player) {
+	protected void disassembleDrive(ItemStack stack, EntityPlayer player) {
 		if (player.isSneaking()) {
 			if (Platform.isClient()) {
 				return;
@@ -161,7 +164,16 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 				}
 			}
 		}
+	}
 
+	@Override
+	public FuzzyMode getFuzzyMode(ItemStack is) {
+		return this.getCellInventory(is).getFuzzyMode();
+	}
+
+	@Override
+	public void setFuzzyMode(ItemStack is, FuzzyMode fzMode) {
+		this.getCellInventory(is).setFuzzyMode(fzMode);
 	}
 
 	protected void dropEmptyStorageCellCase(InventoryAdaptor ia, EntityPlayer player) {
@@ -187,5 +199,13 @@ public abstract class BaseStorageCellVoid<T extends IAEStack<T>> extends AEBaseI
 	@Override
 	public boolean hasContainerItem(final @NotNull ItemStack stack) {
 		return AEConfig.instance().isFeatureEnabled(AEFeature.ENABLE_DISASSEMBLY_CRAFTING);
+	}
+
+	protected IncludeExclude getIncludeExcludeMode(ItemStack itemStack) {
+		return this.getCellInventory(itemStack).getIncludeExcludeMode();
+	}
+
+	protected boolean isFuzzy(ItemStack itemStack) {
+		return this.getCellInventory(itemStack).isFuzzy();
 	}
 }
