@@ -119,7 +119,8 @@ public class PartBeamFormer extends NAEBasePartState implements IBlockStateListe
 
 	@Override
 	public boolean isValid() {
-		return !this.getTile().isInvalid() && this.getHost().getPart(this.getSide()) == this;
+		var tile = this.getTile();
+		return tile.getWorld() == getClientWorld() && !tile.isInvalid() && this.getHost().getPart(this.getSide()) == this;
 	}
 
 	@Override
