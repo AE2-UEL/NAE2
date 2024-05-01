@@ -4,6 +4,7 @@ import appeng.api.networking.IGrid;
 import appeng.api.networking.crafting.ICraftingGrid;
 import appeng.api.networking.crafting.ICraftingJob;
 import appeng.container.AEBaseContainer;
+import appeng.container.ContainerNull;
 import appeng.container.implementations.ContainerCraftConfirm;
 import appeng.container.implementations.ContainerPatternEncoder;
 import appeng.container.interfaces.IInventorySlotAware;
@@ -25,7 +26,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenCustomHashSet;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Mixin;
@@ -35,10 +38,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
@@ -133,20 +133,38 @@ public class MixinPacketJEIRecipe {
 		// No encoders.
 		if (player.openContainer instanceof ContainerPatternEncoder) return;
 
-		// Not a crafting recipe. No do.
-		if (this.output.size() != 1) return;
-
-		var outputAIS = AEItemStack.fromItemStack(this.output.get(0));
-
-		// Invalid output stack. No do.
-		if (outputAIS == null) return;
-
 		// Not a valid context. No do.
 		final var context = ((AEBaseContainer) cct).getOpenContext();
 		if (context == null) return;
 
-		// Collect all items from the recipe and compare.
-		// Fill in whatever we're missing from the grid that's present in the recipe.
+		// Not a crafting matchingRecipe. No do.
+		if (this.output.size() != 1) return;
+		if (craftMatrix.getSlots() != 9) return;
+
+		// Huh? No output?
+		var outputIS = this.output.get(0);
+		if (outputIS == null) return;
+		if (outputIS.isEmpty()) return;
+
+		var outputAIS = AEItemStack.fromItemStack(outputIS);
+
+		// Invalid output stack. No do.
+		if (outputAIS == null) return;
+
+		// Verify the validity of the recipe. We can be sent anything after all!
+		var testFrame = new InventoryCrafting(new ContainerNull(), 3, 3);
+		for (var i = 0; i < craftMatrix.getSlots(); i++) {
+			final var slotID = i;
+			Arrays.stream(this.recipe.get(i)).findFirst().ifPresent((itemStack ->
+				testFrame.setInventorySlotContents(slotID, itemStack)));
+		}
+
+		var matchingRecipe = CraftingManager.findMatchingRecipe(testFrame, player.world);
+		if (matchingRecipe == null) return;
+		if (!ItemStack.areItemStacksEqual(matchingRecipe.getRecipeOutput(), outputIS)) return;
+
+		// Collect all items from the matchingRecipe and compare.
+		// Fill in whatever we're missing from the grid that's present in the matchingRecipe.
 		var strategy = ItemStackHashStrategy.comparingAllButCount();
 
 		var missingItems = new ArrayList<Set<ItemStack>>();
@@ -172,7 +190,7 @@ public class MixinPacketJEIRecipe {
 		// Nothing is missing? No do.
 		if (missingItems.isEmpty()) return;
 
-		// Find the optimal way of satisfying the recipe, minimizing the number of different
+		// Find the optimal way of satisfying the matchingRecipe, minimizing the number of different
 		// items while maximizing the stack size.
 		// Upcast to AEItemStacks. Nothing should be null here, but who knows what AE2 may do.
 		var optimal = findOptimalIngredients(missingItems, strategy)

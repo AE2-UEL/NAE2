@@ -70,6 +70,12 @@ nae2.storage_cell_void.count=%s %s power stored.
 nae2.jei.missing.craft.1=[NAE2] All missing items are craftable.
 nae2.jei.missing.craft.2=Hold Ctrl to mass-order missing items.
 
+nae2.jei.missing.partialcraft.1=[NAE2] Some items found craftable.
+nae2.jei.missing.partialcraft.2=Hold Ctrl to bypass and mass-order missing items.
+
+nae2.jei.missing.bypasscraft.1=[NAE2] No items found craftable.
+nae2.jei.missing.bypasscraft.2=Hold Ctrl to bypass and fill the grid as much as possible.
+
 nae2.jei.cellview.items=items
 nae2.jei.cellview.buckets=buckets
 nae2.jei.cellview.units=buckets
