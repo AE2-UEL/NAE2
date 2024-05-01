@@ -32,8 +32,8 @@ class DenseCraftingCubeModel implements IModel {
 	private static final ResourceLocation MONITOR_LIGHT_MEDIUM = texture("monitor_light_medium");
 	private static final ResourceLocation MONITOR_LIGHT_BRIGHT = texture("monitor_light_bright");
 	private static final ResourceLocation COPROCESSOR_4X_LIGHT = naetexture("coprocessor_4x_light");
-	private static final ResourceLocation COPROCESSOR_64X_LIGHT = naetexture("coprocessor_16x_light");
-	private static final ResourceLocation COPROCESSOR_16X_LIGHT = naetexture("coprocessor_64x_light");
+	private static final ResourceLocation COPROCESSOR_16X_LIGHT = naetexture("coprocessor_16x_light");
+	private static final ResourceLocation COPROCESSOR_64X_LIGHT = naetexture("coprocessor_64x_light");
 	private static final ResourceLocation STORAGE_256K_LIGHT = naetexture("crafting_storage_256k_light");
 	private static final ResourceLocation STORAGE_1024K_LIGHT = naetexture("crafting_storage_1024k_light");
 	private static final ResourceLocation STORAGE_4096K_LIGHT = naetexture("crafting_storage_4096k_light");
