@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "minecraft:item_exists",
+          "item": "nae2:exposer"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:exposer"
+  },
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "nae2:part",
+      "name": "exposer"
+    }
+  ]
+}

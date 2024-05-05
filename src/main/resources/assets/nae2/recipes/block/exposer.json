@@ -1,0 +1,52 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "minecraft:item_exists",
+          "item": "nae2:exposer"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.formation_core"
+        },
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.singularity"
+        },
+        {
+          "type": "appliedenergistics2:part_exists",
+          "part": "part.storage_bus"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:exposer"
+  },
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "ibi",
+    "fsf",
+    "ibi"
+  ],
+  "key": {
+    "i": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "f": {
+      "type": "appliedenergistics2:part",
+      "part": "material.formation_core"
+    },
+    "s": {
+      "type": "appliedenergistics2:part",
+      "part": "material.singularity"
+    },
+    "b": {
+      "type": "appliedenergistics2:part",
+      "part": "part.storage_bus"
+    }
+  }
+}

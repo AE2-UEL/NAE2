@@ -1,0 +1,27 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "minecraft:item_exists",
+          "item": "nae2:exposer"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "type": "part",
+    "name": "exposer",
+    "count": 1
+  },
+  "type": "nae2:shaped_recipe",
+  "pattern": [
+    "e"
+  ],
+  "key": {
+    "e": {
+      "item": "nae2:exposer"
+    }
+  }
+}
