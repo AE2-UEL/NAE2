@@ -71,6 +71,10 @@ public class NAEBaseItemUpgrade extends AEBaseItem implements INAEUpgradeModule 
 		var u = this.getType(stack);
 		if (u != null) {
 			List<String> textList = new ArrayList<>();
+			u.addCheckedInformation(stack, world, lines, advancedTooltips);
+			if (!lines.isEmpty()) {
+				lines.add("");
+			}
 
 			for (var j : u.getSupported().entrySet()) {
 				String name = null;

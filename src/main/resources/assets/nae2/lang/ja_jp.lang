@@ -35,6 +35,8 @@ item.nae2.part.beam_former.name=MEビームフォーマー
 
 # Upgrades
 item.nae2.upgrade.hyper_acceleration.name=超加速カード
+item.nae2.upgrade.auto_complete.name=ジョブ自動補完カード
+item.nae2.upgrade.auto_complete.desc=出力を待たずに自動的にジョブを完了させる。
 
 # Tiles
 tile.nae2.reconstruction_chamber.name=原子再構成機

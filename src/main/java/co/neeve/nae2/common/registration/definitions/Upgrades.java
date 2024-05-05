@@ -2,6 +2,7 @@ package co.neeve.nae2.common.registration.definitions;
 
 import appeng.api.definitions.IBlocks;
 import appeng.api.definitions.IItemDefinition;
+import appeng.api.definitions.IParts;
 import appeng.bootstrap.components.IPostInitComponent;
 import appeng.core.Api;
 import appeng.core.features.DamagedItemDefinition;
@@ -18,9 +19,12 @@ import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.translation.I18n;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +34,7 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 	private final Object2ObjectOpenHashMap<String, DamagedItemDefinition> byId =
 		new Object2ObjectOpenHashMap<>();
 	private final IItemDefinition hyperAcceleration;
+	private final IItemDefinition autoComplete;
 	private final NAEBaseItemUpgrade upgrade;
 
 	public Upgrades(Registry registry) {
@@ -45,6 +50,18 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 				final IBlocks blocks = definitions.blocks();
 
 				UpgradeType.HYPER_ACCELERATION.registerItem(blocks.iOPort(), 3);
+			});
+		}
+
+		this.autoComplete = this.createUpgrade(this.upgrade, UpgradeType.AUTO_COMPLETE);
+		if (this.autoComplete.isEnabled()) {
+			registry.addBootstrapComponent((IPostInitComponent) r -> {
+				var definitions = Api.INSTANCE.definitions();
+				final IBlocks blocks = definitions.blocks();
+				final IParts parts = definitions.parts();
+
+				UpgradeType.AUTO_COMPLETE.registerItem(blocks.iface(), 1);
+				UpgradeType.AUTO_COMPLETE.registerItem(parts.iface(), 1);
 			});
 		}
 	}
@@ -70,6 +87,10 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 		return this.hyperAcceleration;
 	}
 
+	public IItemDefinition autoComplete() {
+		return this.autoComplete;
+	}
+
 	@Override
 	public Collection<UpgradeType> getEntries() {
 		return UpgradeType.getCachedValues().values();
@@ -83,7 +104,15 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 
 	public enum UpgradeType implements IModelProvider {
 
-		HYPER_ACCELERATION("hyper_acceleration", UpgradeFeatures.HYPER_ACCELERATION);
+		HYPER_ACCELERATION("hyper_acceleration", UpgradeFeatures.HYPER_ACCELERATION),
+		AUTO_COMPLETE("auto_complete", UpgradeFeatures.AUTO_COMPLETE) {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+			                                  ITooltipFlag advancedTooltips) {
+				lines.add(I18n.translateToLocal("item.nae2.upgrade.auto_complete.desc"));
+			}
+		};
 
 		private static Int2ObjectLinkedOpenHashMap<UpgradeType> cachedValues;
 		private final Map<ItemStack, Integer> supportedMax = new HashMap<>();
@@ -176,6 +205,10 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 			if (stack != null) {
 				this.supportedMax.put(stack, maxSupported);
 			}
+		}
+
+		public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+		                                  ITooltipFlag advancedTooltips) {
 		}
 	}
 

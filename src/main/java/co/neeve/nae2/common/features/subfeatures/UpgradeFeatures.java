@@ -3,7 +3,8 @@ package co.neeve.nae2.common.features.subfeatures;
 import org.jetbrains.annotations.Nullable;
 
 public enum UpgradeFeatures implements ISubFeature {
-	HYPER_ACCELERATION("Enable Hyper-Acceleration Upgrade cards", "upgrades.hac");
+	HYPER_ACCELERATION("Enable Hyper-Acceleration Upgrade cards for ME IO Ports", "upgrades.hac"),
+	AUTO_COMPLETE("Enable Auto-Complete Upgrade cards for ME Interfaces", "upgrades.autocomplete");
 
 	private final String description;
 	private final String mixins;

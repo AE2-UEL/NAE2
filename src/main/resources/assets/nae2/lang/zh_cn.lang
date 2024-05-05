@@ -35,6 +35,8 @@ item.nae2.part.beam_former.name=ME光束成型器
 
 # Upgrades
 item.nae2.upgrade.hyper_acceleration.name=超速卡
+item.nae2.upgrade.auto_complete.name=工作自动完成卡
+item.nae2.upgrade.auto_complete.desc=自动完成作业，无需等待输出。
 
 # Tiles
 tile.nae2.reconstruction_chamber.name=原子再构室

@@ -5,7 +5,6 @@ import appeng.api.parts.IPart;
 import appeng.core.features.DamagedItemDefinition;
 import appeng.core.localization.GuiText;
 import appeng.util.Platform;
-import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
@@ -22,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -100,7 +100,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 			@Override
 			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
 			                                  ITooltipFlag advancedTooltips) {
-				NAE2.api().exposer().addTooltipInformation(stack, world, lines, advancedTooltips);
+				lines.add(I18n.format("nae2.exposer.tooltip"));
 			}
 		};
 
