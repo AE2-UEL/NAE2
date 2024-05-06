@@ -119,16 +119,12 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 		var storage = this.getStorageList();
 		if (storage == null) return;
 
-		var iterator = iterable.iterator();
-		if (iterator.hasNext()) {
-			var stack = iterator.next();
-			if (stack.getStackSize() < 0) {
-				var precise = storage.findPrecise(stack);
-				if (precise == null || precise.getStackSize() == 0) {
-					this.cache.remove(stack);
-				}
-			} else if (stack.getStackSize() > 0 && this.canHandleStack(stack)) {
-				this.cache.add(stack);
+		for (var stack : iterable) {
+			this.cache.remove(stack);
+
+			var stackInNetwork = storage.findPrecise(stack);
+			if (stackInNetwork != null && stackInNetwork.getStackSize() > 0 && this.canHandleStack(stackInNetwork)) {
+				this.cache.add(stackInNetwork);
 			}
 		}
 	}
