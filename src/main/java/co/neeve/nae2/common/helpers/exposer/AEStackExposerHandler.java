@@ -120,7 +120,7 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 		if (storage == null) return;
 
 		var iterator = iterable.iterator();
-		if (iterator.hasNext()) {
+		while (iterator.hasNext()) {
 			var stack = iterator.next();
 			if (stack.getStackSize() < 0) {
 				var precise = storage.findPrecise(stack);
