@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.card_crafting"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:upgrade",
+    "data": 2,
+    "count": 1
+  },
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "appliedenergistics2:part",
+      "part": "material.card_crafting"
+    },
+    {
+      "type": "forge:ore_dict",
+      "ore": "circuitEv"
+    }
+  ]
+}

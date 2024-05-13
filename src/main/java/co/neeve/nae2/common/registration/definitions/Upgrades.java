@@ -35,6 +35,7 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 		new Object2ObjectOpenHashMap<>();
 	private final IItemDefinition hyperAcceleration;
 	private final IItemDefinition autoComplete;
+	private final IItemDefinition gregtechCircuit;
 	private final NAEBaseItemUpgrade upgrade;
 
 	public Upgrades(Registry registry) {
@@ -64,6 +65,18 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 				UpgradeType.AUTO_COMPLETE.registerItem(parts.iface(), 1);
 			});
 		}
+
+		this.gregtechCircuit = this.createUpgrade(this.upgrade, UpgradeType.GREGTECH_CIRCUIT);
+		if (this.gregtechCircuit.isEnabled()) {
+			registry.addBootstrapComponent((IPostInitComponent) r -> {
+				var definitions = Api.INSTANCE.definitions();
+				final IBlocks blocks = definitions.blocks();
+				final IParts parts = definitions.parts();
+
+				UpgradeType.GREGTECH_CIRCUIT.registerItem(blocks.iface(), 1);
+				UpgradeType.GREGTECH_CIRCUIT.registerItem(parts.iface(), 1);
+			});
+		}
 	}
 
 	@NotNull
@@ -91,6 +104,10 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 		return this.autoComplete;
 	}
 
+	public IItemDefinition gregtechCircuit() {
+		return this.gregtechCircuit;
+	}
+
 	@Override
 	public Collection<UpgradeType> getEntries() {
 		return UpgradeType.getCachedValues().values();
@@ -111,6 +128,14 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
 			                                  ITooltipFlag advancedTooltips) {
 				lines.add(I18n.translateToLocal("item.nae2.upgrade.auto_complete.desc"));
+			}
+		},
+		GREGTECH_CIRCUIT("gregtech_circuit", UpgradeFeatures.GREGTECH_CIRCUIT) {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+			                                  ITooltipFlag advancedTooltips) {
+				lines.add(I18n.translateToLocal("item.nae2.upgrade.gregtech_circuit.desc"));
 			}
 		};
 

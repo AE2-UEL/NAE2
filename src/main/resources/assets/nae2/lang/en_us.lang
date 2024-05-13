@@ -38,6 +38,8 @@ item.nae2.part.exposer.name=ME Storage Exposer
 item.nae2.upgrade.hyper_acceleration.name=Hyper-Acceleration Card
 item.nae2.upgrade.auto_complete.name=Job Auto-Complete Card
 item.nae2.upgrade.auto_complete.desc=Automatically completes jobs without waiting for outputs.
+item.nae2.upgrade.gregtech_circuit.name=Programmed Circuit Card
+item.nae2.upgrade.gregtech_circuit.desc=Automatically sets Programmed Circuits in machines and buses.\nRequires a relevant Circuit in Encoded Pattern.\nDon't forget to enable Blocking Mode!\n\nI'm sorry, Seni.
 
 # Tiles
 tile.nae2.reconstruction_chamber.name=Reconstruction Chamber
