@@ -7,7 +7,7 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "ifacep2p.shared.DualityAccessor",
-    "ifacep2p.shared.MixinBlocking",
+    "ifacep2p.shared.MixinBlockingTermName",
     "ifacep2p.shared.MixinPartP2PTunnel",
     "ifacep2p.shared.MixinPushPattern"
   ],

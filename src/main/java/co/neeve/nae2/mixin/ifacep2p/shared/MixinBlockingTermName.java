@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("rawtypes")
 @Mixin(value = DualityInterface.class, remap = false)
-public abstract class MixinBlocking {
+public abstract class MixinBlockingTermName {
 	@Unique
 	private EnumFacing nae2$originalFacing;
 
@@ -50,7 +50,7 @@ public abstract class MixinBlocking {
 	public abstract IUpgradeableHost getHost();
 
 	@WrapOperation(
-		method = "isBusy",
+		method = { "isBusy", "getTermName" },
 		at = @At(
 			value = "INVOKE",
 			target = "Lnet/minecraft/world/World;getTileEntity(Lnet/minecraft/util/math/BlockPos;)" +
@@ -59,9 +59,9 @@ public abstract class MixinBlocking {
 			remap = true
 		)
 	)
-	private TileEntity wrapBusyGetTE(World instance, BlockPos bp, Operation<TileEntity> operation,
-	                                 @Local LocalRef<EnumFacing> facingRef, @Local Iterator iterator,
-	                                 @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
+	private TileEntity wrapEntityGetter(World instance, BlockPos bp, Operation<TileEntity> operation,
+	                                    @Local LocalRef<EnumFacing> facingRef, @Local Iterator iterator,
+	                                    @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
 		var tiles = tunnelTEs.get();
 
 		// There's a pending tunnel to be iterated. Iterate it instead.
@@ -125,22 +125,22 @@ public abstract class MixinBlocking {
 		return te;
 	}
 
-	@ModifyExpressionValue(method = "isBusy", at = @At(
+	@ModifyExpressionValue(method = { "isBusy", "getTermName" }, at = @At(
 		value = "INVOKE",
 		target = "Ljava/util/Iterator;hasNext()Z"
 	))
-	private boolean wrapBusyHasNext(boolean original,
-	                                @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
+	private boolean wrapIteratorHasNext(boolean original,
+	                                    @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
 		// Continue iterating even if there's no next value, if we're supplying tunnel ents.
 		return original || tunnelTEs.get() != null;
 	}
 
-	@WrapOperation(method = "isBusy", at = @At(
+	@WrapOperation(method = { "isBusy", "getTermName" }, at = @At(
 		value = "INVOKE",
 		target = "Ljava/util/Iterator;next()Ljava/lang/Object;"
 	))
-	private Object wrapBusyNext(Iterator iterator, Operation<Object> operation,
-	                            @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
+	private Object wrapIteratorNext(Iterator iterator, Operation<Object> operation,
+	                                @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
 		// Check if we're iterating tunnels. If we are, the value returned doesn't matter, since we supply our own
 		// in the next method. Return something bogus to keep JVM happy.
 		if (tunnelTEs.get() != null) {
@@ -156,8 +156,24 @@ public abstract class MixinBlocking {
 			"Lnet/minecraft/block/state/IBlockState;",
 		remap = true
 	))
-	private IBlockState wrapBlockingFixUp(World instance, BlockPos blockPos, Operation<IBlockState> operation,
-	                                      @Local(name = "te") TileEntity te) {
+	private IBlockState wrapBlockStateFixUp(World instance, BlockPos blockPos, Operation<IBlockState> operation,
+	                                        @Local(name = "te") TileEntity te) {
+		if (Platform.isModLoaded("actuallyadditions") && te instanceof TileEntityPhantomface)
+			return operation.call(instance, blockPos);
+
+		return instance.getBlockState(te.getPos());
+	}
+
+	@WrapOperation(method = { "getTermName" }, at = @At(
+		value = "INVOKE",
+		target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)" +
+			"Lnet/minecraft/block/state/IBlockState;",
+		remap = true
+	))
+	private IBlockState wrapBlockStateFixUpTermName(World instance, BlockPos blockPos,
+	                                                Operation<IBlockState> operation,
+	                                                @Local(name = "directedTile") TileEntity te) {
+		// This is because the TileEntity variable is different. :P
 		if (Platform.isModLoaded("actuallyadditions") && te instanceof TileEntityPhantomface)
 			return operation.call(instance, blockPos);
 
