@@ -8,6 +8,8 @@ import appeng.core.Api;
 import appeng.core.features.DamagedItemDefinition;
 import appeng.core.features.IStackSrc;
 import co.neeve.nae2.Tags;
+import co.neeve.nae2.common.crafting.patterntransform.PatternTransform;
+import co.neeve.nae2.common.crafting.patterntransform.transformers.GregTechCircuitPatternTransformer;
 import co.neeve.nae2.common.features.IFeature;
 import co.neeve.nae2.common.features.subfeatures.UpgradeFeatures;
 import co.neeve.nae2.common.items.NAEBaseItemUpgrade;
@@ -68,6 +70,8 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 
 		this.gregtechCircuit = this.createUpgrade(this.upgrade, UpgradeType.GREGTECH_CIRCUIT);
 		if (this.gregtechCircuit.isEnabled()) {
+			PatternTransform.registerTransformer(new GregTechCircuitPatternTransformer());
+
 			registry.addBootstrapComponent((IPostInitComponent) r -> {
 				var definitions = Api.INSTANCE.definitions();
 				final IBlocks blocks = definitions.blocks();

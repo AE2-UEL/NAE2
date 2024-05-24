@@ -51,6 +51,9 @@ public class NAE2MixinPlugin implements IFMLLoadingPlugin, ILateMixinLoader {
 
 		var mixins = new ArrayList<String>();
 
+		// Core.
+		mixins.add("mixins.nae2.json");
+
 		for (var feature : Features.values()) {
 			if (!feature.isEnabled()) continue;
 

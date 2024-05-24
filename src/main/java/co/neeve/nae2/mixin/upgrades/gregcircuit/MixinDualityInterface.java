@@ -4,7 +4,7 @@ import appeng.api.networking.crafting.ICraftingPatternDetails;
 import appeng.helpers.DualityInterface;
 import appeng.parts.automation.UpgradeInventory;
 import appeng.util.inv.InvOperation;
-import co.neeve.nae2.common.helpers.GregCircuitCraftingDetailsWrapper;
+import co.neeve.nae2.common.crafting.patterntransform.transformers.GregTechCircuitPatternTransformer;
 import co.neeve.nae2.common.interfaces.IExtendedUpgradeInventory;
 import co.neeve.nae2.common.items.NAEBaseItemUpgrade;
 import co.neeve.nae2.common.registration.definitions.Upgrades;
@@ -12,7 +12,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gregtech.api.capability.IGhostSlotConfigurable;
 import gregtech.api.metatileentity.MetaTileEntityHolder;
-import gregtech.api.recipes.ingredients.IntCircuitIngredient;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -20,16 +20,18 @@ import net.minecraftforge.items.IItemHandler;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 @Mixin(value = DualityInterface.class, remap = false)
 public abstract class MixinDualityInterface {
+	@Unique
+	private final Object2IntOpenHashMap<ICraftingPatternDetails> nae2$cachedCircuitValues =
+		new Object2IntOpenHashMap<>();
+	
 	@Shadow
 	@Final
 	private UpgradeInventory upgrades;
@@ -56,14 +58,8 @@ public abstract class MixinDualityInterface {
 				var mte = metaTileEntityHolder.getMetaTileEntity();
 
 				if (mte instanceof IGhostSlotConfigurable slotConfigurable && slotConfigurable.hasGhostCircuitInventory()) {
-					final int config;
-					if (patternDetails instanceof GregCircuitCraftingDetailsWrapper greg) {
-						config = greg.getConfig();
-					} else {
-						config = 0;
-					}
-
-					slotConfigurable.setGhostCircuitConfig(config);
+					slotConfigurable.setGhostCircuitConfig(
+						this.nae2$cachedCircuitValues.getOrDefault(patternDetails, 0));
 				}
 			}
 		}
@@ -76,6 +72,11 @@ public abstract class MixinDualityInterface {
 			|| (removed.getItem() instanceof NAEBaseItemUpgrade remUpgrade && remUpgrade.getType(added) == Upgrades.UpgradeType.GREGTECH_CIRCUIT)) {
 			this.updateCraftingList();
 		}
+	}
+
+	@Inject(method = "updateCraftingList", at = @At("HEAD"))
+	private void injectUpdateCraftingList(CallbackInfo ci) {
+		this.nae2$cachedCircuitValues.clear();
 	}
 
 	@Inject(
@@ -92,17 +93,9 @@ public abstract class MixinDualityInterface {
 			&& extendedUpgradeInventory.getInstalledUpgrades(Upgrades.UpgradeType.GREGTECH_CIRCUIT) > 0) {
 			var details = detailsRef.get();
 			if (details != null && details.getInputs() != null) {
-				var optCircuit = Arrays.stream(details.getInputs())
-					.filter(Objects::nonNull)
-					.filter(ais -> IntCircuitIngredient.isIntegratedCircuit(ais.createItemStack()))
-					.findFirst();
+				var optCircuit = GregTechCircuitPatternTransformer.getCircuitValueFromDetails(details);
 
-				if (optCircuit.isPresent()) {
-					var circuit = optCircuit.get();
-					var config = IntCircuitIngredient.getCircuitConfiguration(circuit.createItemStack());
-
-					detailsRef.set(new GregCircuitCraftingDetailsWrapper(details, config));
-				}
+				optCircuit.ifPresent(integer -> this.nae2$cachedCircuitValues.put(details, integer.intValue()));
 			}
 		}
 	}
