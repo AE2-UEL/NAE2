@@ -25,7 +25,7 @@ public class MixinContainerPatternTerm extends MixinContainerPatternEncoder impl
 
 	@Override
 	public int getPatternMultiToolToolboxOffsetX() {
-		return -63 - 18;
+		return -63 - 18 - 9;
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import net.minecraftforge.items.IItemHandler;
 
 import java.util.Arrays;
 
-public class SlotPatternMultiTool extends SlotRestrictedInput {
+public class SlotPatternMultiTool extends SlotRestrictedInput implements IPMTSlot {
 	private final IPatternMultiToolHost host;
 	private final int groupNum;
 	private boolean allowEdit = true;
@@ -88,5 +88,15 @@ public class SlotPatternMultiTool extends SlotRestrictedInput {
 	@Override
 	public boolean isSlotEnabled() {
 		return this.host != null && this.host.isPatternRowEnabled(this.groupNum);
+	}
+
+	@Override
+	public void setY(int y) {
+		this.yPos = y;
+	}
+
+	@Override
+	public int getInitialY() {
+		return this.getY();
 	}
 }

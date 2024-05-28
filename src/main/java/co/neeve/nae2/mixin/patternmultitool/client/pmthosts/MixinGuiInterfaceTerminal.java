@@ -1,11 +1,12 @@
 package co.neeve.nae2.mixin.patternmultitool.client.pmthosts;
 
 import appeng.client.gui.implementations.GuiInterfaceTerminal;
-import appeng.container.slot.AppEngSlot;
 import co.neeve.nae2.client.gui.PatternMultiToolGUIHelper;
 import co.neeve.nae2.client.gui.interfaces.IPatternMultiToolHostGui;
-import co.neeve.nae2.common.slots.SlotPatternMultiTool;
+import co.neeve.nae2.common.slots.IPMTSlot;
 import co.neeve.nae2.mixin.patternmultitool.client.MixinAEBaseGui;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.awt.*;
+import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("AddedMixinMembersNamePattern")
@@ -23,7 +25,7 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 		super(inventorySlotsIn);
 	}
 
-	@Inject(method = "drawBG(IIII)V", at = @At("HEAD"), remap
+	@Inject(method = "drawBG(IIII)V", at = @At("RETURN"), remap
 		= false)
 	public void drawBG(int offsetX, int offsetY, int mouseX, int mouseY, CallbackInfo ci) {
 		if (this.getPMTObject() != null) {
@@ -31,14 +33,25 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 		}
 	}
 
-	@Inject(method =
-		"Lappeng/client/gui/implementations/GuiInterfaceTerminal;repositionSlot" + "(Lappeng/container" + "/slot" +
-			"/AppEngSlot;)V", at = @At(value = "HEAD"), remap = false, cancellable = true)
-	public void repositionSlots(final AppEngSlot s, CallbackInfo ci) {
-		if (s instanceof SlotPatternMultiTool) {
-			s.yPos = s.getY() + 11;
-			ci.cancel();
+	@SuppressWarnings("rawtypes")
+	@WrapOperation(
+		method = "repositionSlots",
+		at = @At(
+			value = "INVOKE",
+			target = "Ljava/util/Iterator;next()Ljava/lang/Object;"
+		),
+		remap = false
+	)
+	private Object wrapRepositionSlots(Iterator self, Operation<Object> operation) {
+		var next = operation.call(self);
+		if (next instanceof IPMTSlot slotPatternMultiTool) {
+			slotPatternMultiTool.setY(11 + slotPatternMultiTool.getInitialY());
+			if (self.hasNext()) {
+				return this.wrapRepositionSlots(self, operation);
+			}
+			return null;
 		}
+		return next;
 	}
 
 	@Inject(method = "getJEIExclusionArea", at = @At("RETURN"), remap = false)
@@ -47,19 +60,37 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 	}
 
 	@Inject(method = "drawFG", at = @At("RETURN"), remap = false)
-	public void injectButtons(CallbackInfo ci) {
-		this.initializePatternMultiTool();
-		if (this.patternMultiToolButtons != null)
+	public void repositionButtons(CallbackInfo ci) {
+		if (this.patternMultiToolButtons != null) {
 			PatternMultiToolGUIHelper.repositionButtons(this.patternMultiToolButtons, 0, 11);
+		}
 	}
 
 	@Override
 	public int getPMTOffsetX() {
-		return -63 - 18 - 7 - 1;
+		return -63 - 18 - 7 - 1 - 9;
 	}
 
 	@Override
 	public int getPMTOffsetY() {
 		return 43 + 16 - 7 - 1 + 10;
+	}
+
+	@Inject(method = "drawScreen",
+		at = @At(
+			value = "INVOKE",
+			target = "Ljava/util/List;clear()V",
+			shift = At.Shift.AFTER
+		), remap = false
+	)
+	public void injectDrawScreen(CallbackInfo ci) {
+		if (this.patternMultiToolButtons != null) {
+			this.buttonList.addAll(this.patternMultiToolButtons);
+		}
+	}
+
+	@Inject(method = "initGui", at = @At("RETURN"), remap = false)
+	private void injectButtons(CallbackInfo ci) {
+		this.initializePatternMultiTool();
 	}
 }

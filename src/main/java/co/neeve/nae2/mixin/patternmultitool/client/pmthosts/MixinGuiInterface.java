@@ -30,7 +30,7 @@ public class MixinGuiInterface extends MixinGuiUpgradeable implements IPatternMu
 
 	@Override
 	public int getPMTOffsetX() {
-		return -63 - 18 - 7 - 1;
+		return -63 - 18 - 7 - 1 - 9;
 	}
 
 	@Override

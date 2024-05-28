@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 public class MixinContainerInterface extends MixinContainerUpgradeable implements IPatternMultiToolToolboxHost {
 	@Override
 	public int getPatternMultiToolToolboxOffsetX() {
-		return -63 - 18;
+		return -63 - 18 - 9;
 	}
 
 	@Override

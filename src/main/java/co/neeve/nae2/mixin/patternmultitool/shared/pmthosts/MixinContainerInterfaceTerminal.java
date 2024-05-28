@@ -51,7 +51,7 @@ public class MixinContainerInterfaceTerminal extends MixinAEBaseContainer implem
 
 	@Override
 	public int getPatternMultiToolToolboxOffsetX() {
-		return -63 - 18;
+		return -63 - 18 - 9;
 	}
 
 	@Override

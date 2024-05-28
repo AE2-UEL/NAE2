@@ -2,12 +2,12 @@ package co.neeve.nae2.mixin.patternmultitool.shared;
 
 import appeng.container.AEBaseContainer;
 import appeng.container.slot.AppEngSlot;
-import appeng.container.slot.SlotDisabled;
 import co.neeve.nae2.common.helpers.PlayerHelper;
 import co.neeve.nae2.common.interfaces.IPatternMultiToolToolboxHost;
 import co.neeve.nae2.common.items.patternmultitool.ObjPatternMultiTool;
 import co.neeve.nae2.common.items.patternmultitool.ToolPatternMultiTool;
 import co.neeve.nae2.common.slots.SlotPatternMultiTool;
+import co.neeve.nae2.common.slots.SlotPatternMultiToolDisabled;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -82,7 +82,7 @@ public class MixinAEBaseContainer extends Container {
 						slot = (new SlotPatternMultiTool(this.patternMultiToolObject.getPatternInventory(), host,
 							slotIndex, x, y, u, inventoryPlayer));
 					else
-						slot = (new SlotDisabled(this.patternMultiToolObject.getPatternInventory(),
+						slot = (new SlotPatternMultiToolDisabled(this.patternMultiToolObject.getPatternInventory(),
 							slotIndex, x, y));
 
 					slot.setPlayerSide();
