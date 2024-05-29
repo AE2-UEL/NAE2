@@ -6,4 +6,6 @@ public interface IExtendedUpgradeInventory {
 	int getInstalledUpgrades(Upgrades.UpgradeType u);
 
 	int getMaxInstalled(Upgrades.UpgradeType u);
+
+	void markDirty();
 }

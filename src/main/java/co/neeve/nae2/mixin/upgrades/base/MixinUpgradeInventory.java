@@ -59,4 +59,9 @@ public abstract class MixinUpgradeInventory implements IExtendedUpgradeInventory
 			this.nae2$installedUpgrades.put(type, this.nae2$installedUpgrades.getOrDefault(type, 0) + 1);
 		}
 	}
+
+	@Override
+	public void markDirty() {
+		this.cached = false;
+	}
 }

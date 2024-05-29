@@ -4,15 +4,13 @@ import appeng.api.networking.crafting.ICraftingPatternDetails;
 import appeng.helpers.DualityInterface;
 import appeng.parts.automation.UpgradeInventory;
 import appeng.util.inv.InvOperation;
+import co.neeve.nae2.common.crafting.patterntransform.PatternTransform;
 import co.neeve.nae2.common.crafting.patterntransform.transformers.GregTechCircuitPatternTransformer;
 import co.neeve.nae2.common.interfaces.IExtendedUpgradeInventory;
-import co.neeve.nae2.common.items.NAEBaseItemUpgrade;
 import co.neeve.nae2.common.registration.definitions.Upgrades;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gregtech.api.capability.IGhostSlotConfigurable;
 import gregtech.api.metatileentity.MetaTileEntityHolder;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -26,15 +24,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.List;
+import java.util.WeakHashMap;
+
 @Mixin(value = DualityInterface.class, remap = false)
 public abstract class MixinDualityInterface {
 	@Unique
-	private final Object2IntOpenHashMap<ICraftingPatternDetails> nae2$cachedCircuitValues =
-		new Object2IntOpenHashMap<>();
-	
+	private WeakHashMap<ICraftingPatternDetails, Integer> nae2$cachedCircuitValues = null;
+
 	@Shadow
 	@Final
 	private UpgradeInventory upgrades;
+	@Shadow
+	private List<ICraftingPatternDetails> craftingList;
 
 	@Shadow
 	protected abstract void updateCraftingList();
@@ -58,8 +60,13 @@ public abstract class MixinDualityInterface {
 				var mte = metaTileEntityHolder.getMetaTileEntity();
 
 				if (mte instanceof IGhostSlotConfigurable slotConfigurable && slotConfigurable.hasGhostCircuitInventory()) {
+					if (this.nae2$cachedCircuitValues == null) {
+						this.nae2$cachedCircuitValues = new WeakHashMap<>();
+					}
+
 					slotConfigurable.setGhostCircuitConfig(
-						this.nae2$cachedCircuitValues.getOrDefault(patternDetails, 0));
+						this.nae2$cachedCircuitValues.computeIfAbsent(patternDetails, d ->
+							GregTechCircuitPatternTransformer.getCircuitValueFromDetails(d).orElse(0)));
 				}
 			}
 		}
@@ -68,34 +75,13 @@ public abstract class MixinDualityInterface {
 	@Inject(method = "onChangeInventory", at = @At("HEAD"))
 	private void injectInventoryChange(IItemHandler inv, int slot, InvOperation mc, ItemStack removed, ItemStack added,
 	                                   CallbackInfo ci) {
-		if ((added.getItem() instanceof NAEBaseItemUpgrade addUpgrade && addUpgrade.getType(added) == Upgrades.UpgradeType.GREGTECH_CIRCUIT)
-			|| (removed.getItem() instanceof NAEBaseItemUpgrade remUpgrade && remUpgrade.getType(added) == Upgrades.UpgradeType.GREGTECH_CIRCUIT)) {
-			this.updateCraftingList();
-		}
-	}
+		if (PatternTransform.isTransformer(added) || PatternTransform.isTransformer(removed)) {
+			if (inv == this.upgrades && this.upgrades instanceof IExtendedUpgradeInventory inventory) {
+				this.craftingList = null;
+				this.nae2$cachedCircuitValues = null;
 
-	@Inject(method = "updateCraftingList", at = @At("HEAD"))
-	private void injectUpdateCraftingList(CallbackInfo ci) {
-		this.nae2$cachedCircuitValues.clear();
-	}
-
-	@Inject(
-		method = "addToCraftingList",
-		at = @At(
-			value = "INVOKE",
-			target = "Ljava/util/List;add(Ljava/lang/Object;)Z",
-			shift = At.Shift.BEFORE
-		)
-	)
-	private void injectCraftingList(ItemStack is, CallbackInfo ci,
-	                                @Local LocalRef<ICraftingPatternDetails> detailsRef) {
-		if (this.upgrades instanceof IExtendedUpgradeInventory extendedUpgradeInventory
-			&& extendedUpgradeInventory.getInstalledUpgrades(Upgrades.UpgradeType.GREGTECH_CIRCUIT) > 0) {
-			var details = detailsRef.get();
-			if (details != null && details.getInputs() != null) {
-				var optCircuit = GregTechCircuitPatternTransformer.getCircuitValueFromDetails(details);
-
-				optCircuit.ifPresent(integer -> this.nae2$cachedCircuitValues.put(details, integer.intValue()));
+				inventory.markDirty();
+				this.updateCraftingList();
 			}
 		}
 	}
