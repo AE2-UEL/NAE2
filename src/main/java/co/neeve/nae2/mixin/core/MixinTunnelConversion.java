@@ -1,7 +1,7 @@
-package co.neeve.nae2.mixin.ifacep2p.shared;
+package co.neeve.nae2.mixin.core;
 
+import appeng.api.config.TunnelType;
 import appeng.api.implementations.items.IMemoryCard;
-import appeng.core.Api;
 import appeng.parts.p2p.PartP2PTunnel;
 import co.neeve.nae2.NAE2;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -11,19 +11,30 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(PartP2PTunnel.class)
-public class MixinPartP2PTunnel {
+public class MixinTunnelConversion {
 	@ModifyVariable(method = "onPartActivate", at = @At(value = "LOAD"), name = "newType", remap = false)
 	public ItemStack injectP2PTypes(ItemStack newType, @Local(ordinal = 0) ItemStack hand) {
 		var item = hand.getItem();
 
 		if (!(item instanceof IMemoryCard)) {
-			var definitions = Api.INSTANCE.definitions();
+			var conversion = NAE2.api().tunnelConversion().getConversion(hand);
+			if (!conversion.isEmpty()) {
+				return conversion;
+			}
+		}
 
-			var iface = definitions.blocks().iface().maybeStack(1);
-			var ifacePart = definitions.parts().iface().maybeStack(1);
-			if ((iface.isPresent() && hand.isItemEqual(iface.get())) 
-					|| (ifacePart.isPresent() && hand.isItemEqual(ifacePart.get()))) {
-				return NAE2.definitions().parts().p2pTunnelInterface().maybeStack(1).orElse(ItemStack.EMPTY);
+		return newType;
+	}
+
+	@ModifyVariable(method = "onPartActivate", at = @At(value = "LOAD"), name = "tt", remap = false)
+	public TunnelType maskTunnelType(TunnelType newType, @Local(ordinal = 0) ItemStack hand) {
+		var item = hand.getItem();
+
+		if (!(item instanceof IMemoryCard)) {
+			var conversion = NAE2.api().tunnelConversion().getConversion(hand);
+			if (!conversion.isEmpty()) {
+				// Return whatever.
+				return TunnelType.ME;
 			}
 		}
 

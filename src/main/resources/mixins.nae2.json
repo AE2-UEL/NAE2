@@ -5,8 +5,9 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "crafting.patterntransform.MixinCraftingCPUCluster",
-    "crafting.patterntransform.MixinCraftingGrid"
+    "core.MixinTunnelConversion",
+    "core.crafting.patterntransform.MixinCraftingCPUCluster",
+    "core.crafting.patterntransform.MixinCraftingGrid"
   ],
   "client": [],
   "server": []

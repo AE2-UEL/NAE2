@@ -1,7 +1,7 @@
 package co.neeve.nae2.mixin.ifacep2p.shared;
 
 import appeng.helpers.IInterfaceHost;
-import co.neeve.nae2.common.integration.ae2fc.AE2FCIntegrationHelper;
+import co.neeve.nae2.common.integration.ae2fc.AE2FCInterfaceHelper;
 import com.glodblock.github.inventory.FluidConvertingInventoryAdaptor;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -21,7 +21,7 @@ public class MixinAE2FCInventoryAdaptor {
 		remap = true
 	))
 	private static TileEntity wrapTileEntity(World instance, BlockPos blockPos, Operation<TileEntity> original) {
-		var override = AE2FCIntegrationHelper.getInterfaceOverride();
+		var override = AE2FCInterfaceHelper.getInterfaceOverride();
 		if (override != null) {
 			return override;
 		}
@@ -36,9 +36,9 @@ public class MixinAE2FCInventoryAdaptor {
 	))
 	private static IInterfaceHost wrapGetInterfaceTE(TileEntity te, EnumFacing facing,
 	                                                 Operation<IInterfaceHost> operation) {
-		var override = AE2FCIntegrationHelper.getInterfaceOverride();
+		var override = AE2FCInterfaceHelper.getInterfaceOverride();
 		if (override != null) {
-			return operation.call(override, AE2FCIntegrationHelper.getEnumFacingOverride());
+			return operation.call(override, AE2FCInterfaceHelper.getEnumFacingOverride());
 		}
 
 		return operation.call(te, facing);

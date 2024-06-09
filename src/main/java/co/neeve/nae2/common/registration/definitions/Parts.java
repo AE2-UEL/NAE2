@@ -2,9 +2,12 @@ package co.neeve.nae2.common.registration.definitions;
 
 import appeng.api.AEApi;
 import appeng.api.parts.IPart;
+import appeng.bootstrap.components.IPostInitComponent;
+import appeng.core.Api;
 import appeng.core.features.DamagedItemDefinition;
 import appeng.core.localization.GuiText;
 import appeng.util.Platform;
+import co.neeve.nae2.NAE2;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
@@ -54,7 +57,21 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 
 		this.beamFormer = this.createPart(this.itemPart, PartType.BEAM_FORMER);
 		this.p2pTunnelInterface = this.createPart(this.itemPart, PartType.P2P_TUNNEL_INTERFACE);
+		this.p2pTunnelInterface.maybeStack(1)
+			.ifPresent((tunnelStack) -> registry.addBootstrapComponent((IPostInitComponent) (r) -> {
+				var definitions = Api.INSTANCE.definitions();
+
+				definitions.blocks().iface().maybeStack(1)
+					.ifPresent((stack) -> registerTunnelConversion(tunnelStack, stack));
+
+				definitions.parts().iface().maybeStack(1)
+					.ifPresent((stack) -> registerTunnelConversion(tunnelStack, stack));
+			}));
 		this.exposer = this.createPart(this.itemPart, PartType.EXPOSER);
+	}
+
+	private static void registerTunnelConversion(ItemStack tunnelStack, ItemStack stack) {
+		NAE2.api().tunnelConversion().register(stack, tunnelStack);
 	}
 
 	public static Optional<PartType> getById(int itemDamage) {

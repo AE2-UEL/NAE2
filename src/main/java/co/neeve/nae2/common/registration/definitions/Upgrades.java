@@ -13,7 +13,7 @@ import co.neeve.nae2.common.crafting.patterntransform.PatternTransform;
 import co.neeve.nae2.common.crafting.patterntransform.transformers.GregTechCircuitPatternTransformer;
 import co.neeve.nae2.common.features.IFeature;
 import co.neeve.nae2.common.features.subfeatures.UpgradeFeatures;
-import co.neeve.nae2.common.integration.ae2fc.UpgradeInit;
+import co.neeve.nae2.common.integration.ae2fc.AE2FC;
 import co.neeve.nae2.common.items.NAEBaseItemUpgrade;
 import co.neeve.nae2.common.registration.registry.Registry;
 import co.neeve.nae2.common.registration.registry.interfaces.DamagedDefinitions;
@@ -68,7 +68,7 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 				UpgradeType.AUTO_COMPLETE.registerItem(blocks.iface(), 1);
 				UpgradeType.AUTO_COMPLETE.registerItem(parts.iface(), 1);
 				if (Platform.isModLoaded("ae2fc")) {
-					UpgradeInit.init(UpgradeType.AUTO_COMPLETE);
+					AE2FC.initInterfaceUpgrade(UpgradeType.AUTO_COMPLETE);
 				}
 			});
 		}
@@ -85,7 +85,7 @@ public class Upgrades implements DamagedDefinitions<DamagedItemDefinition, Upgra
 				UpgradeType.GREGTECH_CIRCUIT.registerItem(blocks.iface(), 1);
 				UpgradeType.GREGTECH_CIRCUIT.registerItem(parts.iface(), 1);
 				if (Platform.isModLoaded("ae2fc")) {
-					UpgradeInit.init(UpgradeType.GREGTECH_CIRCUIT);
+					AE2FC.initInterfaceUpgrade(UpgradeType.GREGTECH_CIRCUIT);
 				}
 			});
 		}

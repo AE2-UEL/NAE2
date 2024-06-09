@@ -5,7 +5,7 @@ import appeng.api.parts.IPartHost;
 import appeng.helpers.DualityInterface;
 import appeng.helpers.IInterfaceHost;
 import appeng.util.Platform;
-import co.neeve.nae2.common.integration.ae2fc.AE2FCIntegrationHelper;
+import co.neeve.nae2.common.integration.ae2fc.AE2FCInterfaceHelper;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -85,7 +85,7 @@ public abstract class MixinPushPattern {
 			operation.call(instance, facing);
 		}
 	}
-	
+
 	@WrapOperation(
 		method = "pushPattern",
 		at = @At(
@@ -144,8 +144,8 @@ public abstract class MixinPushPattern {
 					interfaceHost = null;
 				}
 
-				AE2FCIntegrationHelper.setEnumFacingOverride(originalFacing.getOpposite());
-				AE2FCIntegrationHelper.setInterfaceOverride(
+				AE2FCInterfaceHelper.setEnumFacingOverride(originalFacing.getOpposite());
+				AE2FCInterfaceHelper.setInterfaceOverride(
 					interfaceHost != null ? interfaceHost.getTileEntity() : null);
 			}
 
@@ -174,8 +174,8 @@ public abstract class MixinPushPattern {
 		}
 
 		if (Platform.isModLoaded("ae2fc")) {
-			AE2FCIntegrationHelper.setEnumFacingOverride(null);
-			AE2FCIntegrationHelper.setInterfaceOverride(null);
+			AE2FCInterfaceHelper.setEnumFacingOverride(null);
+			AE2FCInterfaceHelper.setInterfaceOverride(null);
 		}
 
 		currentOutputTunnel.set(null);

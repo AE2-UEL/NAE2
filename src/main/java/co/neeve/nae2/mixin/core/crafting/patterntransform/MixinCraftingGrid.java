@@ -1,4 +1,4 @@
-package co.neeve.nae2.mixin.crafting.patterntransform;
+package co.neeve.nae2.mixin.core.crafting.patterntransform;
 
 import appeng.api.networking.crafting.ICraftingMedium;
 import appeng.api.networking.crafting.ICraftingPatternDetails;

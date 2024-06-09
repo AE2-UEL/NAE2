@@ -3,7 +3,7 @@ package co.neeve.nae2.common.integration.ae2fc;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
-public class AE2FCIntegrationHelper {
+public class AE2FCInterfaceHelper {
 	private static TileEntity interfaceOverride = null;
 	private static EnumFacing enumFacingOverride = null;
 
@@ -12,7 +12,7 @@ public class AE2FCIntegrationHelper {
 	}
 
 	public static void setInterfaceOverride(TileEntity interfaceOverride) {
-		AE2FCIntegrationHelper.interfaceOverride = interfaceOverride;
+		AE2FCInterfaceHelper.interfaceOverride = interfaceOverride;
 	}
 
 	public static EnumFacing getEnumFacingOverride() {
@@ -20,6 +20,6 @@ public class AE2FCIntegrationHelper {
 	}
 
 	public static void setEnumFacingOverride(EnumFacing enumFacingOverride) {
-		AE2FCIntegrationHelper.enumFacingOverride = enumFacingOverride;
+		AE2FCInterfaceHelper.enumFacingOverride = enumFacingOverride;
 	}
 }

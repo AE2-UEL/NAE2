@@ -4,6 +4,8 @@ import appeng.bootstrap.IModelRegistry;
 import appeng.bootstrap.components.*;
 import appeng.core.AEConfig;
 import appeng.core.features.AEFeature;
+import appeng.util.Platform;
+import co.neeve.nae2.common.integration.ae2fc.AE2FC;
 import co.neeve.nae2.common.recipes.handlers.DisassembleRecipe;
 import co.neeve.nae2.common.registration.definitions.*;
 import co.neeve.nae2.common.registration.registry.Registry;
@@ -43,6 +45,10 @@ public class Registration {
 		this.parts = new Parts(this.registry);
 		this.upgrades = new Upgrades(this.registry);
 		this.blocks = new Blocks(this.registry);
+
+		if (Platform.isModLoaded("ae2fc")) {
+			this.registry.addBootstrapComponent((IPostInitComponent) AE2FC::postInit);
+		}
 	}
 
 	public void preInit(FMLPreInitializationEvent event) {
