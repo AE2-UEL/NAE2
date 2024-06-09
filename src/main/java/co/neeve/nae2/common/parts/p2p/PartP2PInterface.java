@@ -9,6 +9,7 @@ import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.parts.IPartHost;
 import appeng.api.parts.IPartModel;
 import appeng.api.storage.channels.IItemStorageChannel;
+import appeng.api.util.AEPartLocation;
 import appeng.capabilities.Capabilities;
 import appeng.core.settings.TickRates;
 import appeng.fluids.helper.IFluidInterfaceHost;
@@ -63,6 +64,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	private final MachineSource mySource;
 	private final List<ItemStack> waitingToSend = new ArrayList<>();
 	private final CapabilityCache capabilityCache;
+	private EnumFacing myFacing;
 	private int depth = 0;
 
 	private boolean requested;
@@ -70,6 +72,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	private IItemHandler cachedInv;
 	private IFluidHandler cachedTank;
 	private ObjectOpenHashSet<PartP2PInterface> cachedInputs;
+	private TileEntity facingTileEntity;
 
 	public PartP2PInterface(ItemStack is) {
 		super(is);
@@ -87,11 +90,10 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	                                                           Capability<T> capabilityType) {
 		var caps = new ObjectOpenHashSet<T>();
 		for (var tunnel : tunnels) {
-			var optionalTileEntity = tunnel.getFacingTileEntity();
-			if (!optionalTileEntity.isPresent()) continue;
+			var te = tunnel.getFacingTileEntity();
+			if (te == null) continue;
 
-			var facing = tunnel.getSide().getOpposite().getFacing();
-			var te = optionalTileEntity.get();
+			var facing = tunnel.getFacing().getOpposite();
 			if (!isInterface(te, facing)) continue;
 
 			var capability = te.getCapability(capabilityType, facing);
@@ -122,6 +124,17 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		}
 
 		return false;
+	}
+
+	@Override
+	public void setPartHostInfo(AEPartLocation side, IPartHost host, TileEntity tile) {
+		super.setPartHostInfo(side, host, tile);
+
+		this.myFacing = side.getFacing();
+	}
+
+	public EnumFacing getFacing() {
+		return this.myFacing;
 	}
 
 	public @NotNull IPartModel getStaticModels() {
@@ -205,7 +218,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		var worked = false;
 
 		if (!this.waitingToSend.isEmpty()) {
-			var s = this.getSide().getFacing();
+			var s = this.myFacing;
 			var tile = this.getTile();
 			var w = tile.getWorld();
 
@@ -326,10 +339,15 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		drops.addAll(this.waitingToSend);
 	}
 
-	public Optional<TileEntity> getFacingTileEntity() {
-		var tile = this.getTile();
+	@Nullable
+	public TileEntity getFacingTileEntity() {
+		if (this.facingTileEntity == null) {
+			var tile = this.getTile();
 
-		return Optional.ofNullable(tile.getWorld().getTileEntity(tile.getPos().offset(this.getSide().getFacing())));
+			this.facingTileEntity = tile.getWorld().getTileEntity(tile.getPos().offset(this.myFacing));
+		}
+
+		return this.facingTileEntity;
 	}
 
 	public boolean hasCapability(Capability<?> capabilityClass) {
@@ -372,13 +390,14 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		return this.getCachedOutputs().contains(tunnel);
 	}
 
-	private ObjectOpenHashSet<PartP2PInterface> getCachedOutputs() {
+	public ObjectOpenHashSet<PartP2PInterface> getCachedOutputs() {
 		if (this.cachedOutputs == null) {
-			this.cachedOutputs = new ObjectOpenHashSet<>();
-
 			var outputs = this.getOutputs();
 			if (outputs != null) {
+				this.cachedOutputs = new ObjectOpenHashSet<>(outputs.size());
 				outputs.forEach(this.cachedOutputs::add);
+			} else {
+				this.cachedOutputs = new ObjectOpenHashSet<>();
 			}
 		}
 		return this.cachedOutputs;
@@ -386,11 +405,12 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 
 	private ObjectOpenHashSet<PartP2PInterface> getCachedInputs() {
 		if (this.cachedInputs == null) {
-			this.cachedInputs = new ObjectOpenHashSet<>();
-
 			var inputs = this.getInputs();
 			if (inputs != null) {
+				this.cachedInputs = new ObjectOpenHashSet<>(inputs.size());
 				inputs.forEach(this.cachedInputs::add);
+			} else {
+				this.cachedInputs = new ObjectOpenHashSet<>();
 			}
 		}
 		return this.cachedInputs;
@@ -399,6 +419,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	public void onTunnelNetworkChange() {
 		this.cachedInputs = null;
 		this.cachedOutputs = null;
+		this.facingTileEntity = null;
 
 		if (this.isOutput()) {
 			this.cachedInv = null;
