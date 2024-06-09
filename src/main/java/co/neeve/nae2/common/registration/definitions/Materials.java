@@ -37,6 +37,11 @@ public class Materials implements DamagedDefinitions<DamagedItemDefinition, Mate
 	private final IItemDefinition cellFluidPart1024K;
 	private final IItemDefinition cellFluidPart4096K;
 	private final IItemDefinition cellFluidPart16384K;
+	private final IItemDefinition cellGasPart256K;
+	private final IItemDefinition cellGasPart1024K;
+	private final IItemDefinition cellGasPart4096K;
+	private final IItemDefinition cellGasPart16384K;
+
 	private final NAEMaterial material;
 
 	public Materials(Registry registry) {
@@ -54,6 +59,26 @@ public class Materials implements DamagedDefinitions<DamagedItemDefinition, Mate
 		this.cellFluidPart1024K = this.createMaterial(this.material, MaterialType.CELL_FLUID_PART_1024K);
 		this.cellFluidPart4096K = this.createMaterial(this.material, MaterialType.CELL_FLUID_PART_4096K);
 		this.cellFluidPart16384K = this.createMaterial(this.material, MaterialType.CELL_FLUID_PART_16384K);
+		this.cellGasPart256K = this.createMaterial(this.material, MaterialType.CELL_GAS_PART_256K);
+		this.cellGasPart1024K = this.createMaterial(this.material, MaterialType.CELL_GAS_PART_1024K);
+		this.cellGasPart4096K = this.createMaterial(this.material, MaterialType.CELL_GAS_PART_4096K);
+		this.cellGasPart16384K = this.createMaterial(this.material, MaterialType.CELL_GAS_PART_16384K);
+	}
+
+	public IItemDefinition cellGasPart256K() {
+		return this.cellGasPart256K;
+	}
+
+	public IItemDefinition cellGasPart1024K() {
+		return this.cellGasPart1024K;
+	}
+
+	public IItemDefinition cellGasPart4096K() {
+		return this.cellGasPart4096K;
+	}
+
+	public IItemDefinition cellGasPart16384K() {
+		return this.cellGasPart16384K;
 	}
 
 	@NotNull
@@ -129,7 +154,12 @@ public class Materials implements DamagedDefinitions<DamagedItemDefinition, Mate
 		CELL_FLUID_PART_256K("cell_part_fluid_256k", Features.DENSE_FLUID_CELLS),
 		CELL_FLUID_PART_1024K("cell_part_fluid_1024k", Features.DENSE_FLUID_CELLS),
 		CELL_FLUID_PART_4096K("cell_part_fluid_4096k", Features.DENSE_FLUID_CELLS),
-		CELL_FLUID_PART_16384K("cell_part_fluid_16384k", Features.DENSE_FLUID_CELLS);
+		CELL_FLUID_PART_16384K("cell_part_fluid_16384k", Features.DENSE_FLUID_CELLS),
+		CELL_GAS_PART_256K("cell_part_gas_256k", Features.DENSE_GAS_CELLS),
+		CELL_GAS_PART_1024K("cell_part_gas_1024k", Features.DENSE_GAS_CELLS),
+		CELL_GAS_PART_4096K("cell_part_gas_4096k", Features.DENSE_GAS_CELLS),
+		CELL_GAS_PART_16384K("cell_part_gas_16384k", Features.DENSE_GAS_CELLS);
+
 		private static Int2ObjectLinkedOpenHashMap<MaterialType> cachedValues;
 
 		private final String id;
