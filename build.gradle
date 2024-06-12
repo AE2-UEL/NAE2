@@ -14,6 +14,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.gradle.internal.logging.text.StyledTextOutputFactory
 import org.jetbrains.gradle.ext.Gradle
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 import static org.gradle.internal.logging.text.StyledTextOutput.Style
 
@@ -289,6 +290,11 @@ tasks.withType(ScalaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
 
 // Allow others using this buildscript to have custom gradle code run
 if (getFile('addon.gradle').exists()) {
@@ -313,10 +319,9 @@ if (!modVersion) {
     }
 }
 
-if (includeMCVersionJar.toBoolean()){
+if (includeMCVersionJar.toBoolean()) {
     version = "${minecraftVersion}-${modVersion}"
-}
-else {
+} else {
     version = modVersion
 }
 
@@ -346,9 +351,9 @@ minecraft {
     extraRunJvmArguments.add("-ea:${modGroup}")
     if (usesMixins.toBoolean()) {
         extraRunJvmArguments.addAll([
-            '-Dmixin.hotSwap=true',
-            '-Dmixin.checks.interfaces=true',
-            '-Dmixin.debug.export=true'
+                '-Dmixin.hotSwap=true',
+                '-Dmixin.checks.interfaces=true',
+                '-Dmixin.debug.export=true'
         ])
     }
 
@@ -476,7 +481,7 @@ dependencies {
         annotationProcessor 'com.google.code.gson:gson:2.8.9'
 
         mixinProviderSpec = modUtils.enableMixins(mixinProviderSpec, "mixins.${modId}.refmap.json")
-        api (mixinProviderSpec) {
+        api(mixinProviderSpec) {
             transitive = false
         }
 
@@ -727,7 +732,7 @@ if (usesShadowedDependencies.toBoolean()) {
         finalizedBy(tasks.shadowJar)
     }
     tasks.named('reobfJar', ReobfuscatedJar) {
-        inputJar.set(tasks.named('shadowJar', ShadowJar).flatMap({it.archiveFile}))
+        inputJar.set(tasks.named('shadowJar', ShadowJar).flatMap({ it.archiveFile }))
     }
     AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.components.findByName('java')
     javaComponent.withVariantsFromConfiguration(configurations.shadowRuntimeElements) {
@@ -862,7 +867,7 @@ tasks.register('generateChangelog') {
                 .collect { ['--', it] }).flatten())
 
         if (changelog) {
-            changelog = "Changes since ${lastTag}:\n${{("\n" + changelog).replaceAll("\n", "\n* ")}}"
+            changelog = "Changes since ${lastTag}:\n${{ ("\n" + changelog).replaceAll("\n", "\n* ") }}"
         }
         def f = getFile('build/changelog.md')
         changelog = changelog ?: 'There have been no changes.'
@@ -1023,6 +1028,7 @@ def getReleaseType() {
  * Next, if 'generateDefaultChangelog' option is enabled, use that.
  * Otherwise, try to use a CHANGELOG.md file at root directory.
  */
+
 def getChangelog() {
     def final changelogEnv = providers.environmentVariable('CHANGELOG_LOCATION')
     if (changelogEnv.isPresent()) {

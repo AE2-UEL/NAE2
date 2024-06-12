@@ -1,7 +1,6 @@
 package co.neeve.nae2.common.integration.jei;
 
 import appeng.api.AEApi;
-import appeng.api.implementations.items.IStorageCell;
 import appeng.api.storage.ICellInventory;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.channels.IFluidStorageChannel;
@@ -13,6 +12,7 @@ import appeng.client.render.StackSizeRenderer;
 import appeng.fluids.client.render.FluidStackSizeRenderer;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.Tags;
+import co.neeve.nae2.common.integration.jei.adapt.StorageCellWrapper;
 import com.github.bsideup.jabel.Desugar;
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -87,10 +87,8 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 	}
 
 	public static <T extends IAEStack<T>> CellInfo<T> getCellInfo(ItemStack is) {
-		if (!(is.getItem() instanceof IStorageCell<?>)) return null;
-
-		@SuppressWarnings("unchecked")
-		var storageCell = (IStorageCell<T>) is.getItem();
+		var storageCell = StorageCellWrapper.<T>getCell(is.getItem());
+		if (storageCell == null) return null;
 
 		var handler = AEApi.instance().registries().cell().getHandler(is);
 		if (handler == null) return null;

@@ -1,8 +1,8 @@
 package co.neeve.nae2.common.integration.jei;
 
 import appeng.api.definitions.IItemDefinition;
-import appeng.api.implementations.items.IStorageCell;
 import co.neeve.nae2.common.features.subfeatures.JEIFeatures;
+import co.neeve.nae2.common.integration.jei.adapt.StorageCellWrapper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import mezz.jei.api.IModPlugin;
@@ -57,7 +57,7 @@ public class NAEJEIPlugin implements IModPlugin, IRecipeRegistryPlugin {
 	@Override
 	public <V> @NotNull List<String> getRecipeCategoryUids(@NotNull IFocus<V> focus) {
 		if (JEIFeatures.CELL_VIEW.isEnabled() && focus.getValue() instanceof ItemStack focusStack) {
-			if (focusStack.getItem() instanceof IStorageCell<?>) {
+			if (StorageCellWrapper.isCell(focusStack.getItem())) {
 				return Collections.singletonList(JEICellCategory.UID);
 			}
 		}
@@ -68,7 +68,10 @@ public class NAEJEIPlugin implements IModPlugin, IRecipeRegistryPlugin {
 	@Override
 	public <T extends IRecipeWrapper, V> @NotNull List<T> getRecipeWrappers(@NotNull IRecipeCategory<T> recipeCategory,
 	                                                                        @NotNull IFocus<V> focus) {
-		if (JEIFeatures.CELL_VIEW.isEnabled() && recipeCategory instanceof JEICellCategory && focus.getValue() instanceof ItemStack is && is.getItem() instanceof IStorageCell<?>) {
+		if (JEIFeatures.CELL_VIEW.isEnabled()
+			&& recipeCategory instanceof JEICellCategory
+			&& focus.getValue() instanceof ItemStack is
+			&& StorageCellWrapper.isCell(is.getItem())) {
 			//noinspection unchecked
 			return Collections.singletonList((T) new SingleStackRecipe(is));
 		}
