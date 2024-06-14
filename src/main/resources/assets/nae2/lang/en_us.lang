@@ -10,6 +10,7 @@ item.nae2.pattern_multiplier.name=Pattern Multi-Tool
 # Cells
 item.nae2.storage_cell_void.name=ME Void Storage Cell
 item.nae2.fluid_storage_cell_void.name=ME Fluid Void Storage Cell
+item.nae2.gas_storage_cell_void.name=ME Fluid Void Storage Cell
 item.nae2.storage_cell_256k.name=§c256k§r ME Storage Cell
 item.nae2.storage_cell_1024k.name=§61024k§r ME Storage Cell
 item.nae2.storage_cell_4096k.name=§e4096k§r ME Storage Cell

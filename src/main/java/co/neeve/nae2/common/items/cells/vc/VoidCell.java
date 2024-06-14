@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -53,7 +54,7 @@ public abstract class VoidCell<T extends IAEStack<T>> extends AEBaseItem impleme
 
 	@Override
 	public IItemHandler getConfigInventory(ItemStack is) {
-		return this.getCellInventory(is).getCellConfig();
+		return this.getCellConfig(is);
 	}
 
 	public VoidCellInventory<T> getCellInventory(ItemStack stack) {
@@ -208,4 +209,9 @@ public abstract class VoidCell<T extends IAEStack<T>> extends AEBaseItem impleme
 	protected boolean isFuzzy(ItemStack itemStack) {
 		return this.getCellInventory(itemStack).isFuzzy();
 	}
+
+	public abstract CellConfig getCellConfig(ItemStack o);
+
+	@Nullable
+	public abstract T handleConfigStack(ItemStack stack);
 }
