@@ -11,10 +11,12 @@ import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
 import appeng.client.render.StackSizeRenderer;
 import appeng.fluids.client.render.FluidStackSizeRenderer;
+import appeng.util.Platform;
 import appeng.util.item.AEItemStack;
 import co.neeve.nae2.Tags;
 import com.github.bsideup.jabel.Desugar;
 import com.google.common.collect.ImmutableList;
+import com.mekeng.github.common.me.storage.IGasStorageChannel;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import mezz.jei.Internal;
@@ -80,6 +82,8 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 		if (storageChannel instanceof IItemStorageChannel) {
 			return "items";
 		} else if (storageChannel instanceof IFluidStorageChannel) {
+			return "buckets";
+		} else if (Platform.isModLoaded("mekeng") && storageChannel instanceof IGasStorageChannel) {
 			return "buckets";
 		} else {
 			return "units";
@@ -187,7 +191,8 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 			var format = NumberFormat.getInstance();
 
 			var storedItemCount = this.cellInfo.cellInv.getStoredItemCount();
-			var transferFactor = this.cellInfo.channel().transferFactor();
+			var transferFactor = this.getTransferFactor();
+
 			var capacity = (this.cellInfo.cellInv.getRemainingItemCount() + storedItemCount) / transferFactor;
 			var byteLoss = this.cellInfo.cellInv.getBytesPerType() * this.cellInfo.cellInv.getStoredItemTypes();
 			var capacityLoss = byteLoss * this.cellInfo.channel.getUnitsPerByte() / transferFactor;
@@ -209,6 +214,16 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 				this.slotSprite.draw(minecraft, bgXY.x, bgXY.y);
 			}
 		}
+	}
+
+	private int getTransferFactor() {
+		final int transferFactor;
+		if (Platform.isModLoaded("mekeng") && this.cellInfo.channel instanceof IGasStorageChannel) {
+			transferFactor = 1000;
+		} else {
+			transferFactor = this.cellInfo.channel().transferFactor();
+		}
+		return transferFactor;
 	}
 
 	@Override
@@ -243,7 +258,7 @@ public class JEICellCategory implements IRecipeCategory<SingleStackRecipe>, IRec
 				var unitName = I18n.format("nae2.jei.cellview." + getStorageChannelUnits(cellInfo.channel()));
 
 				tooltip.add(I18n.format("nae2.jei.cellview.hover.stored",
-					format.format(stackSize / (double) this.cellInfo.channel.transferFactor()), unitName));
+					format.format(stackSize / (double) this.getTransferFactor()), unitName));
 				tooltip.add(I18n.format("nae2.jei.cellview.used",
 					format.format(cellInfo.cellInv().getBytesPerType() + Math.ceil(stackSize / (double) cellInfo.channel().getUnitsPerByte()))));
 			}

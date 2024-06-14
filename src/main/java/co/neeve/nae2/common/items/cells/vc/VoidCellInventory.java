@@ -9,12 +9,8 @@ import appeng.api.storage.ISaveProvider;
 import appeng.api.storage.IStorageChannel;
 import appeng.api.storage.data.IAEStack;
 import appeng.api.storage.data.IItemList;
-import appeng.fluids.helper.FluidCellConfig;
-import appeng.fluids.items.FluidDummyItem;
-import appeng.fluids.util.AEFluidStack;
 import appeng.items.contents.CellConfig;
 import appeng.util.Platform;
-import appeng.util.item.AEItemStack;
 import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,13 +36,12 @@ public class VoidCellInventory<T extends IAEStack<T>> implements ICellInventoryH
 		this.itemListCache = this.getChannel().createList();
 		this.saveProvider = iSaveProvider;
 
-		this.cellConfig = this.isFluid() ? new FluidCellConfig(o) : new CellConfig(o);
+		this.cellConfig = this.item.getCellConfig(o);
 		for (final var is : this.cellConfig) {
 			if (!is.isEmpty()) {
-				if (this.isFluid() && is.getItem() instanceof FluidDummyItem fdi) {
-					this.itemListCache.add((T) AEFluidStack.fromFluidStack(fdi.getFluidStack(is)));
-				} else if (!this.isFluid()) {
-					this.itemListCache.add((T) AEItemStack.fromItemStack(is));
+				var aeStack = this.item.handleConfigStack(is);
+				if (aeStack != null) {
+					this.itemListCache.add(aeStack);
 				}
 			}
 		}
@@ -68,10 +63,6 @@ public class VoidCellInventory<T extends IAEStack<T>> implements ICellInventoryH
 				}
 			}
 		}
-	}
-
-	public CellConfig getCellConfig() {
-		return this.cellConfig;
 	}
 
 	@Override
@@ -110,10 +101,6 @@ public class VoidCellInventory<T extends IAEStack<T>> implements ICellInventoryH
 	@Override
 	public IStorageChannel<T> getChannel() {
 		return this.channel;
-	}
-
-	private boolean isFluid() {
-		return this.itemStack.getItem() instanceof VoidFluidCell;
 	}
 
 	@Override

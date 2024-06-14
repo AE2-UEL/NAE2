@@ -29,4 +29,6 @@ dependencies {
     implementation rfg.deobf("curse.maven:gregtechceu-557242:4951281")
     implementation rfg.deobf("curse.maven:actually-additions-228404:3117927")
     implementation rfg.deobf("curse.maven:codechicken-lib-1-8-242818:2779848")
+    implementation rfg.deobf("curse.maven:mekanism-energistics-1027681:5408319")
+    implementation rfg.deobf("curse.maven:mekanism-ce-399904:5351260")
 }

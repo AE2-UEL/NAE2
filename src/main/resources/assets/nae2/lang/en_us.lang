@@ -10,6 +10,7 @@ item.nae2.pattern_multiplier.name=Pattern Multi-Tool
 # Cells
 item.nae2.storage_cell_void.name=ME Void Storage Cell
 item.nae2.fluid_storage_cell_void.name=ME Fluid Void Storage Cell
+item.nae2.gas_storage_cell_void.name=ME Gas Void Storage Cell
 item.nae2.storage_cell_256k.name=§c256k§r ME Storage Cell
 item.nae2.storage_cell_1024k.name=§61024k§r ME Storage Cell
 item.nae2.storage_cell_4096k.name=§e4096k§r ME Storage Cell
@@ -18,6 +19,10 @@ item.nae2.storage_cell_fluid_256k.name=§c256k§r ME Fluid Storage Cell
 item.nae2.storage_cell_fluid_1024k.name=§61024k§r ME Fluid Storage Cell
 item.nae2.storage_cell_fluid_4096k.name=§e4096k§r ME Fluid Storage Cell
 item.nae2.storage_cell_fluid_16384k.name=§a16384k§r ME Fluid Storage Cell
+item.nae2.storage_cell_gas_256k.name=§c256k§r ME Gas Storage Cell
+item.nae2.storage_cell_gas_1024k.name=§61024k§r ME Gas Storage Cell
+item.nae2.storage_cell_gas_4096k.name=§e4096k§r ME Gas Storage Cell
+item.nae2.storage_cell_gas_16384k.name=§a16384k§r ME Gas Storage Cell
 
 # Materials
 item.nae2.material.cell_part_void.name=ME Void Storage Component
@@ -29,6 +34,10 @@ item.nae2.material.cell_part_fluid_256k.name=§c256k§r ME Fluid Storage Compone
 item.nae2.material.cell_part_fluid_1024k.name=§61024k§r ME Fluid Storage Component
 item.nae2.material.cell_part_fluid_4096k.name=§e4096k§r ME Fluid Storage Component
 item.nae2.material.cell_part_fluid_16384k.name=§a16384k§r ME Fluid Storage Component
+item.nae2.material.cell_part_gas_256k.name=§c256k§r ME Gas Storage Component
+item.nae2.material.cell_part_gas_1024k.name=§61024k§r ME Gas Storage Component
+item.nae2.material.cell_part_gas_4096k.name=§e4096k§r ME Gas Storage Component
+item.nae2.material.cell_part_gas_16384k.name=§a16384k§r ME Gas Storage Component
 
 # Parts
 item.nae2.part.beam_former.name=ME Beam Former

@@ -2,10 +2,10 @@ package co.neeve.nae2.common.recipes.handlers;
 
 import appeng.api.AEApi;
 import appeng.api.definitions.IItemDefinition;
-import appeng.api.storage.IMEInventory;
-import appeng.api.storage.channels.IItemStorageChannel;
-import appeng.api.storage.data.IAEItemStack;
+import appeng.api.storage.data.IAEStack;
+import appeng.api.storage.data.IItemList;
 import co.neeve.nae2.NAE2;
+import co.neeve.nae2.common.items.cells.vc.VoidCell;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
@@ -33,8 +33,6 @@ public final class DisassembleRecipe extends net.minecraftforge.registries.IForg
 		this.cellMappings = new HashMap<>(6);
 		this.nonCellMappings = new HashMap<>(4);
 
-		this.cellMappings.put(items.storageCellVoid(), mats.cellPartVoid());
-		this.cellMappings.put(items.fluidStorageCellVoid(), mats.cellPartVoid());
 		this.cellMappings.put(items.storageCell256K(), mats.cellPart256K());
 		this.cellMappings.put(items.storageCell1024K(), mats.cellPart1024K());
 		this.cellMappings.put(items.storageCell4096K(), mats.cellPart4096K());
@@ -48,6 +46,21 @@ public final class DisassembleRecipe extends net.minecraftforge.registries.IForg
 		this.nonCellMappings.put(blocks.storageCrafting1024K(), mats.cellPart1024K());
 		this.nonCellMappings.put(blocks.storageCrafting4096K(), mats.cellPart4096K());
 		this.nonCellMappings.put(blocks.storageCrafting16384K(), mats.cellPart16384K());
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static <T extends IAEStack<T>> IItemList<T> getStorageList(final ItemStack stack) {
+		var item = (VoidCell<T>) stack.getItem();
+		var channel = item.getStorageChannel();
+
+		// make sure the storage cell is empty...
+		var cellInv = AEApi.instance()
+			.registries()
+			.cell()
+			.getCellInventory(stack, null, channel);
+
+		assert cellInv != null;
+		return cellInv.getAvailableItems(channel.createList());
 	}
 
 	@Override
@@ -73,18 +86,9 @@ public final class DisassembleRecipe extends net.minecraftforge.registries.IForg
 				var maybeCellOutput = this.getCellOutput(stackInSlot);
 				if (maybeCellOutput.isPresent()) {
 					var storageCellStack = maybeCellOutput.get();
-					// make sure the storage cell stackInSlot empty...
-					final IMEInventory<IAEItemStack> cellInv = AEApi.instance()
-						.registries()
-						.cell()
-						.getCellInventory(stackInSlot, null,
-							AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class));
-					if (cellInv != null) {
-						final var list = cellInv
-							.getAvailableItems(AEApi.instance().storage().getStorageChannel(IItemStorageChannel.class).createList());
-						if (!list.isEmpty()) {
-							return ItemStack.EMPTY;
-						}
+					var storageList = getStorageList(storageCellStack);
+					if (storageList.isEmpty()) {
+						return MISMATCHED_STACK;
 					}
 
 					output = storageCellStack;
