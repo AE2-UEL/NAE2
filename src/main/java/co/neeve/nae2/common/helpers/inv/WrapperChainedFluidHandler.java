@@ -1,4 +1,4 @@
-package co.neeve.nae2.common.helpers;
+package co.neeve.nae2.common.helpers.inv;
 
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;

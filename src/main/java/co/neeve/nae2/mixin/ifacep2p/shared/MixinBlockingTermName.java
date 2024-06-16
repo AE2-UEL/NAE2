@@ -7,6 +7,7 @@ import appeng.helpers.IInterfaceHost;
 import appeng.util.Platform;
 import co.neeve.nae2.common.integration.ae2fc.AE2FCInterfaceHelper;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
+import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -93,9 +94,8 @@ public abstract class MixinBlockingTermName {
 
 		// Is the entity an input tunnel?
 		if (te instanceof IPartHost ph && ph.getPart(facing.getOpposite()) instanceof PartP2PInterface tunnel && !tunnel.isOutput()) {
-			var outputs = tunnel.getCachedOutputs();
-
-			if (outputs != null && outputs.size() > 0) {
+			var outputs = Lists.newLinkedList(tunnel.getCachedOutputsRecursive());
+			if (!outputs.isEmpty()) {
 				var outputTiles = new LinkedList<Pair<EnumFacing, TileEntity>>();
 				for (var output : outputs) {
 					if (output.hasItemsToSend()) continue;

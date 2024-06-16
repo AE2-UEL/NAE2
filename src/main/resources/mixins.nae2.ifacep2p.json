@@ -8,6 +8,8 @@
   "mixins": [
     "ifacep2p.shared.DualityAccessor",
     "ifacep2p.shared.MixinBlockingTermName",
+    "ifacep2p.shared.MixinP2PCache",
+    "ifacep2p.shared.MixinPartStorageBus",
     "ifacep2p.shared.MixinPushPattern"
   ],
   "client": [],

@@ -158,16 +158,12 @@ public abstract class MixinPushPattern {
 
 		// Is the entity an input tunnel?
 		if (te instanceof IPartHost ph && ph.getPart(facing.getOpposite()) instanceof PartP2PInterface inputTunnel && !inputTunnel.isOutput()) {
-			var outputs = inputTunnel.getCachedOutputs();
-			if (outputs != null) {
-				var outputTunnels = Lists.newLinkedList(outputs);
-
+			var outputs = Lists.newLinkedList(inputTunnel.getCachedOutputsRecursive());
+			if (!outputs.isEmpty()) {
 				// Sure it is, and we have TEs. Let the other part of this method know we're iterating them next.
-				if (!outputTunnels.isEmpty()) {
-					this.nae2$tunnelsToVisit = outputTunnels;
-					this.nae2$originalFacing = facing;
-					this.nae2$inputTunnel = inputTunnel;
-				}
+				this.nae2$tunnelsToVisit = outputs;
+				this.nae2$originalFacing = facing;
+				this.nae2$inputTunnel = inputTunnel;
 			}
 
 			return null; // Skip. :)

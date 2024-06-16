@@ -12,7 +12,6 @@ import appeng.api.storage.channels.IItemStorageChannel;
 import appeng.api.util.AEPartLocation;
 import appeng.capabilities.Capabilities;
 import appeng.core.settings.TickRates;
-import appeng.fluids.helper.IFluidInterfaceHost;
 import appeng.helpers.IInterfaceHost;
 import appeng.helpers.ItemStackHelper;
 import appeng.items.parts.PartModels;
@@ -24,12 +23,12 @@ import appeng.parts.p2p.PartP2PTunnel;
 import appeng.tile.networking.TileCableBus;
 import appeng.util.InventoryAdaptor;
 import appeng.util.Platform;
-import appeng.util.inv.WrapperChainedItemHandler;
 import appeng.util.item.AEItemStack;
-import co.neeve.nae2.common.helpers.WrapperChainedFluidHandler;
+import co.neeve.nae2.common.helpers.inv.FluidHandlerDelegate;
+import co.neeve.nae2.common.helpers.inv.ItemHandlerDelegate;
+import co.neeve.nae2.common.parts.p2p.iface.InterfaceTunnelGridCache;
 import co.neeve.nae2.mixin.ifacep2p.shared.DualityAccessor;
 import com.glodblock.github.inventory.FluidConvertingInventoryAdaptor;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,46 +38,32 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
-import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.EmptyHandler;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IItemHandler, IGridTickable,
-	IFluidHandler {
-	public static final ObjectOpenHashSet<Capability<?>> SUPPORTED_CAPABILITIES = new ObjectOpenHashSet<Capability<?>>(
-		new Capability[]{
-			CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,
-			CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY
-		});
+public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements IGridTickable {
 	private static final P2PModels MODELS = new P2PModels("part/p2p/p2p_tunnel_interface");
 	private final MachineSource mySource;
 	private final List<ItemStack> waitingToSend = new ArrayList<>();
-	private final CapabilityCache capabilityCache;
+	private final ItemHandlerDelegate myItemHandlerDelegate = new ItemHandlerDelegate();
+	private final FluidHandlerDelegate myFluidHandlerDelegate = new FluidHandlerDelegate();
 	private EnumFacing myFacing;
-	private int depth = 0;
-
 	private boolean requested;
 	private ObjectOpenHashSet<PartP2PInterface> cachedOutputs;
-	private IItemHandler cachedInv;
-	private IFluidHandler cachedTank;
-	private ObjectOpenHashSet<PartP2PInterface> cachedInputs;
 	private TileEntity facingTileEntity;
+	private boolean isViewing;
+	private Collection<PartP2PInterface> cachedOutputsRecursive;
 
 	public PartP2PInterface(ItemStack is) {
 		super(is);
 
 		this.mySource = new MachineSource(this);
-		this.capabilityCache = new CapabilityCache();
 	}
 
 	@PartModels
@@ -86,49 +71,11 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		return MODELS.getModels();
 	}
 
-	private static <T> ObjectOpenHashSet<T> gatherCapabilities(Collection<PartP2PInterface> tunnels,
-	                                                           Capability<T> capabilityType) {
-		var caps = new ObjectOpenHashSet<T>();
-		for (var tunnel : tunnels) {
-			var te = tunnel.getFacingTileEntity();
-			if (te == null) continue;
-
-			var facing = tunnel.getFacing().getOpposite();
-			if (!isInterface(te, facing)) continue;
-
-			var capability = te.getCapability(capabilityType, facing);
-			if (capability != null) {
-				caps.add(capability);
-			}
-		}
-		return caps;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> T[] toArray(Set<T> set, Class<T> clazz) {
-		var array = (T[]) java.lang.reflect.Array.newInstance(clazz, set.size());
-		var i = 0;
-		for (var item : set) {
-			array[i++] = item;
-		}
-		return array;
-	}
-
-	public static boolean isInterface(Object te, EnumFacing facing) {
-		if (te instanceof IInterfaceHost) return true;
-		if (te instanceof IFluidInterfaceHost) return true;
-
-		if (te instanceof IPartHost iPartHost) {
-			var part = iPartHost.getPart(facing);
-			return isInterface(part, facing);
-		}
-
-		return false;
-	}
-
 	@Override
 	public void setPartHostInfo(AEPartLocation side, IPartHost host, TileEntity tile) {
 		super.setPartHostInfo(side, host, tile);
+
+		if (Platform.isClient()) return;
 
 		this.myFacing = side.getFacing();
 	}
@@ -204,7 +151,7 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 			pushWorked = this.pushItemsOut();
 		}
 
-		if (this.hasWorkToDo())
+		if (this.hasItemsToSend())
 			return pushWorked ? TickRateModulation.URGENT : reqResult;
 		return reqResult;
 	}
@@ -308,10 +255,6 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		return worked;
 	}
 
-	private boolean hasWorkToDo() {
-		return this.hasItemsToSend();
-	}
-
 	@Override
 	@Nullable
 	public TunnelCollection<PartP2PInterface> getOutputs() {
@@ -342,52 +285,18 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 	@Nullable
 	public TileEntity getFacingTileEntity() {
 		if (this.facingTileEntity == null) {
-			var tile = this.getTile();
+			try {
+				var tile = this.getTile();
 
-			this.facingTileEntity = tile.getWorld().getTileEntity(tile.getPos().offset(this.myFacing));
+				this.facingTileEntity = tile.getWorld().getTileEntity(tile.getPos().offset(this.myFacing));
+			} catch (NullPointerException ignored) {return null;}
 		}
 
 		return this.facingTileEntity;
 	}
 
-	public boolean hasCapability(Capability<?> capabilityClass) {
-		return SUPPORTED_CAPABILITIES.contains(capabilityClass) || super.hasCapability(capabilityClass);
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T getCapability(Capability<T> capabilityClass) {
-		return SUPPORTED_CAPABILITIES.contains(capabilityClass) ? (T) this : super.getCapability(capabilityClass);
-	}
-
-	private IItemHandler getItemHandler() {
-		if (this.cachedInv == null) {
-			this.cachedInv = EmptyHandler.INSTANCE;
-
-			for (var input : this.getCachedInputs()) {
-				var pair = input.capabilityCache.get(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
-				pair.ifPresent(objectOpenHashSetObjectPair ->
-					this.cachedInv = (IItemHandler) objectOpenHashSetObjectPair.getRight());
-			}
-		}
-		return this.cachedInv;
-	}
-
-	private IFluidHandler getFluidHandler() {
-		if (this.cachedTank == null) {
-			this.cachedTank = EmptyFluidHandler.INSTANCE;
-
-			for (var input : this.getCachedInputs()) {
-				var pair = input.capabilityCache.get(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
-				pair.ifPresent(objectOpenHashSetObjectPair ->
-					this.cachedTank = (IFluidHandler) objectOpenHashSetObjectPair.getRight());
-			}
-
-		}
-		return this.cachedTank;
-	}
-
 	public boolean isValidDestination(PartP2PInterface tunnel) {
-		return this.getCachedOutputs().contains(tunnel);
+		return this.getCachedOutputsRecursive().contains(tunnel);
 	}
 
 	public ObjectOpenHashSet<PartP2PInterface> getCachedOutputs() {
@@ -403,170 +312,86 @@ public class PartP2PInterface extends PartP2PTunnel<PartP2PInterface> implements
 		return this.cachedOutputs;
 	}
 
-	private ObjectOpenHashSet<PartP2PInterface> getCachedInputs() {
-		if (this.cachedInputs == null) {
-			var inputs = this.getInputs();
-			if (inputs != null) {
-				this.cachedInputs = new ObjectOpenHashSet<>(inputs.size());
-				inputs.forEach(this.cachedInputs::add);
-			} else {
-				this.cachedInputs = new ObjectOpenHashSet<>();
-			}
+	public Collection<PartP2PInterface> getCachedOutputsRecursive() {
+		if (this.cachedOutputsRecursive == null) {
+			this.cachedOutputsRecursive = new ObjectOpenHashSet<>();
+			this.getOutputsRecursive(this.cachedOutputsRecursive);
 		}
-		return this.cachedInputs;
+
+		return this.cachedOutputsRecursive;
+	}
+
+	public void getOutputsRecursive(Collection<PartP2PInterface> collection) {
+		if (this.isViewing) return;
+		this.isViewing = true;
+
+		try {
+			if (!this.isOutput()) {
+				var outputs = this.getCachedOutputs();
+				for (var output : outputs) {
+					var opposite = output.getFacing().getOpposite();
+					var te = output.getFacingTileEntity();
+					if (te != null) {
+						if (te instanceof IPartHost partHost && partHost.getPart(opposite) instanceof PartP2PInterface ifacep2p && !ifacep2p.isOutput()) {
+							ifacep2p.getOutputsRecursive(collection);
+						} else {
+							collection.add(output);
+						}
+					}
+				}
+			}
+		} finally {
+			this.isViewing = false;
+		}
+	}
+
+	@Override
+	public void onNeighborChanged(IBlockAccess w, BlockPos pos, BlockPos neighbor) {
+		var node = this.getGridNode();
+		if (node == null) return;
+
+		var grid = node.getGrid();
+		if (grid == null) return;
+
+		var cache = grid.getCache(InterfaceTunnelGridCache.class);
+		if (cache == null) return;
+
+		((InterfaceTunnelGridCache) cache).onNeighborChanged(this);
+		this.cachedOutputsRecursive = null;
 	}
 
 	public void onTunnelNetworkChange() {
-		this.cachedInputs = null;
+		if (Platform.isClient()) return;
+
 		this.cachedOutputs = null;
 		this.facingTileEntity = null;
+		this.cachedOutputsRecursive = null;
 
-		if (this.isOutput()) {
-			this.cachedInv = null;
-			this.cachedTank = null;
-			this.getHost().notifyNeighbors();
-		}
+		var cache = (InterfaceTunnelGridCache) this.getGridNode().getGrid().getCache(InterfaceTunnelGridCache.class);
+		var capabilityContainer = cache.getCapabilityCacheForFreq(this.getFrequency());
+		this.myItemHandlerDelegate.setDelegate(capabilityContainer);
+		this.myFluidHandlerDelegate.setDelegate(capabilityContainer);
+
+		this.getHost().notifyNeighbors();
 	}
 
-	public void onNeighborChanged(IBlockAccess w, BlockPos pos, BlockPos neighbor) {
-		if (!this.isOutput()) {
-			var changed = false;
-
-			for (var capability : SUPPORTED_CAPABILITIES) {
-				changed |= this.processCapabiltiies(this.getCachedInputs(), capability);
-			}
-
-			if (changed) {
-				for (var tunnel : this.getCachedOutputs()) {
-					tunnel.onTunnelNetworkChange();
-				}
-			}
-		}
-	}
-
-	private <T> boolean processCapabiltiies(Collection<PartP2PInterface> inputs, Capability<T> capability) {
-		final var caps = gatherCapabilities(inputs, capability);
-
-		if (!this.capabilityCache.isSameAsCached(capability, caps)) {
-			final var handler = this.createHandler(capability, caps);
-			this.capabilityCache.store(capability, caps, handler);
-			for (var input : inputs) {
-				input.capabilityCache.store(capability, caps, handler);
-			}
-
-			return true;
-		}
-
-		return false;
+	@Override
+	public boolean hasCapability(Capability<?> capabilityClass) {
+		return capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY
+			|| capabilityClass == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY;
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T> Class<T> getCapabilityHandlerClass(Capability<T> capability) {
-		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return (Class<T>) IItemHandler.class;
-		} else if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-			return (Class<T>) IFluidHandler.class;
-		} else {
-			throw new RuntimeException("Unexpected capability: " + capability);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private <T> T createHandler(Capability<T> capability, ObjectOpenHashSet<T> caps) {
-		var clazz = this.getCapabilityHandlerClass(capability);
-		var array = toArray(caps, clazz);
-
-		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return (T) new WrapperChainedItemHandler((IItemHandler[]) array);
-		} else if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-			return (T) new WrapperChainedFluidHandler((IFluidHandler[]) array);
-		}
-		return null;
-	}
-
-	// Capability implementations
-
-	public int getSlots() {
-		return this.getItemHandler().getSlots();
-	}
-
-	public @NotNull ItemStack getStackInSlot(int i) {
-		return this.getItemHandler().getStackInSlot(i);
-	}
-
-	public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-		if (!this.isOutput()) return stack;
-
-		if (this.depth == 1) {
-			return stack;
-		} else {
-			++this.depth;
-			var ret = this.getItemHandler().insertItem(slot, stack, simulate);
-			--this.depth;
-			return ret;
-		}
-	}
-
-	public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-		if (!this.isOutput()) return ItemStack.EMPTY;
-
-		return this.getItemHandler().extractItem(slot, amount, simulate);
-	}
-
-	public int getSlotLimit(int slot) {
-		return this.getItemHandler().getSlotLimit(slot);
-	}
-
 	@Override
-	public IFluidTankProperties[] getTankProperties() {
-		return this.getFluidHandler().getTankProperties();
-	}
-
-	@Override
-	public int fill(FluidStack resource, boolean doFill) {
-		return this.getFluidHandler().fill(resource, doFill);
-	}
-
-	@Nullable
-	@Override
-	public FluidStack drain(FluidStack fluid, boolean doDrain) {
-		return this.getFluidHandler().drain(fluid, doDrain);
-	}
-
-	@Nullable
-	@Override
-	public FluidStack drain(int maxDrain, boolean doDrain) {
-		return this.getFluidHandler().drain(maxDrain, doDrain);
-	}
-
-	private static class CapabilityCache {
-		private final Object2ObjectOpenHashMap<Capability<?>, ObjectOpenHashSet<?>> cachedCapabilities =
-			new Object2ObjectOpenHashMap<>();
-		private final Object2ObjectOpenHashMap<Capability<?>, Object> cachedHandlers =
-			new Object2ObjectOpenHashMap<>();
-
-		public <T> void store(Capability<T> capability, ObjectOpenHashSet<T> capabilities, T handler) {
-			this.cachedCapabilities.put(capability, capabilities);
-			this.cachedHandlers.put(capability, handler);
+	public <T> T getCapability(Capability<T> capabilityClass) {
+		if (capabilityClass == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+			return (T) this.myItemHandlerDelegate;
 		}
 
-		@SuppressWarnings("unchecked")
-		public <T> Optional<Pair<ObjectOpenHashSet<T>, Object>> get(Capability<T> capability) {
-			var set = this.cachedCapabilities.getOrDefault(capability, null);
-			if (set != null) {
-				return Optional.of(Pair.of((ObjectOpenHashSet<T>) set, this.cachedHandlers.get(capability)));
-			}
-
-			return Optional.empty();
+		if (capabilityClass == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+			return (T) this.myFluidHandlerDelegate;
 		}
 
-		public <T> boolean isSameAsCached(Capability<T> capability, @Nullable ObjectOpenHashSet<T> capabilities) {
-			var cached = this.get(capability);
-			var present = cached.isPresent();
-			if (capabilities == null && present) return false;
-			if (capabilities != null && !present) return false;
-
-			return capabilities != null && capabilities.equals(cached.get().getLeft());
-		}
+		return super.getCapability(capabilityClass);
 	}
 }
