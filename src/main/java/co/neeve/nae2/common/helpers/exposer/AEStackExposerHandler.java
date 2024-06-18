@@ -80,9 +80,17 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 	 */
 	@Nullable
 	protected T pullStack(T stack, boolean simulate) {
+		if (this.lockRecursion()) {
+			return null;
+		}
+
 		this.updateMonitor();
 
-		return this.pullStackInternal(stack, simulate);
+		try {
+			return this.pullStackInternal(stack, simulate);
+		} finally {
+			this.unlockRecursion();
+		}
 	}
 
 	/**
@@ -95,20 +103,28 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 	 */
 	@Nullable
 	protected T pullStackFromSlot(int slot, long maxAmt, boolean simulate) {
-		this.updateMonitor();
-
-		if (slot < this.cache.size()) {
-			var stack = this.cache.getByIndex(slot);
-			if (stack != null) {
-				if (slot > 0 && !simulate) {
-					this.cache.makeFirst(stack);
-				}
-
-				return this.pullStackInternal(stack.copy().setStackSize(maxAmt), simulate);
-			}
+		if (this.lockRecursion()) {
+			return null;
 		}
 
-		return null;
+		try {
+			this.updateMonitor();
+
+			if (slot < this.cache.size()) {
+				var stack = this.cache.getByIndex(slot);
+				if (stack != null) {
+					if (slot > 0 && !simulate) {
+						this.cache.makeFirst(stack);
+					}
+
+					return this.pullStackInternal(stack.copy().setStackSize(maxAmt), simulate);
+				}
+			}
+
+			return null;
+		} finally {
+			this.unlockRecursion();
+		}
 	}
 
 	/**
@@ -165,12 +181,20 @@ public abstract class AEStackExposerHandler<T extends IAEStack<T>> extends Expos
 	 */
 	@Nullable
 	protected T getInSlot(int slot) {
-		this.updateMonitor();
-
-		if (!this.cache.isEmpty() && slot < this.cache.size()) {
-			return this.cache.getByIndex(slot);
+		if (this.lockRecursion()) {
+			return null;
 		}
 
-		return null;
+		try {
+			this.updateMonitor();
+
+			if (!this.cache.isEmpty() && slot < this.cache.size()) {
+				return this.cache.getByIndex(slot);
+			}
+
+			return null;
+		} finally {
+			this.unlockRecursion();
+		}
 	}
 }

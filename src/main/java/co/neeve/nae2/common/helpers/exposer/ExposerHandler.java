@@ -20,6 +20,7 @@ public abstract class ExposerHandler<T extends IAEStack<T>> implements IExposerH
 	protected final IActionSource mySrc;
 	protected final AENetworkProxy proxy;
 	protected IMEMonitor<T> monitor;
+	protected boolean isRecursionLocked = false;
 
 	public ExposerHandler(IExposerHost host) {
 		this.host = host;
@@ -135,5 +136,18 @@ public abstract class ExposerHandler<T extends IAEStack<T>> implements IExposerH
 	 */
 	public AENetworkProxy getProxy() {
 		return this.proxy;
+	}
+
+	protected boolean lockRecursion() {
+		if (this.isRecursionLocked) {
+			return true;
+		} else {
+			this.isRecursionLocked = true;
+			return false;
+		}
+	}
+
+	protected void unlockRecursion() {
+		this.isRecursionLocked = false;
 	}
 }
