@@ -6,6 +6,7 @@ itemGroup.nae2=Neeve的AE2:EL附加工具
 # Items
 item.nae2.invalid.name=无效或禁用的物品
 item.nae2.pattern_multiplier.name=多功能样板工具
+item.nae2.universal_wireless_terminal.name=通用无线终端
 
 # Cells
 item.nae2.storage_cell_void.name=ME虚空存储元件
@@ -90,3 +91,13 @@ nae2.jei.cellview.hover.1=已占用 %s 种类型。
 nae2.jei.cellview.hover.2=每种占用类型均会损耗容量。
 nae2.jei.cellview.hover.3=%s 字节/类型 * %s = %s 字节损耗。
 nae2.jei.cellview.keybind=按下 %s 来浏览内容
+
+# Universal Wireless Terminal
+nae2.tooltip.universal_wireless_terminal.mode=模式
+nae2.tooltip.universal_wireless_terminal.installed=已安装
+nae2.tooltip.universal_wireless_terminal.item=物品
+nae2.tooltip.universal_wireless_terminal.fluid=流体
+nae2.tooltip.universal_wireless_terminal.gas=气体
+nae2.tooltip.universal_wireless_terminal.crafting=合成
+nae2.tooltip.universal_wireless_terminal.pattern=样板
+nae2.tooltip.universal_wireless_terminal.interface=接口

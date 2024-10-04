@@ -2,6 +2,7 @@ package co.neeve.nae2.common.integration.jei;
 
 import appeng.api.definitions.IItemDefinition;
 import appeng.api.implementations.items.IStorageCell;
+import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.JEIFeatures;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -16,6 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -107,6 +109,14 @@ public class NAEJEIPlugin implements IModPlugin, IRecipeRegistryPlugin {
 		var blacklist = registry.getJeiHelpers().getIngredientBlacklist();
 		for (var blacklistEntry : ingredientBlacklist) {
 			blacklistEntry.maybeStack(1).ifPresent(blacklist::addIngredientToBlacklist);
+		}
+
+		if (Features.UNIVERSAL_TERMINAL.isEnabled()) {
+			List<UniversalTerminalRecipeWrapper> recipeWrappers = new ArrayList<>();
+			recipeWrappers.add(new UniversalTerminalRecipeWrapper(true));
+			recipeWrappers.add(new UniversalTerminalRecipeWrapper(false));
+
+			registry.addRecipes(recipeWrappers,VanillaRecipeCategoryUid.CRAFTING);
 		}
 	}
 }

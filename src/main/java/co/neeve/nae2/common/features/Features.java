@@ -41,7 +41,14 @@ public enum Features implements IFeature {
 	},
 	DENSE_CPU_COPROCESSORS("dense.coprocessor"),
 	DENSE_FLUID_CELLS(),
-	EXPOSER();
+	EXPOSER(),
+	UNIVERSAL_TERMINAL(),
+	OPEN_COMPUTER_UPGRADE() {
+		@Override
+		public boolean isEnabled() {
+			return Platform.isModLoaded("opencomputers") && super.isEnabled();
+		}
+	};
 
 	private String[] mixins;
 	private EnumSet<? extends ISubFeature> subFeatures = null;
