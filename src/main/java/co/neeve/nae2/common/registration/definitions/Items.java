@@ -12,7 +12,6 @@ import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
-import co.neeve.nae2.common.items.OCUpgrade;
 import co.neeve.nae2.common.items.VirtualPattern;
 import co.neeve.nae2.common.items.WirelessTerminalUniversal;
 import co.neeve.nae2.common.items.cells.DenseFluidCell;
@@ -62,7 +61,6 @@ public class Items implements Definitions<IItemDefinition> {
 	private final IItemDefinition storageCellGas16384K;
 	private final IItemDefinition virtualPattern;
 	private final IItemDefinition universalWirelessTerminal;
-	private final IItemDefinition openComputerUpgrade;
 
 	public Items(Registry registry) {
 		this.virtualPattern = this.registerById(registry.item("virtual_pattern", VirtualPattern::new)
@@ -204,9 +202,6 @@ public class Items implements Definitions<IItemDefinition> {
 					Upgrades.MAGNET.registerItem(new ItemStack(item),1);
 				})
 				.build());
-		this.openComputerUpgrade = this.registerById(registry.item("opencomputer_upgrade", OCUpgrade::new)
-						.features(Features.OPEN_COMPUTER_UPGRADE)
-						.build());
 
 		registry.addBootstrapComponent((IPostInitComponent) r -> {
 			var items = AEApi.instance().definitions().items();
@@ -346,6 +341,4 @@ public class Items implements Definitions<IItemDefinition> {
 	}
 
 	public IItemDefinition universalWirelessTerminal() {return this.universalWirelessTerminal;}
-
-	public IItemDefinition openComputerUpgrade() {return this.openComputerUpgrade;}
 }
