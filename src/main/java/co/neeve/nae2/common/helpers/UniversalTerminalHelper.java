@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -17,8 +18,10 @@ public class UniversalTerminalHelper {
     private final static boolean isMekELoaded = Platform.isModLoaded("mekeng");
     public static final List<ItemStack> wirelessTerminals = new ArrayList<>();
     public static final List<ItemStack> terminals = new ArrayList<>();
+    public static final List<WirelessTerminalType> WIRELESS_TERMINAL_TYPE_LIST = Arrays.asList(WirelessTerminalType.values());
 
     private static final boolean isMekEngLoaded = Platform.isModLoaded("mekeng");
+
     static {
         wirelessTerminals.add(AEApi.instance().definitions().items().wirelessTerminal().maybeStack(1).orElse(null));
         wirelessTerminals.add(AEApi.instance().definitions().items().wirelessFluidTerminal().maybeStack(1).orElse(null));
@@ -30,11 +33,12 @@ public class UniversalTerminalHelper {
         terminals.add(AEApi.instance().definitions().parts().patternTerminal().maybeStack(1).orElse(null));
         terminals.add(AEApi.instance().definitions().parts().fluidTerminal().maybeStack(1).orElse(null));
 
-        if (Platform.isModLoaded("mekeng")){
+        if (Platform.isModLoaded("mekeng")) {
             wirelessTerminals.add(new ItemStack(ItemAndBlocks.WIRELESS_GAS_TERMINAL));
             terminals.add(new ItemStack(ItemAndBlocks.GAS_TERMINAL));
         }
     }
+
     public static boolean isWirelessTerminal(ItemStack stack) {
         if (stack == ItemStack.EMPTY) return false;
 
@@ -42,10 +46,12 @@ public class UniversalTerminalHelper {
         Item item = stack.getItem();
 
         ItemStack wirelessTerminal = AEApi.instance().definitions().items().wirelessTerminal().maybeStack(1).orElse(null);
-        if (wirelessTerminal != null && wirelessTerminal.getItem() == item && wirelessTerminal.getItemDamage() == itemDamage) return true;
+        if (wirelessTerminal != null && wirelessTerminal.getItem() == item && wirelessTerminal.getItemDamage() == itemDamage)
+            return true;
 
         ItemStack wirelessFluidTerminal = AEApi.instance().definitions().items().wirelessFluidTerminal().maybeStack(1).orElse(null);
-        if (wirelessFluidTerminal != null && wirelessFluidTerminal.getItem() == item && wirelessFluidTerminal.getItemDamage() == itemDamage) return true;
+        if (wirelessFluidTerminal != null && wirelessFluidTerminal.getItem() == item && wirelessFluidTerminal.getItemDamage() == itemDamage)
+            return true;
 
         if (isMekEngLoaded) {
             ItemStack wirelessGasTerminal = new ItemStack(ItemAndBlocks.WIRELESS_GAS_TERMINAL);
@@ -53,10 +59,12 @@ public class UniversalTerminalHelper {
         }
 
         ItemStack wirelessCraftingTerminal = AEApi.instance().definitions().items().wirelessCraftingTerminal().maybeStack(1).orElse(null);
-        if (wirelessCraftingTerminal != null && wirelessCraftingTerminal.getItem() == item && wirelessCraftingTerminal.getItemDamage() == itemDamage) return true;
+        if (wirelessCraftingTerminal != null && wirelessCraftingTerminal.getItem() == item && wirelessCraftingTerminal.getItemDamage() == itemDamage)
+            return true;
 
         ItemStack wirelessPatternTerminal = AEApi.instance().definitions().items().wirelessPatternTerminal().maybeStack(1).orElse(null);
-        if (wirelessPatternTerminal != null && wirelessPatternTerminal.getItem() == item && wirelessPatternTerminal.getItemDamage() == itemDamage) return true;
+        if (wirelessPatternTerminal != null && wirelessPatternTerminal.getItem() == item && wirelessPatternTerminal.getItemDamage() == itemDamage)
+            return true;
 
         return false;
     }
@@ -71,21 +79,25 @@ public class UniversalTerminalHelper {
         if (terminal != null && terminal.getItem() == item && terminal.getItemDamage() == itemDamage) return true;
 
         ItemStack fluidTerminal = AEApi.instance().definitions().parts().fluidTerminal().maybeStack(1).orElse(null);
-        if (fluidTerminal != null && fluidTerminal.getItem() == item && fluidTerminal.getItemDamage() == itemDamage) return true;
+        if (fluidTerminal != null && fluidTerminal.getItem() == item && fluidTerminal.getItemDamage() == itemDamage)
+            return true;
 
-        if (isMekEngLoaded){
+        if (isMekEngLoaded) {
             ItemStack gasTerminal = new ItemStack(ItemAndBlocks.GAS_TERMINAL);
             if (gasTerminal.getItem() == item && gasTerminal.getItemDamage() == itemDamage) return true;
         }
 
         ItemStack craftingTerminal = AEApi.instance().definitions().parts().craftingTerminal().maybeStack(1).orElse(null);
-        if (craftingTerminal != null && craftingTerminal.getItem() == item && craftingTerminal.getItemDamage() == itemDamage) return true;
+        if (craftingTerminal != null && craftingTerminal.getItem() == item && craftingTerminal.getItemDamage() == itemDamage)
+            return true;
 
         ItemStack patternTerminal = AEApi.instance().definitions().parts().patternTerminal().maybeStack(1).orElse(null);
-        if (patternTerminal != null && patternTerminal.getItem() == item && patternTerminal.getItemDamage() == itemDamage) return true;
+        if (patternTerminal != null && patternTerminal.getItem() == item && patternTerminal.getItemDamage() == itemDamage)
+            return true;
 
         ItemStack interfaceTerminal = AEApi.instance().definitions().parts().interfaceTerminal().maybeStack(1).orElse(null);
-        if (interfaceTerminal != null && interfaceTerminal.getItem() == item && interfaceTerminal.getItemDamage() == itemDamage) return true;
+        if (interfaceTerminal != null && interfaceTerminal.getItem() == item && interfaceTerminal.getItemDamage() == itemDamage)
+            return true;
 
         return false;
     }
@@ -97,61 +109,61 @@ public class UniversalTerminalHelper {
         int itemDamage = stack.getItemDamage();
 
         ItemStack terminal = AEApi.instance().definitions().parts().terminal().maybeStack(1).orElse(null);
-        if (terminal != null && terminal.getItem() == item && terminal.getItemDamage() == itemDamage){
+        if (terminal != null && terminal.getItem() == item && terminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.ITEM;
         }
 
         ItemStack fluidTerminal = AEApi.instance().definitions().parts().fluidTerminal().maybeStack(1).orElse(null);
-        if (fluidTerminal != null && fluidTerminal.getItem() == item && fluidTerminal.getItemDamage() == itemDamage){
+        if (fluidTerminal != null && fluidTerminal.getItem() == item && fluidTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.FLUID;
         }
 
         ItemStack craftingTerminal = AEApi.instance().definitions().parts().craftingTerminal().maybeStack(1).orElse(null);
-        if (craftingTerminal != null && fluidTerminal.getItem() == item && craftingTerminal.getItemDamage() == itemDamage){
+        if (craftingTerminal != null && fluidTerminal.getItem() == item && craftingTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.CRAFTING;
         }
 
         ItemStack patternTerminal = AEApi.instance().definitions().parts().patternTerminal().maybeStack(1).orElse(null);
-        if (patternTerminal != null && patternTerminal.getItem() == item && patternTerminal.getItemDamage() == itemDamage){
+        if (patternTerminal != null && patternTerminal.getItem() == item && patternTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.PATTERN;
         }
 
         ItemStack wirelessInterfaceTerminal = AEApi.instance().definitions().parts().interfaceTerminal().maybeStack(1).orElse(null);
-        if (wirelessInterfaceTerminal != null && wirelessInterfaceTerminal.getItem() == item && wirelessInterfaceTerminal.getItemDamage() == itemDamage){
+        if (wirelessInterfaceTerminal != null && wirelessInterfaceTerminal.getItem() == item && wirelessInterfaceTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.INTERFACE;
         }
 
         //Wireless Terminal
 
         ItemStack wirelessTerminal = AEApi.instance().definitions().items().wirelessTerminal().maybeStack(1).orElse(null);
-        if (wirelessTerminal != null && wirelessTerminal.getItem() == item && wirelessTerminal.getItemDamage() == itemDamage){
+        if (wirelessTerminal != null && wirelessTerminal.getItem() == item && wirelessTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.ITEM;
         }
 
         ItemStack wirelessFluidTerminal = AEApi.instance().definitions().items().wirelessFluidTerminal().maybeStack(1).orElse(null);
-        if (wirelessFluidTerminal != null && wirelessFluidTerminal.getItem() == item && wirelessFluidTerminal.getItemDamage() == itemDamage){
+        if (wirelessFluidTerminal != null && wirelessFluidTerminal.getItem() == item && wirelessFluidTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.FLUID;
         }
 
         ItemStack wirelessCraftingTerminal = AEApi.instance().definitions().items().wirelessCraftingTerminal().maybeStack(1).orElse(null);
-        if (wirelessCraftingTerminal != null && wirelessCraftingTerminal.getItem() == item && wirelessCraftingTerminal.getItemDamage() == itemDamage){
+        if (wirelessCraftingTerminal != null && wirelessCraftingTerminal.getItem() == item && wirelessCraftingTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.CRAFTING;
         }
 
         ItemStack wirelessPatternTerminal = AEApi.instance().definitions().items().wirelessPatternTerminal().maybeStack(1).orElse(null);
-        if (wirelessPatternTerminal != null && wirelessPatternTerminal.getItem() == item && wirelessPatternTerminal.getItemDamage() == itemDamage){
+        if (wirelessPatternTerminal != null && wirelessPatternTerminal.getItem() == item && wirelessPatternTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.PATTERN;
         }
 
         //MekEng Integration
         if (isMekEngLoaded) {
             ItemStack gasTerminal = new ItemStack(ItemAndBlocks.GAS_TERMINAL);
-            if (gasTerminal.getItem() == item && gasTerminal.getItemDamage() == itemDamage){
+            if (gasTerminal.getItem() == item && gasTerminal.getItemDamage() == itemDamage) {
                 return WirelessTerminalType.GAS;
             }
 
             ItemStack wirelessGasTerminal = new ItemStack(ItemAndBlocks.WIRELESS_GAS_TERMINAL);
-            if (wirelessGasTerminal.getItem() == item && wirelessGasTerminal.getItemDamage() == itemDamage){
+            if (wirelessGasTerminal.getItem() == item && wirelessGasTerminal.getItemDamage() == itemDamage) {
                 return WirelessTerminalType.GAS;
             }
         }
@@ -159,75 +171,21 @@ public class UniversalTerminalHelper {
         return null;
     }
 
+
     public static ItemStack changeMode(ItemStack itemStack, EntityPlayer player, NBTTagCompound tag) {
-        EnumSet<WirelessTerminalType> installed = getInstalledModules(itemStack);
+        EnumSet<WirelessTerminalType> installedModules = getInstalledModules(itemStack);
+        int type = tag.getInteger("type");
+        boolean installed;
+        do {
+            type = (type + 1) % WIRELESS_TERMINAL_TYPE_LIST.size();
+            installed = installedModules.contains(WIRELESS_TERMINAL_TYPE_LIST.get(type));
+            if (WIRELESS_TERMINAL_TYPE_LIST.get(type) == WirelessTerminalType.GAS && !isMekELoaded) {
+                installed = false;
+            }
+        } while (!installed);
 
-        switch (tag.getInteger("type")) {
-            case 0 -> {
-                if (installed.contains(WirelessTerminalType.FLUID)) {
-                    tag.setInteger("type", 1);
-                } else if (isMekELoaded && installed.contains(WirelessTerminalType.GAS)) {
-                    tag.setInteger("type", 2);
-                } else if (installed.contains(WirelessTerminalType.CRAFTING)) {
-                    tag.setInteger("type", 3);
-                }
-            }
+        tag.setInteger("type", type);
 
-            case 1 -> {
-                if (isMekELoaded && installed.contains(WirelessTerminalType.GAS)) {
-                    tag.setInteger("type", 2);
-                } else if (installed.contains(WirelessTerminalType.CRAFTING)) {
-                    tag.setInteger("type", 3);
-                } else if (installed.contains(WirelessTerminalType.ITEM)) {
-                    tag.setInteger("type", 0);
-                }
-            }
-
-            case 2 -> {
-                if (installed.contains(WirelessTerminalType.CRAFTING)) {
-                    tag.setInteger("type", 3);
-                } else if (installed.contains(WirelessTerminalType.ITEM)) {
-                    tag.setInteger("type", 0);
-                } else if (installed.contains(WirelessTerminalType.FLUID)) {
-                    tag.setInteger("type", 1);
-                }
-            }
-
-            case 3 -> {
-                if (installed.contains(WirelessTerminalType.PATTERN)) {
-                    tag.setInteger("type", 4);
-                } else if (installed.contains(WirelessTerminalType.ITEM)) {
-                    tag.setInteger("type", 0);
-                } else if (installed.contains(WirelessTerminalType.FLUID)) {
-                    tag.setInteger("type", 1);
-                } else if (isMekELoaded && installed.contains(WirelessTerminalType.GAS)) {
-                    tag.setInteger("type", 2);
-                }
-            }
-
-            case 4 -> {
-                if (installed.contains(WirelessTerminalType.ITEM)) {
-                    tag.setInteger("type", 0);
-                } else if (installed.contains(WirelessTerminalType.FLUID)) {
-                    tag.setInteger("type", 1);
-                } else if (isMekELoaded && installed.contains(WirelessTerminalType.GAS)) {
-                    tag.setInteger("type", 2);
-                }
-            }
-            default -> {
-                if (installed.contains(WirelessTerminalType.ITEM)) {
-                    tag.setInteger("type", 0);
-                } else if (installed.contains(WirelessTerminalType.FLUID)) {
-                    tag.setInteger("type", 1);
-                } else if (isMekELoaded && installed.contains(WirelessTerminalType.GAS)) {
-                    tag.setInteger("type", 2);
-                } else if (installed.contains(WirelessTerminalType.CRAFTING)) {
-                    tag.setInteger("type", 3);
-                } else if (installed.contains(WirelessTerminalType.PATTERN)) {
-                    tag.setInteger("type", 4);
-                }
-            }
-        }
         return itemStack;
     }
 

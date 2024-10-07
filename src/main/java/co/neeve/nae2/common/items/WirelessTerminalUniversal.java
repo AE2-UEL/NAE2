@@ -31,16 +31,15 @@ import java.util.List;
 import static co.neeve.nae2.common.helpers.UniversalTerminalHelper.*;
 
 public class WirelessTerminalUniversal extends ToolWirelessTerminal {
-
     @Override
     public IGuiHandler getGuiHandler(ItemStack is) {
-        return switch (Platform.openNbtData(is).getInteger("type")) {
-            case 0 -> GuiBridge.GUI_WIRELESS_TERM;
-            case 1 -> GuiBridge.GUI_WIRELESS_FLUID_TERMINAL;
-            case 2 -> GuiWrapper.INSTANCE.wrap(AEGuiBridge.WIRELESS_GAS_TERM);
-            case 3 -> GuiBridge.GUI_WIRELESS_CRAFTING_TERMINAL;
-            case 4 -> GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL;
-            default -> GuiBridge.GUI_WIRELESS_TERM;
+        return switch (WIRELESS_TERMINAL_TYPE_LIST.get(Platform.openNbtData(is).getInteger("type"))) {
+            case ITEM -> GuiBridge.GUI_WIRELESS_TERM;
+            case FLUID -> GuiBridge.GUI_WIRELESS_FLUID_TERMINAL;
+            case GAS -> GuiWrapper.INSTANCE.wrap(AEGuiBridge.WIRELESS_GAS_TERM);
+            case CRAFTING -> GuiBridge.GUI_WIRELESS_CRAFTING_TERMINAL;
+            case PATTERN -> GuiBridge.GUI_WIRELESS_PATTERN_TERMINAL;
+            case INTERFACE -> GuiBridge.GUI_WIRELESS_INTERFACE_TERMINAL;
         };
     }
 
