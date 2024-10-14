@@ -16,6 +16,8 @@ import co.neeve.nae2.common.interfaces.IPatternMultiToolHost;
 import co.neeve.nae2.common.net.INAEMessage;
 import com.glodblock.github.common.item.ItemFluidDrop;
 import com.glodblock.github.common.item.ItemFluidEncodedPattern;
+import com.glodblock.github.common.item.fake.FakeFluids;
+import com.glodblock.github.common.item.fake.FakeItemRegister;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.InventoryCrafting;
@@ -23,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
@@ -177,9 +180,9 @@ public class PatternMultiToolPacket implements INAEMessage {
 						list.set(idx, data);
 					} else if (fluidReplacement && stack.getItem() instanceof ItemFluidDrop) {
 						// ¯\_(ツ)_/¯
-						var fluidStack = ItemFluidDrop.getFluidStack(stack);
-						if (fluidStackIn.isFluidEqual(fluidStack)) {
-							var ifd = ItemFluidDrop.newStack(fluidStackOut);
+						var fluidStack = FakeItemRegister.getStack(stack);
+						if (fluidStackIn.isFluidEqual(((FluidStack) fluidStack))) {
+							var ifd = FakeFluids.packFluid2Drops(fluidStackOut);
 							NBTTagCompound ifdCompound;
 							if (ifd == null || (ifdCompound = ifd.getTagCompound()) == null) continue;
 
