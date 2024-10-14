@@ -3,6 +3,7 @@ package co.neeve.nae2.common.helpers;
 import appeng.api.AEApi;
 import appeng.util.Platform;
 import co.neeve.nae2.common.api.config.WirelessTerminalType;
+import com.glodblock.github.loader.FCItems;
 import com.mekeng.github.common.ItemAndBlocks;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -21,6 +22,7 @@ public class UniversalTerminalHelper {
     public static final List<WirelessTerminalType> WIRELESS_TERMINAL_TYPE_LIST = Arrays.asList(WirelessTerminalType.values());
 
     private static final boolean isMekEngLoaded = Platform.isModLoaded("mekeng");
+    private static final boolean isAE2FCLoaded = Platform.isModLoaded("ae2fc");
 
     static {
         wirelessTerminals.add(AEApi.instance().definitions().items().wirelessTerminal().maybeStack(1).orElse(null));
@@ -33,9 +35,14 @@ public class UniversalTerminalHelper {
         terminals.add(AEApi.instance().definitions().parts().patternTerminal().maybeStack(1).orElse(null));
         terminals.add(AEApi.instance().definitions().parts().fluidTerminal().maybeStack(1).orElse(null));
 
-        if (Platform.isModLoaded("mekeng")) {
+        if (isMekEngLoaded) {
             wirelessTerminals.add(new ItemStack(ItemAndBlocks.WIRELESS_GAS_TERMINAL));
             terminals.add(new ItemStack(ItemAndBlocks.GAS_TERMINAL));
+        }
+
+        if (isAE2FCLoaded) {
+            wirelessTerminals.add(new ItemStack(FCItems.WIRELESS_FLUID_PATTERN_TERMINAL));
+            terminals.add(new ItemStack(FCItems.PART_FLUID_PATTERN_TERMINAL));
         }
     }
 
@@ -56,6 +63,11 @@ public class UniversalTerminalHelper {
         if (isMekEngLoaded) {
             ItemStack wirelessGasTerminal = new ItemStack(ItemAndBlocks.WIRELESS_GAS_TERMINAL);
             if (wirelessGasTerminal.getItem() == item && wirelessGasTerminal.getItemDamage() == itemDamage) return true;
+        }
+
+        if (isAE2FCLoaded) {
+            ItemStack fluidPatternWirelessTerminal = new ItemStack(FCItems.WIRELESS_FLUID_PATTERN_TERMINAL);
+            if (fluidPatternWirelessTerminal.getItem() == item && fluidPatternWirelessTerminal.getItemDamage() == itemDamage) return true;
         }
 
         ItemStack wirelessCraftingTerminal = AEApi.instance().definitions().items().wirelessCraftingTerminal().maybeStack(1).orElse(null);
@@ -85,6 +97,11 @@ public class UniversalTerminalHelper {
         if (isMekEngLoaded) {
             ItemStack gasTerminal = new ItemStack(ItemAndBlocks.GAS_TERMINAL);
             if (gasTerminal.getItem() == item && gasTerminal.getItemDamage() == itemDamage) return true;
+        }
+
+        if (isAE2FCLoaded) {
+            ItemStack fluidPatternTerminal = new ItemStack(FCItems.PART_FLUID_PATTERN_TERMINAL);
+            if (fluidPatternTerminal.getItem() == item && fluidPatternTerminal.getItemDamage() == itemDamage) return true;
         }
 
         ItemStack craftingTerminal = AEApi.instance().definitions().parts().craftingTerminal().maybeStack(1).orElse(null);
@@ -128,8 +145,8 @@ public class UniversalTerminalHelper {
             return WirelessTerminalType.PATTERN;
         }
 
-        ItemStack wirelessInterfaceTerminal = AEApi.instance().definitions().parts().interfaceTerminal().maybeStack(1).orElse(null);
-        if (wirelessInterfaceTerminal != null && wirelessInterfaceTerminal.getItem() == item && wirelessInterfaceTerminal.getItemDamage() == itemDamage) {
+        ItemStack interfaceTerminal = AEApi.instance().definitions().parts().interfaceTerminal().maybeStack(1).orElse(null);
+        if (interfaceTerminal != null && interfaceTerminal.getItem() == item && interfaceTerminal.getItemDamage() == itemDamage) {
             return WirelessTerminalType.INTERFACE;
         }
 
@@ -155,6 +172,11 @@ public class UniversalTerminalHelper {
             return WirelessTerminalType.PATTERN;
         }
 
+        ItemStack wirelessInterfaceTerminal = AEApi.instance().definitions().items().wirelessInterfaceTerminal().maybeStack(1).orElse(null);
+        if (wirelessInterfaceTerminal != null && wirelessInterfaceTerminal.getItem() == item && wirelessInterfaceTerminal.getItemDamage() == itemDamage) {
+            return WirelessTerminalType.INTERFACE;
+        }
+
         //MekEng Integration
         if (isMekEngLoaded) {
             ItemStack gasTerminal = new ItemStack(ItemAndBlocks.GAS_TERMINAL);
@@ -168,21 +190,39 @@ public class UniversalTerminalHelper {
             }
         }
 
+        if (isAE2FCLoaded) {
+            ItemStack fluidPatternTerminal = new ItemStack(FCItems.PART_FLUID_PATTERN_TERMINAL);
+            if (fluidPatternTerminal.getItem() == item && fluidPatternTerminal.getItemDamage() == itemDamage) {
+                return WirelessTerminalType.FLUID_PATTERN;
+            }
+
+            ItemStack fluidPatternWirelessTerminal = new ItemStack(FCItems.WIRELESS_FLUID_PATTERN_TERMINAL);
+            if (fluidPatternWirelessTerminal.getItem() == item && fluidPatternWirelessTerminal.getItemDamage() == itemDamage) {
+                return WirelessTerminalType.FLUID_PATTERN;
+            }
+        }
+
         return null;
+    }
+
+    public static boolean isModuleValid(WirelessTerminalType type) {
+        return switch (type) {
+            case FLUID_PATTERN -> Platform.isModLoaded("ae2fc");
+            case GAS -> Platform.isModLoaded("mekeng");
+            default -> true;
+        };
     }
 
 
     public static ItemStack changeMode(ItemStack itemStack, EntityPlayer player, NBTTagCompound tag) {
         EnumSet<WirelessTerminalType> installedModules = getInstalledModules(itemStack);
         int type = tag.getInteger("type");
-        boolean installed;
+        WirelessTerminalType terminalType;
         do {
             type = (type + 1) % WIRELESS_TERMINAL_TYPE_LIST.size();
-            installed = installedModules.contains(WIRELESS_TERMINAL_TYPE_LIST.get(type));
-            if (WIRELESS_TERMINAL_TYPE_LIST.get(type) == WirelessTerminalType.GAS && !isMekELoaded) {
-                installed = false;
-            }
-        } while (!installed);
+            terminalType = WIRELESS_TERMINAL_TYPE_LIST.get(type);
+
+        } while (!isModuleValid(terminalType) || !installedModules.contains(terminalType));
 
         tag.setInteger("type", type);
 

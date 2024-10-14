@@ -101,3 +101,5 @@ nae2.tooltip.universal_wireless_terminal.gas=气体
 nae2.tooltip.universal_wireless_terminal.crafting=合成
 nae2.tooltip.universal_wireless_terminal.pattern=样板
 nae2.tooltip.universal_wireless_terminal.interface=接口
+nae2.tooltip.universal_wireless_terminal.fluid_pattern=流体样板
+

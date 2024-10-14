@@ -6,5 +6,6 @@ public enum WirelessTerminalType {
     GAS,
     CRAFTING,
     PATTERN,
-    INTERFACE
+    INTERFACE,
+    FLUID_PATTERN,
 }
