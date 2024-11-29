@@ -104,6 +104,7 @@ public class BeaconRenderHelper {
 		bufferbuilder.pos(x + d3, y + (double) yOffset, z + d4).tex(0.0D, d13).color(f, f1, f2, 0.125F).endVertex();
 		bufferbuilder.pos(x + d3, y + i, z + d4).tex(0.0D, d14).color(f, f1, f2, 0.125F).endVertex();
 		tessellator.draw();
+		GlStateManager.depthMask(true);
 		GlStateManager.enableLighting();
 		GlStateManager.enableTexture2D();
 		GlStateManager.enableFog();
