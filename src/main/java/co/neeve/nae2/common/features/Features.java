@@ -42,7 +42,7 @@ public enum Features implements IFeature {
 	DENSE_CPU_COPROCESSORS("dense.coprocessor"),
 	DENSE_FLUID_CELLS(),
 	EXPOSER(),
-	UNIVERSAL_TERMINAL();
+	UNIVERSAL_TERMINAL("universalterminal"),;
 
 	private String[] mixins;
 	private EnumSet<? extends ISubFeature> subFeatures = null;
