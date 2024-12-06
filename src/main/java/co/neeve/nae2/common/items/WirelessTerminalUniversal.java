@@ -9,7 +9,6 @@ import appeng.util.Platform;
 import co.neeve.nae2.NAE2;
 import co.neeve.nae2.common.api.config.WirelessTerminalType;
 import co.neeve.nae2.common.helpers.UniversalTerminalHelper;
-import com.glodblock.github.common.item.ItemWirelessFluidPatternTerminal;
 import com.glodblock.github.inventory.GuiType;
 import com.glodblock.github.util.Util;
 import com.mekeng.github.common.container.handler.AEGuiBridge;
@@ -28,8 +27,7 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.EnumSet;
-import java.util.Iterator;
+
 import java.util.List;
 
 import static co.neeve.nae2.common.helpers.UniversalTerminalHelper.*;
@@ -89,22 +87,6 @@ public class WirelessTerminalUniversal extends ToolWirelessTerminal {
         return new ActionResult(EnumActionResult.SUCCESS, stack);
     }
 
-
-
-    @Override
-    public String getItemStackDisplayName(ItemStack stack) {
-        NBTTagCompound tag = Platform.openNbtData(stack);
-        if (!tag.hasKey("type")) {
-            tag.setInteger("type", 0);
-        }
-
-        return super.getItemStackDisplayName(stack) + " - " + I18n.translateToLocal(
-                "nae2.tooltip.universal_wireless_terminal." + WirelessTerminalType.values()[tag.getInteger(
-                        "type"
-                )].toString().toLowerCase()
-        );
-    }
-
     @Override
     @SideOnly(Side.CLIENT)
     public void addCheckedInformation(ItemStack stack, World world, List<String> lines, ITooltipFlag advancedTooltips) {
@@ -150,5 +132,17 @@ public class WirelessTerminalUniversal extends ToolWirelessTerminal {
         itemStacks.add(itemStack);
     }
 
+    @Override
+    public String getHighlightTip(ItemStack item, String displayName) {
+        NBTTagCompound tag = Platform.openNbtData(item);
+        if (!tag.hasKey("type")) {
+            tag.setInteger("type", 0);
+        }
 
+        return displayName + " - " + I18n.translateToLocal(
+                "nae2.tooltip.universal_wireless_terminal." + WirelessTerminalType.values()[tag.getInteger(
+                        "type"
+                )].toString().toLowerCase()
+        );
+    }
 }
