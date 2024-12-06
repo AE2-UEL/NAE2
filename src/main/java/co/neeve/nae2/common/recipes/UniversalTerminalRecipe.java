@@ -12,7 +12,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -134,22 +134,17 @@ public class UniversalTerminalRecipe extends IForgeRegistryEntry.Impl<IRecipe> i
                 double power = ((IAEItemPowerStorage) itemTerminal).getAECurrentPower(terminal);
                 wirelessTerminalUniversal.injectAEPower(t, power, Actionable.MODULATE);
             }
-            if (terminal.hasTagCompound()) {
-                NBTTagCompound nbt = terminal.getTagCompound();
-                if (!t.hasTagCompound()) {
-                    t.setTagCompound(new NBTTagCompound());
-                }
-                if (nbt.hasKey("BoosterSlot")) {
-                    t.getTagCompound().setTag("BoosterSlot", nbt.getTag("BoosterSlot"));
-                }
-                if (nbt.hasKey("MagnetSlot")) {
-                    t.getTagCompound().setTag("MagnetSlot", nbt.getTag("MagnetSlot"));
-                }
-            }
-            UniversalTerminalHelper.installModule(t, terminalType);
+
             if (terminalType != null) {
-                t.getTagCompound().setInteger("type", terminalType.ordinal());
+                Platform.openNbtData(t).setInteger("type", terminalType.ordinal());
+                UniversalTerminalHelper.installModule(t, terminalType);
             }
+
+            if (terminalType == WirelessTerminalType.CRAFTING) {
+                NBTBase craftingGrid = Platform.openNbtData(terminal).getTag("craftingGrid");
+                Platform.openNbtData(t).setTag("craftingGrid", craftingGrid);
+            }
+
             terminal = t;
             for (WirelessTerminalType x : terminals) {
                 UniversalTerminalHelper.installModule(terminal, x);
