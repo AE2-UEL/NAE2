@@ -145,6 +145,14 @@ public class UniversalTerminalRecipe extends IForgeRegistryEntry.Impl<IRecipe> i
                 Platform.openNbtData(t).setTag("craftingGrid", craftingGrid);
             }
 
+            if (terminalType == WirelessTerminalType.PATTERN) {
+                NBTBase patterns = Platform.openNbtData(terminal).getTag("patterns");
+                Platform.openNbtData(t).setTag("patterns", patterns);
+            }
+
+            NBTBase upgrades = Platform.openNbtData(terminal).getTag("upgrades");
+            Platform.openNbtData(t).setTag("upgrades", upgrades);
+
             terminal = t;
             for (WirelessTerminalType x : terminals) {
                 UniversalTerminalHelper.installModule(terminal, x);
