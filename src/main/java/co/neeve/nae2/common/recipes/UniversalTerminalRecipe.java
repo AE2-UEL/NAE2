@@ -13,6 +13,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -23,7 +24,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 public class UniversalTerminalRecipe extends IForgeRegistryEntry.Impl<IRecipe> implements IRecipe {
-    private final WirelessTerminalUniversal wirelessTerminalUniversal = ((WirelessTerminalUniversal) NAE2.definitions().items().universalWirelessTerminal().maybeItem().orElse(null));
 
     @Override
     public boolean matches(InventoryCrafting inv, World worldIn) {
@@ -121,39 +121,22 @@ public class UniversalTerminalRecipe extends IForgeRegistryEntry.Impl<IRecipe> i
             }
         } else {
             WirelessTerminalType terminalType = UniversalTerminalHelper.getTerminalType(terminal);
-            Item itemTerminal = terminal.getItem();
-            ItemStack t = new ItemStack(wirelessTerminalUniversal);
-            if (itemTerminal instanceof INetworkEncodable) {
-                String key = ((INetworkEncodable) itemTerminal).getEncryptionKey(terminal);
-                if (!key.isEmpty()) {
-                    String name = Platform.openNbtData(terminal).getString("name");
-                    wirelessTerminalUniversal.setEncryptionKey(t, key, name);
-                }
-            }
-            if (itemTerminal instanceof IAEItemPowerStorage) {
-                double power = ((IAEItemPowerStorage) itemTerminal).getAECurrentPower(terminal);
-                wirelessTerminalUniversal.injectAEPower(t, power, Actionable.MODULATE);
-            }
+            ItemStack universalTerminal = NAE2.definitions().items().universalWirelessTerminal().maybeStack(1).orElse(ItemStack.EMPTY);
+
+            universalTerminal.setTagCompound(terminal.getTagCompound());
 
             if (terminalType != null) {
-                Platform.openNbtData(t).setInteger("type", terminalType.ordinal());
-                UniversalTerminalHelper.installModule(t, terminalType);
-            }
-
-            if (terminalType == WirelessTerminalType.CRAFTING) {
-                NBTBase craftingGrid = Platform.openNbtData(terminal).getTag("craftingGrid");
-                Platform.openNbtData(t).setTag("craftingGrid", craftingGrid);
+                UniversalTerminalHelper.installModule(universalTerminal, terminalType);
+                Platform.openNbtData(universalTerminal).setInteger("type", terminalType.ordinal());
             }
 
             if (terminalType == WirelessTerminalType.PATTERN) {
-                NBTBase patterns = Platform.openNbtData(terminal).getTag("patterns");
-                Platform.openNbtData(t).setTag("patterns", patterns);
+                NBTTagCompound compound = Platform.openNbtData(universalTerminal);
+                compound.setTag("craftingGridPattern",compound.getTag("craftingGrid"));
+                compound.removeTag("craftingGrid");
             }
 
-            NBTBase upgrades = Platform.openNbtData(terminal).getTag("upgrades");
-            Platform.openNbtData(t).setTag("upgrades", upgrades);
-
-            terminal = t;
+            terminal = universalTerminal;
             for (WirelessTerminalType x : terminals) {
                 UniversalTerminalHelper.installModule(terminal, x);
             }
