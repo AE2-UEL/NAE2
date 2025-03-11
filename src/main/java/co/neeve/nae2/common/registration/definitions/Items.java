@@ -3,6 +3,8 @@ package co.neeve.nae2.common.registration.definitions;
 import appeng.api.AEApi;
 import appeng.api.config.Upgrades;
 import appeng.api.definitions.IItemDefinition;
+import appeng.api.features.IWirelessTermHandler;
+import appeng.bootstrap.components.IInitComponent;
 import appeng.bootstrap.components.IPostInitComponent;
 import appeng.bootstrap.components.IRecipeRegistrationComponent;
 import appeng.core.features.ItemDefinition;
@@ -11,6 +13,7 @@ import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
 import co.neeve.nae2.common.items.VirtualPattern;
+import co.neeve.nae2.common.items.WirelessTerminalUniversal;
 import co.neeve.nae2.common.items.cells.DenseFluidCell;
 import co.neeve.nae2.common.items.cells.DenseGasCell;
 import co.neeve.nae2.common.items.cells.DenseItemCell;
@@ -57,6 +60,7 @@ public class Items implements Definitions<IItemDefinition> {
 	private final IItemDefinition storageCellGas4096K;
 	private final IItemDefinition storageCellGas16384K;
 	private final IItemDefinition virtualPattern;
+	private final IItemDefinition universalWirelessTerminal;
 
 	public Items(Registry registry) {
 		this.virtualPattern = this.registerById(registry.item("virtual_pattern", VirtualPattern::new)
@@ -168,8 +172,7 @@ public class Items implements Definitions<IItemDefinition> {
 			.features(Features.DENSE_FLUID_CELLS)
 			.build());
 
-		this.storageCellGas256K = this.registerById(registry.item("storage_cell_gas_256k", () ->
-				new DenseGasCell(Materials.MaterialType.CELL_GAS_PART_256K,
+		this.storageCellGas256K = this.registerById(registry.item("storage_cell_gas_256k", () -> new DenseGasCell(Materials.MaterialType.CELL_GAS_PART_256K,
 					(int) Math.pow(2, 8)))
 			.features(Features.DENSE_GAS_CELLS)
 			.build());
@@ -191,6 +194,14 @@ public class Items implements Definitions<IItemDefinition> {
 					(int) Math.pow(2, 14)))
 			.features(Features.DENSE_GAS_CELLS)
 			.build());
+
+		this.universalWirelessTerminal = this.registerById(registry.item("universal_wireless_terminal", WirelessTerminalUniversal::new)
+				.features(Features.UNIVERSAL_TERMINAL)
+				.bootstrap((item) -> (IInitComponent) r -> {
+					AEApi.instance().registries().wireless().registerWirelessHandler((IWirelessTermHandler) item);
+					Upgrades.MAGNET.registerItem(new ItemStack(item),1);
+				})
+				.build());
 
 		registry.addBootstrapComponent((IPostInitComponent) r -> {
 			var items = AEApi.instance().definitions().items();
@@ -328,4 +339,6 @@ public class Items implements Definitions<IItemDefinition> {
 	public IItemDefinition storageCellGas16384K() {
 		return this.storageCellGas16384K;
 	}
+
+	public IItemDefinition universalWirelessTerminal() {return this.universalWirelessTerminal;}
 }

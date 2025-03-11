@@ -5,7 +5,9 @@ import appeng.bootstrap.components.*;
 import appeng.core.AEConfig;
 import appeng.core.features.AEFeature;
 import appeng.util.Platform;
+import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.integration.ae2fc.AE2FC;
+import co.neeve.nae2.common.recipes.UniversalTerminalRecipe;
 import co.neeve.nae2.common.recipes.handlers.DisassembleRecipe;
 import co.neeve.nae2.common.registration.definitions.*;
 import co.neeve.nae2.common.registration.registry.Registry;
@@ -81,6 +83,10 @@ public class Registration {
 
 		if (AEConfig.instance().isFeatureEnabled(AEFeature.ENABLE_DISASSEMBLY_CRAFTING)) {
 			registry.register(new DisassembleRecipe().setRegistryName("disassemble"));
+		}
+
+		if (Features.UNIVERSAL_TERMINAL.isEnabled()) {
+			registry.register(new UniversalTerminalRecipe().setRegistryName("universal_terminal"));
 		}
 
 		this.registry.getBootstrapComponents(IRecipeRegistrationComponent.class)

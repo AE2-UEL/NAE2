@@ -6,6 +6,7 @@ itemGroup.nae2=Neeve's AE2:EL Additions
 # Items
 item.nae2.invalid.name=Invalid or Disabled Item
 item.nae2.pattern_multiplier.name=Pattern Multi-Tool
+item.nae2.universal_wireless_terminal.name=Universal Wireless Terminal
 
 # Cells
 item.nae2.storage_cell_void.name=ME Void Storage Cell
@@ -108,3 +109,18 @@ nae2.jei.cellview.keybind=Press %s to view contents
 nae2.exposer.tooltip=Exposes the network contents as capabilities. The cooler ME Interface.
 nae2.exposer.noneregistered=No handlers registered.
 nae2.exposer.registered=Registered handlers:
+
+# Universal Wireless Terminal
+nae2.tooltip.universal_wireless_terminal.mode=Mode
+nae2.tooltip.universal_wireless_terminal.installed=Installed
+nae2.tooltip.universal_wireless_terminal.item=Item
+nae2.tooltip.universal_wireless_terminal.fluid=Fluid
+nae2.tooltip.universal_wireless_terminal.gas=Gas
+nae2.tooltip.universal_wireless_terminal.crafting=Crafting
+nae2.tooltip.universal_wireless_terminal.pattern=Pattern
+nae2.tooltip.universal_wireless_terminal.interface=Interface
+nae2.tooltip.universal_wireless_terminal.fluid_pattern=Fluid Pattern
+
+
+
+
