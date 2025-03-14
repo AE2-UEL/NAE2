@@ -31,7 +31,7 @@ public class PatternMultiToolGUIHelper {
 			var columns = pmt.getInstalledCapacityUpgrades();
 			for (var i = 1; i <= columns; i++) {
 				gui.drawTexturedModalRect(offsetX + gui.getPMTOffsetX() + 8 + (i * 18),
-					offsetY + gui.getPMTOffsetY() + 8, 8, 8, 18, 18 * 9);
+					offsetY + gui.getPMTOffsetY() + 8, 8, 8, 16, 18 * 9);
 			}
 		}
 	}
