@@ -62,6 +62,12 @@ public abstract class MixinBlockingTermName {
 	                                    @Share("tunnelTiles") LocalRef<LinkedList<Pair<EnumFacing, TileEntity>>> tunnelTEs) {
 		var tiles = tunnelTEs.get();
 
+		// Safeguard, though this has absolutely no chance of happening naturally.
+		if (tiles != null && tiles.isEmpty()) {
+			tiles = null;
+			tunnelTEs.set(null);
+		}
+
 		// There's a pending tunnel to be iterated. Iterate it instead.
 		if (tiles != null) {
 			// Pop one entity and feed it instead, supplying the output tunnel's facing value.

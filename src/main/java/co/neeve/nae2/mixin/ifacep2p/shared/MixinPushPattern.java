@@ -100,6 +100,11 @@ public abstract class MixinPushPattern {
 	                                 @Local LocalRef<EnumFacing> facingRef, @Local Iterator iterator,
 	                                 @Local World world,
 	                                 @Share("tunnel") LocalRef<PartP2PInterface> currentOutputTunnel) {
+		// Safeguard, though this has absolutely no chance of happening naturally.
+		if (this.nae2$tunnelsToVisit != null && this.nae2$tunnelsToVisit.isEmpty()) {
+			this.nae2$tunnelsToVisit = null;
+		}
+		
 		// There's a pending inputTunnel to be iterated. Iterate it instead.
 		if (this.nae2$tunnelsToVisit != null) {
 			var originalFacing = this.nae2$originalFacing;
