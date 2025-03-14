@@ -3,7 +3,7 @@ package co.neeve.nae2.common.registration.definitions;
 import appeng.api.AEApi;
 import appeng.api.config.TunnelType;
 import appeng.api.parts.IPart;
-import appeng.bootstrap.components.IPostInitComponent;
+import appeng.bootstrap.components.IInitComponent;
 import appeng.core.Api;
 import appeng.core.features.DamagedItemDefinition;
 import appeng.core.localization.GuiText;
@@ -59,7 +59,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 		this.beamFormer = this.createPart(this.itemPart, PartType.BEAM_FORMER);
 		this.p2pTunnelInterface = this.createPart(this.itemPart, PartType.P2P_TUNNEL_INTERFACE);
 		this.p2pTunnelInterface.maybeStack(1)
-			.ifPresent((tunnelStack) -> registry.addBootstrapComponent((IPostInitComponent) (r) -> {
+			.ifPresent((tunnelStack) -> registry.addBootstrapComponent((IInitComponent) (r) -> {
 				AEApi.instance().registries().gridCache()
 					.registerGridCache(InterfaceTunnelGridCache.class, InterfaceTunnelGridCache.class);
 
