@@ -57,6 +57,7 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 	private final ContainerPatternMultiTool containerPMT;
 	private PMTSwitcherButton switcherButton;
 	private Rectangle tabSwitcherExclusion = null;
+	private PatternMultiToolButton replace;
 
 	// Constructor
 	public GuiPatternMultiTool(InventoryPlayer inventoryPlayer, ObjPatternMultiTool te) {
@@ -135,10 +136,10 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 				PatternMultiToolActions.CLEAR));
 			unencode.width = 60;
 		} else if (this.getContainer().getViewingTab() == PatternMultiToolTabs.SEARCH_REPLACE) {
-			var btn = new PatternMultiToolButton(start + 176 - 60 - 15, y,
+			this.replace = new PatternMultiToolButton(start + 176 - 60 - 15, y,
 				PatternMultiToolActions.REPLACE);
-			btn.width = 60;
-			this.buttonList.add(btn);
+			this.replace.width = 60;
+			this.buttonList.add(this.replace);
 		}
 	}
 
@@ -186,14 +187,23 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 
 		this.fontRenderer.drawString(GuiText.inventory.getLocal(), 8, this.ySize - 96 + 3, 4210752);
 
+		if (this.replace != null) {
+			this.replace.enabled = false;
+		}
+
 		for (var entry :
 			this.getContainer().getHighlightedSlots().entrySet()) {
 			var slot = entry.getKey();
 			var result = entry.getValue();
 			var x = slot.xPos;
 			var y = slot.yPos;
-			drawRect(x, y, x + 16, y + 16, result == ContainerPatternMultiTool.ValidatonResult.OK ? -1979646208 :
-				0xFFFF0000);
+			var isOK = result == ContainerPatternMultiTool.ValidatonResult.OK;
+			drawRect(x, y, x + 16, y + 16, isOK ? -1979646208 : 0xFFFF0000);
+
+			if (isOK && this.replace != null) {
+				this.replace.enabled = true;
+			}
+
 		}
 	}
 
@@ -275,14 +285,14 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 		List<IGhostIngredientHandler.Target<?>> targets = new ArrayList<>();
 
 		List<IJEITargetSlot> slots = new ArrayList<>();
-		if (this.inventorySlots.inventorySlots.size() > 0) {
+		if (!this.inventorySlots.inventorySlots.isEmpty()) {
 			for (var slot : this.inventorySlots.inventorySlots) {
 				if (slot instanceof SlotFake && (!itemStack.isEmpty())) {
 					slots.add((IJEITargetSlot) slot);
 				}
 			}
 		}
-		if (this.getGuiSlots().size() > 0) {
+		if (!this.getGuiSlots().isEmpty()) {
 			for (var slot : this.getGuiSlots()) {
 				if (slot instanceof GuiFluidSlot && fluidStack != null) {
 					slots.add((IJEITargetSlot) slot);
@@ -290,51 +300,54 @@ public class GuiPatternMultiTool extends AEBaseGui implements IPatternMultiToolH
 			}
 		}
 		for (var slot : slots) {
-			var finalItemStack = itemStack;
-			var finalFluidStack = fluidStack;
-			var targetItem = new IGhostIngredientHandler.Target<>() {
-				@Override
-				public @NotNull Rectangle getArea() {
-					if (slot instanceof SlotFake && ((SlotFake) slot).isSlotEnabled()) {
-						return new Rectangle(GuiPatternMultiTool.this.getGuiLeft() + ((SlotFake) slot).xPos,
-							GuiPatternMultiTool.this.getGuiTop() + ((SlotFake) slot).yPos, 16, 16);
-					} else if (slot instanceof GuiFluidSlot && ((GuiFluidSlot) slot).isSlotEnabled()) {
-						return new Rectangle(GuiPatternMultiTool.this.getGuiLeft() + ((GuiFluidSlot) slot).xPos(),
-							GuiPatternMultiTool.this.getGuiTop() + ((GuiFluidSlot) slot).yPos(), 16, 16);
-					}
-					return new Rectangle();
-				}
-
-				@Override
-				public void accept(@NotNull Object ingredient) {
-					PacketInventoryAction p = null;
-					try {
-						if (slot instanceof SlotFake && ((SlotFake) slot).isSlotEnabled()) {
-							if (finalItemStack.isEmpty() && finalFluidStack != null) {
-								p = new PacketInventoryAction(InventoryAction.PLACE_JEI_GHOST_ITEM, slot,
-									AEItemStack.fromItemStack(FluidUtil.getFilledBucket(finalFluidStack)));
-							} else if (!finalItemStack.isEmpty()) {
-								p = new PacketInventoryAction(InventoryAction.PLACE_JEI_GHOST_ITEM, slot,
-									AEItemStack.fromItemStack(finalItemStack));
-							}
-						} else {
-							if (finalFluidStack == null) {
-								return;
-							}
-							p = new PacketInventoryAction(InventoryAction.PLACE_JEI_GHOST_ITEM, slot,
-								AEItemStack.fromItemStack(AEFluidStack.fromFluidStack(finalFluidStack).asItemStackRepresentation()));
-						}
-						NetworkHandler.instance().sendToServer(p);
-
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			};
+			var targetItem = this.getTarget(slot, fluidStack, itemStack);
 			targets.add(targetItem);
 			this.mapTargetSlot.putIfAbsent(targetItem, slot);
 		}
 		return targets;
+	}
+
+	private IGhostIngredientHandler.@NotNull Target<Object> getTarget(IJEITargetSlot slot, FluidStack fluidStack,
+	                                                                  ItemStack finalItemStack) {
+		return new IGhostIngredientHandler.Target<>() {
+			@Override
+			public @NotNull Rectangle getArea() {
+				if (slot instanceof SlotFake && ((SlotFake) slot).isSlotEnabled()) {
+					return new Rectangle(GuiPatternMultiTool.this.getGuiLeft() + ((SlotFake) slot).xPos,
+						GuiPatternMultiTool.this.getGuiTop() + ((SlotFake) slot).yPos, 16, 16);
+				} else if (slot instanceof GuiFluidSlot && ((GuiFluidSlot) slot).isSlotEnabled()) {
+					return new Rectangle(GuiPatternMultiTool.this.getGuiLeft() + ((GuiFluidSlot) slot).xPos(),
+						GuiPatternMultiTool.this.getGuiTop() + ((GuiFluidSlot) slot).yPos(), 16, 16);
+				}
+				return new Rectangle();
+			}
+
+			@Override
+			public void accept(@NotNull Object ingredient) {
+				PacketInventoryAction p = null;
+				try {
+					if (slot instanceof SlotFake && ((SlotFake) slot).isSlotEnabled()) {
+						if (finalItemStack.isEmpty() && fluidStack != null) {
+							p = new PacketInventoryAction(InventoryAction.PLACE_JEI_GHOST_ITEM, slot,
+								AEItemStack.fromItemStack(FluidUtil.getFilledBucket(fluidStack)));
+						} else if (!finalItemStack.isEmpty()) {
+							p = new PacketInventoryAction(InventoryAction.PLACE_JEI_GHOST_ITEM, slot,
+								AEItemStack.fromItemStack(finalItemStack));
+						}
+					} else {
+						if (fluidStack == null) {
+							return;
+						}
+						p = new PacketInventoryAction(InventoryAction.PLACE_JEI_GHOST_ITEM, slot,
+							AEItemStack.fromItemStack(AEFluidStack.fromFluidStack(fluidStack).asItemStackRepresentation()));
+					}
+					NetworkHandler.instance().sendToServer(p);
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		};
 	}
 
 	@Override
