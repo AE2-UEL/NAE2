@@ -42,6 +42,9 @@ item.nae2.material.cell_part_gas_16384k.name=§a16384k§r ME Gas Storage Compone
 # Parts
 item.nae2.part.beam_former.name=ME Beam Former
 item.nae2.part.exposer.name=ME Storage Exposer
+item.nae2.part.pcc_notifier.name=ME Programmed Circuit Card Notifier
+item.nae2.part.pcc_notifier.desc=Changes the ghost circuit in the machine/bus it's pointed at, but only whenever an §aME Interface§7 with a §aProgrammed Circuit Card§7 pushes a pattern into the network it's in.\n\nAutomate your multiblocks.
+
 
 # Upgrades
 item.nae2.upgrade.hyper_acceleration.name=Hyper-Acceleration Card

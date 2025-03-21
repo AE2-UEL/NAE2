@@ -11,9 +11,11 @@ import appeng.util.Platform;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
+import co.neeve.nae2.common.features.subfeatures.UpgradeFeatures;
 import co.neeve.nae2.common.items.NAEBaseItemPart;
 import co.neeve.nae2.common.parts.implementations.PartBeamFormer;
 import co.neeve.nae2.common.parts.implementations.PartExposer;
+import co.neeve.nae2.common.parts.implementations.PartPCCNotifier;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import co.neeve.nae2.common.parts.p2p.iface.InterfaceTunnelGridCache;
 import co.neeve.nae2.common.registration.registry.Registry;
@@ -43,6 +45,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 	private final DamagedItemDefinition beamFormer;
 	private final DamagedItemDefinition p2pTunnelInterface;
 	private final DamagedItemDefinition exposer;
+	private final DamagedItemDefinition pccnotifier;
 
 	public Parts(Registry registry) {
 		this.itemPart = new NAEBaseItemPart();
@@ -76,6 +79,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 			}));
 
 		this.exposer = this.createPart(this.itemPart, PartType.EXPOSER);
+		this.pccnotifier = this.createPart(this.itemPart, PartType.PCC_NOTIFIER);
 	}
 
 	private static void registerTunnelConversion(TunnelType tunnelType, ItemStack stack) {
@@ -112,6 +116,10 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 		return Optional.ofNullable(this.byId.getOrDefault(id, null));
 	}
 
+	public DamagedItemDefinition pccNotifier() {
+		return this.pccnotifier;
+	}
+
 	public enum PartType implements IDefinition {
 		BEAM_FORMER("beam_former", PartBeamFormer.class, Features.BEAM_FORMERS),
 		P2P_TUNNEL_INTERFACE("p2p_tunnel_interface",
@@ -126,6 +134,13 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
 			                                  ITooltipFlag advancedTooltips) {
 				lines.add(I18n.format("nae2.exposer.tooltip"));
+			}
+		},
+		PCC_NOTIFIER("pcc_notifier", PartPCCNotifier.class, UpgradeFeatures.GREGTECH_CIRCUIT) {
+			@Override
+			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+			                                  ITooltipFlag advancedTooltips) {
+				lines.add(I18n.format("item.nae2.part.pcc_notifier.desc"));
 			}
 		};
 
