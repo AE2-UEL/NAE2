@@ -10,6 +10,7 @@ item.nae2.pattern_multiplier.name=多功能样板工具
 # Cells
 item.nae2.storage_cell_void.name=ME虚空存储元件
 item.nae2.fluid_storage_cell_void.name=ME流体虚空存储元件
+item.nae2.gas_storage_cell_void.name=ME气体虚空存储元件
 item.nae2.storage_cell_256k.name=§c256k§r-ME存储元件
 item.nae2.storage_cell_1024k.name=§61024k§r-ME存储元件
 item.nae2.storage_cell_4096k.name=§e4096k§r-ME存储元件
@@ -18,6 +19,10 @@ item.nae2.storage_cell_fluid_256k.name=§c256k§r-ME流体存储元件
 item.nae2.storage_cell_fluid_1024k.name=§61024k§r-ME流体存储元件
 item.nae2.storage_cell_fluid_4096k.name=§e4096k§r-ME流体存储元件
 item.nae2.storage_cell_fluid_16384k.name=§a16384k§r-ME流体存储元件
+item.nae2.storage_cell_gas_256k.name=§c256k§r-ME气体存储元件
+item.nae2.storage_cell_gas_1024k.name=§61024k§r-ME气体存储元件
+item.nae2.storage_cell_gas_4096k.name=§e4096k§r-ME气体存储元件
+item.nae2.storage_cell_gas_16384k.name=§a16384k§r-ME气体存储元件
 
 # Materials
 item.nae2.material.cell_part_void.name=ME虚空存储组件
@@ -29,14 +34,21 @@ item.nae2.material.cell_part_fluid_256k.name=§c256k§r-ME流体存储组件
 item.nae2.material.cell_part_fluid_1024k.name=§61024k§r-ME流体存储组件
 item.nae2.material.cell_part_fluid_4096k.name=§e4096k§r-ME流体存储组件
 item.nae2.material.cell_part_fluid_16384k.name=§a16384k§r-ME流体存储组件
+item.nae2.material.cell_part_gas_256k.name=§c256k§r-ME气体存储组件
+item.nae2.material.cell_part_gas_1024k.name=§61024k§r-ME气体存储组件
+item.nae2.material.cell_part_gas_4096k.name=§e4096k§r-ME气体存储组件
+item.nae2.material.cell_part_gas_16384k.name=§a16384k§r-ME气体存储组件
 
 # Parts
 item.nae2.part.beam_former.name=ME光束成型器
+item.nae2.part.exposer.name=ME存储暴露器
 
 # Upgrades
 item.nae2.upgrade.hyper_acceleration.name=超速卡
 item.nae2.upgrade.auto_complete.name=工作自动完成卡
 item.nae2.upgrade.auto_complete.desc=自动完成作业，无需等待输出。
+item.nae2.upgrade.gregtech_circuit.name=编程电路卡
+item.nae2.upgrade.gregtech_circuit.desc=自动在机器和总线上设置编程电路。\n需要在编码样板中放置相关的电路。\n不要忘记启用阻塞模式！\n\n对不起，Seni.
 
 # Tiles
 tile.nae2.reconstruction_chamber.name=原子再构室
@@ -48,6 +60,7 @@ tile.nae2.storage_crafting_256k.name=§c256k§r合成存储器
 tile.nae2.storage_crafting_1024k.name=§61024k§r合成存储器
 tile.nae2.storage_crafting_4096k.name=§e4096k§r合成存储器
 tile.nae2.storage_crafting_16384k.name=§a16384k§r合成存储器
+tile.nae2.exposer.name=ME存储暴露器
 
 # Pattern Multi-Tool GUI
 nae2.pattern_multiplier.unencode=清除
@@ -70,11 +83,11 @@ nae2.storage_cell_void.count=已存储%s %s能量。
 nae2.jei.missing.craft.1=[NAE2] 所有缺失物品均可合成。
 nae2.jei.missing.craft.2=按住 Ctrl 来批量请求合成。
 
-nae2.jei.missing.partialcraft.1=[NAE2] Some items found craftable.
-nae2.jei.missing.partialcraft.2=Hold Ctrl to bypass and mass-order missing items.
+nae2.jei.missing.partialcraft.1=[NAE2] 发现部分物品可合成。
+nae2.jei.missing.partialcraft.2=按住 Ctrl 跳过并批量订购缺失的物品。
 
-nae2.jei.missing.bypasscraft.1=[NAE2] No items found craftable.
-nae2.jei.missing.bypasscraft.2=Hold Ctrl to bypass and fill the grid as much as possible.
+nae2.jei.missing.bypasscraft.1=[NAE2] 未发现可合成的物品。
+nae2.jei.missing.bypasscraft.2=按住 Ctrl 跳过并尽可能填充网格。
 
 nae2.jei.cellview.items=物品
 nae2.jei.cellview.buckets=桶
@@ -90,3 +103,8 @@ nae2.jei.cellview.hover.1=已占用 %s 种类型。
 nae2.jei.cellview.hover.2=每种占用类型均会损耗容量。
 nae2.jei.cellview.hover.3=%s 字节/类型 * %s = %s 字节损耗。
 nae2.jei.cellview.keybind=按下 %s 来浏览内容
+
+# Exposer
+nae2.exposer.tooltip=将网络内容作为能力暴露出来。更酷的 ME 接口。
+nae2.exposer.noneregistered=未注册任何处理程序。
+nae2.exposer.registered=已注册的处理程序：
