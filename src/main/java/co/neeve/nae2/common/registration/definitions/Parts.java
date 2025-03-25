@@ -11,9 +11,11 @@ import appeng.util.Platform;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.IFeature;
+import co.neeve.nae2.common.features.subfeatures.UpgradeFeatures;
 import co.neeve.nae2.common.items.NAEBaseItemPart;
 import co.neeve.nae2.common.parts.implementations.PartBeamFormer;
 import co.neeve.nae2.common.parts.implementations.PartExposer;
+import co.neeve.nae2.common.parts.implementations.PartPCCNotifier;
 import co.neeve.nae2.common.parts.p2p.PartP2PInterface;
 import co.neeve.nae2.common.parts.p2p.iface.InterfaceTunnelGridCache;
 import co.neeve.nae2.common.registration.registry.Registry;
@@ -22,6 +24,10 @@ import co.neeve.nae2.common.registration.registry.interfaces.Definitions;
 import co.neeve.nae2.common.registration.registry.interfaces.IDefinition;
 import co.neeve.nae2.common.registration.registry.rendering.ItemPartRendering;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import gregtech.api.GTValues;
+import gregtech.api.recipes.ingredients.GTRecipeItemInput;
+import gregtech.common.items.MetaItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -37,14 +43,21 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+import static gregtech.api.recipes.RecipeMaps.ASSEMBLER_RECIPES;
+
 public class Parts implements Definitions<DamagedItemDefinition> {
 	private final Object2ObjectOpenHashMap<String, DamagedItemDefinition> byId = new Object2ObjectOpenHashMap<>();
 	private final NAEBaseItemPart itemPart;
 	private final DamagedItemDefinition beamFormer;
 	private final DamagedItemDefinition p2pTunnelInterface;
 	private final DamagedItemDefinition exposer;
+	private final DamagedItemDefinition pccnotifier;
 
 	public Parts(Registry registry) {
+		var definitions = Api.INSTANCE.definitions();
+		var parts = definitions.parts();
+		var blocks = definitions.blocks();
+
 		this.itemPart = new NAEBaseItemPart();
 		registry.item("part", () -> this.itemPart)
 			.rendering(new ItemPartRendering(this.itemPart))
@@ -58,6 +71,7 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 
 		this.beamFormer = this.createPart(this.itemPart, PartType.BEAM_FORMER);
 		this.p2pTunnelInterface = this.createPart(this.itemPart, PartType.P2P_TUNNEL_INTERFACE);
+
 		this.p2pTunnelInterface.maybeStack(1)
 			.ifPresent((tunnelStack) -> registry.addBootstrapComponent((IInitComponent) (r) -> {
 				AEApi.instance().registries().gridCache()
@@ -66,16 +80,36 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 				var tunnelType = AEApi.instance().registries().p2pTunnel()
 					.registerTunnelType("NAE2_IFACE_P2P", tunnelStack);
 
-				var definitions = Api.INSTANCE.definitions();
 
-				definitions.blocks().iface().maybeStack(1)
+				blocks.iface().maybeStack(1)
 					.ifPresent((stack) -> registerTunnelConversion(tunnelType, stack));
 
-				definitions.parts().iface().maybeStack(1)
+				parts.iface().maybeStack(1)
 					.ifPresent((stack) -> registerTunnelConversion(tunnelType, stack));
 			}));
 
 		this.exposer = this.createPart(this.itemPart, PartType.EXPOSER);
+		this.pccnotifier = this.createPart(this.itemPart, PartType.PCC_NOTIFIER);
+		this.pccnotifier.maybeStack(1).ifPresent((notifier) ->
+			registry.addBootstrapComponent((IInitComponent) (r) ->
+				ASSEMBLER_RECIPES.addRecipe(
+					ASSEMBLER_RECIPES.recipeBuilder()
+						.EUt(GTValues.VA[GTValues.LV])
+						.duration(100)
+						.input(new GTRecipeItemInput(
+							Lists.newArrayList(
+									parts.levelEmitter(),
+									parts.fluidLevelEmitter()
+								)
+								.stream()
+								.map(opt -> opt.maybeStack(1))
+								.filter(Optional::isPresent)
+								.map(Optional::get)
+								.toArray(ItemStack[]::new)
+						))
+						.input(MetaItems.SENSOR_LV)
+						.outputs(notifier)
+						.build())));
 	}
 
 	private static void registerTunnelConversion(TunnelType tunnelType, ItemStack stack) {
@@ -112,6 +146,10 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 		return Optional.ofNullable(this.byId.getOrDefault(id, null));
 	}
 
+	public DamagedItemDefinition pccNotifier() {
+		return this.pccnotifier;
+	}
+
 	public enum PartType implements IDefinition {
 		BEAM_FORMER("beam_former", PartBeamFormer.class, Features.BEAM_FORMERS),
 		P2P_TUNNEL_INTERFACE("p2p_tunnel_interface",
@@ -126,6 +164,13 @@ public class Parts implements Definitions<DamagedItemDefinition> {
 			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
 			                                  ITooltipFlag advancedTooltips) {
 				lines.add(I18n.format("nae2.exposer.tooltip"));
+			}
+		},
+		PCC_NOTIFIER("pcc_notifier", PartPCCNotifier.class, UpgradeFeatures.GREGTECH_CIRCUIT) {
+			@Override
+			public void addCheckedInformation(ItemStack stack, World world, List<String> lines,
+			                                  ITooltipFlag advancedTooltips) {
+				lines.add(I18n.format("item.nae2.part.pcc_notifier.desc"));
 			}
 		};
 
