@@ -80,16 +80,16 @@ public class MixinGuiInterfaceTerminal extends MixinAEBaseGui implements IPatter
 		at = @At(
 			value = "INVOKE",
 			target = "Ljava/util/List;clear()V",
-			shift = At.Shift.AFTER
-		), remap = false
-	)
+			shift = At.Shift.AFTER,
+			remap = false
+	))
 	public void injectDrawScreen(CallbackInfo ci) {
 		if (this.patternMultiToolButtons != null) {
 			this.buttonList.addAll(this.patternMultiToolButtons);
 		}
 	}
 
-	@Inject(method = "initGui", at = @At("RETURN"), remap = false)
+	@Inject(method = "initGui", at = @At("RETURN"))
 	private void injectButtons(CallbackInfo ci) {
 		this.initializePatternMultiTool();
 	}
