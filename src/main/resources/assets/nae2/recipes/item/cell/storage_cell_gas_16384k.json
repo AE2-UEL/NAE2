@@ -1,0 +1,31 @@
+{
+  "conditions": [
+    {
+      "type": "forge:and",
+      "values": [
+        {
+          "type": "appliedenergistics2:material_exists",
+          "material": "material.empty_storage_cell"
+        },
+        {
+          "type": "nae2:material_exists",
+          "name": "cell_part_gas_16384k"
+        }
+      ]
+    }
+  ],
+  "result": {
+    "item": "nae2:storage_cell_gas_16384k"
+  },
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "appliedenergistics2:part",
+      "part": "material.empty_storage_cell"
+    },
+    {
+      "type": "nae2:material",
+      "name": "cell_part_gas_16384k"
+    }
+  ]
+}
