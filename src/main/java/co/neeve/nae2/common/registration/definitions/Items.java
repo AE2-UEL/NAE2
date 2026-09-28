@@ -4,12 +4,16 @@ import appeng.api.AEApi;
 import appeng.api.config.Upgrades;
 import appeng.api.definitions.IItemDefinition;
 import appeng.bootstrap.components.IPostInitComponent;
+import appeng.bootstrap.components.IPreInitComponent;
 import appeng.bootstrap.components.IRecipeRegistrationComponent;
 import appeng.core.features.ItemDefinition;
 import co.neeve.nae2.Tags;
 import co.neeve.nae2.client.gui.PatternMultiToolButtonHandler;
 import co.neeve.nae2.common.features.Features;
 import co.neeve.nae2.common.features.subfeatures.VoidCellFeatures;
+import co.neeve.nae2.common.integration.opencomputer.OpenComputer;
+import co.neeve.nae2.common.integration.opencomputer.WirelessHandlerUpgradeAE;
+import co.neeve.nae2.common.items.ItemMEUpgrade;
 import co.neeve.nae2.common.items.VirtualPattern;
 import co.neeve.nae2.common.items.cells.DenseFluidCell;
 import co.neeve.nae2.common.items.cells.DenseGasCell;
@@ -25,7 +29,9 @@ import co.neeve.nae2.common.registration.registry.interfaces.Definitions;
 import co.neeve.nae2.common.registration.registry.rendering.NoItemRendering;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Arrays;
@@ -56,6 +62,7 @@ public class Items implements Definitions<IItemDefinition> {
 	private final IItemDefinition storageCellGas4096K;
 	private final IItemDefinition storageCellGas16384K;
 	private final IItemDefinition virtualPattern;
+	private final IItemDefinition ocUpgrade;
 
 	public Items(Registry registry) {
 		this.virtualPattern = this.registerById(registry.item("virtual_pattern", VirtualPattern::new)
@@ -73,6 +80,21 @@ public class Items implements Definitions<IItemDefinition> {
 				}
 			})
 			.build());
+
+		this.ocUpgrade = this.registerById(registry.item("oc_upgrade", ItemMEUpgrade::new)
+						.bootstrap((item) -> (IPostInitComponent) r -> {
+							AEApi.instance().registries().wireless().registerWirelessHandler(WirelessHandlerUpgradeAE.INSTANCE);
+							OpenComputer.postInit(r);
+						}).bootstrap((item) -> (IPreInitComponent) r -> {
+					ModelLoader.setCustomModelResourceLocation(item, 0,
+							new ModelResourceLocation("nae2:oc_upgrade", "inventory"));
+					ModelLoader.setCustomModelResourceLocation(item, 1,
+							new ModelResourceLocation("nae2:oc_upgrade", "inventory"));
+					ModelLoader.setCustomModelResourceLocation(item, 2,
+							new ModelResourceLocation("nae2:oc_upgrade", "inventory"));
+				})
+				.features(Features.OC_UPGRADES)
+				.build());
 
 		// Void Cells.
 		this.storageCellVoid = this.registerById(
@@ -273,6 +295,9 @@ public class Items implements Definitions<IItemDefinition> {
 
 	public IItemDefinition patternMultiTool() {
 		return this.patternMultiTool;
+	}
+	public IItemDefinition ocUpgrade()  {
+		return this.ocUpgrade;
 	}
 
 	public IItemDefinition storageCellVoid() {

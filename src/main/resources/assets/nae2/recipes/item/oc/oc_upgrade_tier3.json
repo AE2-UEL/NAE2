@@ -1,0 +1,40 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "opencomputers"
+    }
+  ],
+  "result": {
+    "item": "nae2:oc_upgrade",
+    "data": 0
+  },
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "dad",
+    "mbm",
+    "dcd"
+  ],
+  "key": {
+    "a": {
+      "item": "appliedenergistics2:material",
+      "data": 41
+    },
+    "b": {
+      "item": "opencomputers:card",
+      "data": 6
+    },
+    "c": {
+      "item": "opencomputers:material",
+      "data": 4
+    },
+    "d": {
+      "type": "forge:ore_dict",
+      "ore": "gemDiamond"
+    },
+    "m": {
+      "item": "opencomputers:material",
+      "data": 9
+    }
+  }
+}
