@@ -50,6 +50,10 @@ item.nae2.upgrade.auto_complete.desc=Automatically completes jobs without waitin
 item.nae2.upgrade.gregtech_circuit.name=Programmed Circuit Card
 item.nae2.upgrade.gregtech_circuit.desc=Automatically sets Programmed Circuits in machines and buses.\nRequires a relevant Circuit in Encoded Pattern.\nDon't forget to enable Blocking Mode!\n\nI'm sorry, Seni.
 
+item.nae2.oc_upgrade.0.name=ME Upgrade Module (Tier 3)
+item.nae2.oc_upgrade.1.name=ME Upgrade Module (Tier 2)
+item.nae2.oc_upgrade.2.name=ME Upgrade Module (Tier 1)
+
 # Tiles
 tile.nae2.reconstruction_chamber.name=Reconstruction Chamber
 tile.nae2.reconstruction_chamber.desc=Makes Atomic Recontructors from Actually Additions treat items inside as if they were on the ground for conversion purposes. No more item drops!\n\nAuto-pushes products into nearby inventories and ME Interfaces.
@@ -108,3 +112,10 @@ nae2.jei.cellview.keybind=Press %s to view contents
 nae2.exposer.tooltip=Exposes the network contents as capabilities. The cooler ME Interface.
 nae2.exposer.noneregistered=No handlers registered.
 nae2.exposer.registered=Registered handlers:
+
+# OpenComputer Upgrade Module
+nae2.upgrade_me.linked=Linked to network
+nae2.upgrade_me.unlinked=Not linked
+nae2.upgrade_me.range_tier1=Range: Half of WAP Coverage (Same Dimension)
+nae2.upgrade_me.range_tier2=Range: Full WAP Coverage (Same Dimension)
+nae2.upgrade_me.range_tier3=Range: Infinite & Cross-Dimensional (Requires active WAP)
