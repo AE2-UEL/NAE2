@@ -18,6 +18,7 @@ import appeng.api.storage.data.IAEFluidStack;
 import appeng.api.storage.data.IAEItemStack;
 import appeng.api.util.AEPartLocation;
 import appeng.api.util.DimensionalCoord;
+import appeng.me.helpers.BaseActionSource;
 import appeng.me.helpers.MachineSource;
 import appeng.tile.networking.TileWireless;
 import co.neeve.nae2.NAE2;
@@ -170,7 +171,7 @@ public class EnvironmentMEUpgrade extends AbstractManagedEnvironment {
         if (sec instanceof IActionHost actionHost) {
             return new MachineSource(actionHost);
         }
-        return null;
+        return new BaseActionSource();
     }
 
     @Override
