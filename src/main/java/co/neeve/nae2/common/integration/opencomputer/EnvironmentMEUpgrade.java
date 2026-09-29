@@ -305,7 +305,7 @@ public class EnvironmentMEUpgrade extends AbstractManagedEnvironment {
         return new Object[]{ext};
     }
 
-    @Callback(doc = "function([number:amount]):number -- Transfer selecte fluid to your ae system.")
+    @Callback(doc = "function([number:amount]):number -- Transfer selected fluid to your ae system.")
     public Object[] sendFluids(Context context, Arguments args) {
         if (agent == null) return new Object[]{0};
         int selected = agent.selectedTank();

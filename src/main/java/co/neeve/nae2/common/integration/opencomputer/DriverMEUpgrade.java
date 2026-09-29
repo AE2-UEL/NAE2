@@ -2,14 +2,16 @@ package co.neeve.nae2.common.integration.opencomputer;
 
 import co.neeve.nae2.NAE2;
 import li.cil.oc.api.driver.DriverItem;
+import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.internal.Agent;
 import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.network.ManagedEnvironment;
+import li.cil.oc.integration.opencomputers.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DriverMEUpgrade implements DriverItem {
+public class DriverMEUpgrade implements DriverItem, EnvironmentProvider {
 
     @Override
     public boolean worksWith(ItemStack stack) {
@@ -47,5 +49,13 @@ public class DriverMEUpgrade implements DriverItem {
         }
 
         return nbt.getCompoundTag("oc:data");
+    }
+
+    @Override
+    public Class<?> getEnvironment(ItemStack itemStack) {
+        if (worksWith(itemStack)) {
+            return EnvironmentMEUpgrade.class;
+        }
+        return null;
     }
 }
